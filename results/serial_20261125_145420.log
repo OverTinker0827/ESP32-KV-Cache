@@ -1,0 +1,156 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6180
+load:0x40078000,len:15852
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 14:53:17
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 40MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 4MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00177000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=29f30h (171824) map
+I (134) esp_image: segment 1: paddr=00039f58 vaddr=3ffb0000 size=027a8h ( 10152) load
+I (138) esp_image: segment 2: paddr=0003c708 vaddr=40080000 size=03910h ( 14608) load
+I (144) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=182e0h ( 99040) map
+I (179) esp_image: segment 4: paddr=00058308 vaddr=40083910 size=0a0d4h ( 41172) load
+I (196) esp_image: segment 5: paddr=000623e4 vaddr=50000000 size=00020h (    32) load
+I (203) boot: Loaded app from partition at offset 0x10000
+I (210) cpu_start: Multicore app
+I (218) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (218) cpu_start: Pro cpu start user code
+I (218) cpu_start: cpu freq: 240000000 Hz
+I (220) app_init: Application information:
+I (224) app_init: Project name:     kvcache
+I (228) app_init: App version:      8addd0e-dirty
+I (232) app_init: Compile time:     Nov 25 2026 14:52:16
+I (237) app_init: ELF file SHA256:  e1b8f5c84...
+I (241) app_init: ESP-IDF:          v5.5.6
+I (245) efuse_init: Min chip rev:     v0.0
+I (249) efuse_init: Max chip rev:     v3.99
+I (253) efuse_init: Chip rev:         v3.1
+I (257) heap_init: Initializing. RAM available for dynamic allocation:
+I (263) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (268) heap_init: At 3FFBEC50 len 000213B0 (132 KiB): DRAM
+I (273) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (279) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (284) heap_init: At 4008D9E4 len 0001261C (73 KiB): IRAM
+I (291) spi_flash: detected chip: generic
+I (293) spi_flash: flash io: dio
+I (297) main_task: Started on CPU0
+I (299) main_task: Calling app_main()
+VARIANT engine=opt-slab-oa-locked server=opt-eventloop cores=single-core1 iram=1
+MC phase 2: 5 balancing designs x 5 workloads, then Phase 1 designs under wifisim
+I (403) kv_opt: arena 39 pages (156 KiB) in 2 blocks, index 4094 slots (16352 B), 8 shard(s), heap left 41024
+RESULT {"part":"balance","scenario":"quiet","design":"static_hash","workload":"uniform","get_pct":90,"ops_per_s":380663,"w0_ops_per_s":188226,"w1_ops_per_s":192436,"offered_w0_pct":49.4,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (863) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"roundrobin_rw","workload":"uniform","get_pct":90,"ops_per_s":364270,"w0_ops_per_s":182044,"w1_ops_per_s":182226,"offered_w0_pct":49.3,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":1.10}
+I (1318) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"spill_rw","workload":"uniform","get_pct":90,"ops_per_s":377190,"w0_ops_per_s":173564,"w1_ops_per_s":203626,"offered_w0_pct":49.8,"spills":6783,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.27}
+I (1772) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"migrate","workload":"uniform","get_pct":90,"ops_per_s":392563,"w0_ops_per_s":173731,"w1_ops_per_s":218831,"offered_w0_pct":49.8,"spills":0,"migrations":72,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (2226) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"hotrep_rw","workload":"uniform","get_pct":90,"ops_per_s":249551,"w0_ops_per_s":120751,"w1_ops_per_s":128799,"offered_w0_pct":48.4,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":174,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (2681) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"static_hash","workload":"zipf099","get_pct":90,"ops_per_s":399785,"w0_ops_per_s":186656,"w1_ops_per_s":213128,"offered_w0_pct":46.7,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (3222) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"roundrobin_rw","workload":"zipf099","get_pct":90,"ops_per_s":366295,"w0_ops_per_s":183216,"w1_ops_per_s":183079,"offered_w0_pct":47.2,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":1.19}
+I (3763) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"spill_rw","workload":"zipf099","get_pct":90,"ops_per_s":387333,"w0_ops_per_s":172956,"w1_ops_per_s":214376,"offered_w0_pct":47.0,"spills":7343,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.22}
+I (4303) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"migrate","workload":"zipf099","get_pct":90,"ops_per_s":406722,"w0_ops_per_s":180294,"w1_ops_per_s":226428,"offered_w0_pct":45.3,"spills":0,"migrations":28,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (4843) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4089 slots (16352 B), 8 shard(s), heap left 44892
+RESULT {"part":"balance","scenario":"quiet","design":"hotrep_rw","workload":"zipf099","get_pct":90,"ops_per_s":301760,"w0_ops_per_s":131836,"w1_ops_per_s":169924,"offered_w0_pct":46.0,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":13727,"rep_fallbacks":26,"side_stalls":0,"lk_contended_pct":0.00}
+I (5384) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"static_hash","workload":"zipf12","get_pct":90,"ops_per_s":423637,"w0_ops_per_s":183459,"w1_ops_per_s":240178,"offered_w0_pct":43.3,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (5924) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"roundrobin_rw","workload":"zipf12","get_pct":90,"ops_per_s":365628,"w0_ops_per_s":182636,"w1_ops_per_s":182991,"offered_w0_pct":41.8,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":1.58}
+I (6464) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"spill_rw","workload":"zipf12","get_pct":90,"ops_per_s":400915,"w0_ops_per_s":171214,"w1_ops_per_s":229701,"offered_w0_pct":42.7,"spills":5343,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.28}
+I (7004) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"migrate","workload":"zipf12","get_pct":90,"ops_per_s":393478,"w0_ops_per_s":177871,"w1_ops_per_s":215606,"offered_w0_pct":42.3,"spills":0,"migrations":55,"final_owners":"01000101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (7543) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"hotrep_rw","workload":"zipf12","get_pct":90,"ops_per_s":332745,"w0_ops_per_s":143002,"w1_ops_per_s":189742,"offered_w0_pct":41.5,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":20732,"rep_fallbacks":77,"side_stalls":0,"lk_contended_pct":0.00}
+I (8083) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"static_hash","workload":"hotshard_zipf12","get_pct":90,"ops_per_s":226001,"w0_ops_per_s":208369,"w1_ops_per_s":17632,"offered_w0_pct":92.2,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (8624) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"roundrobin_rw","workload":"hotshard_zipf12","get_pct":90,"ops_per_s":360620,"w0_ops_per_s":180309,"w1_ops_per_s":180311,"offered_w0_pct":91.3,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":7.32}
+I (9166) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"spill_rw","workload":"hotshard_zipf12","get_pct":90,"ops_per_s":362065,"w0_ops_per_s":170871,"w1_ops_per_s":191194,"offered_w0_pct":91.5,"spills":65006,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":7.82}
+I (9707) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"migrate","workload":"hotshard_zipf12","get_pct":90,"ops_per_s":236302,"w0_ops_per_s":200751,"w1_ops_per_s":35551,"offered_w0_pct":91.3,"spills":0,"migrations":3,"final_owners":"01111111","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (10248) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"hotrep_rw","workload":"hotshard_zipf12","get_pct":90,"ops_per_s":290137,"w0_ops_per_s":131183,"w1_ops_per_s":158953,"offered_w0_pct":91.6,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":53753,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (10789) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"static_hash","workload":"hotshard_zipf12_g50","get_pct":50,"ops_per_s":226480,"w0_ops_per_s":208440,"w1_ops_per_s":18039,"offered_w0_pct":92.0,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (11331) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"roundrobin_rw","workload":"hotshard_zipf12_g50","get_pct":50,"ops_per_s":339838,"w0_ops_per_s":169918,"w1_ops_per_s":169920,"offered_w0_pct":91.3,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":29.57}
+I (11873) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"spill_rw","workload":"hotshard_zipf12_g50","get_pct":50,"ops_per_s":335479,"w0_ops_per_s":163038,"w1_ops_per_s":172440,"offered_w0_pct":91.9,"spills":58955,"migrations":0,"final_owners":"01010101","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":31.94}
+I (12415) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"migrate","workload":"hotshard_zipf12_g50","get_pct":50,"ops_per_s":235174,"w0_ops_per_s":200590,"w1_ops_per_s":34583,"offered_w0_pct":91.2,"spills":0,"migrations":3,"final_owners":"01111111","rep_hits":0,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (12957) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16320 B), 8 shard(s), heap left 44780
+RESULT {"part":"balance","scenario":"quiet","design":"hotrep_rw","workload":"hotshard_zipf12_g50","get_pct":50,"ops_per_s":223095,"w0_ops_per_s":149688,"w1_ops_per_s":73407,"offered_w0_pct":91.5,"spills":0,"migrations":0,"final_owners":"01010101","rep_hits":21787,"rep_fallbacks":0,"side_stalls":0,"lk_contended_pct":0.00}
+I (13581) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16348 B), 1 shard(s), heap left 44808
+RESULT {"part":"direct","scenario":"quiet","design":"1c_nolock","workload":"g90_uniform","ntasks":1,"nshards":1,"ops_per_s":290243,"core0_ops_per_s":0,"core1_ops_per_s":290243,"p50_ns":3270,"p99_ns":3754,"p999_ns":7508,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (14027) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16348 B), 1 shard(s), heap left 44808
+RESULT {"part":"direct","scenario":"quiet","design":"2c_shared_cas","workload":"g90_uniform","ntasks":2,"nshards":1,"ops_per_s":325120,"core0_ops_per_s":162534,"core1_ops_per_s":162586,"p50_ns":5983,"p99_ns":6512,"p999_ns":17925,"lk_acq":130049,"lk_contended_pct":99.32,"lk_spin_cyc_per_contended":456,"seq_retries":0,"spin_pct":30.74}
+I (14490) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_sharded_cas","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":420320,"core0_ops_per_s":210047,"core1_ops_per_s":210272,"p50_ns":4037,"p99_ns":6333,"p999_ns":16304,"lk_acq":168130,"lk_contended_pct":34.51,"lk_spin_cyc_per_contended":453,"seq_retries":0,"spin_pct":13.70}
+I (14956) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_sharded_rw","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":486272,"core0_ops_per_s":242883,"core1_ops_per_s":243388,"p50_ns":3800,"p99_ns":5862,"p999_ns":14066,"lk_acq":194510,"lk_contended_pct":7.20,"lk_spin_cyc_per_contended":339,"seq_retries":0,"spin_pct":2.48}
+I (15421) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_sharded_seqlock","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":498397,"core0_ops_per_s":248526,"core1_ops_per_s":249871,"p50_ns":3616,"p99_ns":7737,"p999_ns":14045,"lk_acq":199360,"lk_contended_pct":5.05,"lk_spin_cyc_per_contended":329,"seq_retries":5806,"spin_pct":1.73}
+I (15888) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_owned_nolock","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":517927,"core0_ops_per_s":258648,"core1_ops_per_s":259278,"p50_ns":3650,"p99_ns":4066,"p999_ns":14050,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (16357) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15932 B), 1 shard(s), heap left 44432
+RESULT {"part":"direct","scenario":"quiet","design":"1c_nolock","workload":"g50_uniform","ntasks":1,"nshards":1,"ops_per_s":290861,"core0_ops_per_s":0,"core1_ops_per_s":290861,"p50_ns":3270,"p99_ns":3625,"p999_ns":7283,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (16811) kv_opt: arena 38 pages (152 KiB) in 2 blocks, index 4087 slots (16348 B), 1 shard(s), heap left 44808
+RESULT {"part":"direct","scenario":"quiet","design":"2c_shared_cas","workload":"g50_uniform","ntasks":2,"nshards":1,"ops_per_s":351798,"core0_ops_per_s":175854,"core1_ops_per_s":175944,"p50_ns":5441,"p99_ns":6237,"p999_ns":17116,"lk_acq":140720,"lk_contended_pct":99.29,"lk_spin_cyc_per_contended":367,"seq_retries":0,"spin_pct":26.74}
+I (17276) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_sharded_cas","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":430698,"core0_ops_per_s":215282,"core1_ops_per_s":215415,"p50_ns":3995,"p99_ns":6433,"p999_ns":16545,"lk_acq":172281,"lk_contended_pct":36.98,"lk_spin_cyc_per_contended":358,"seq_retries":0,"spin_pct":11.91}
+I (17743) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_sharded_rw","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":455095,"core0_ops_per_s":227362,"core1_ops_per_s":227732,"p50_ns":3879,"p99_ns":5916,"p999_ns":16033,"lk_acq":182040,"lk_contended_pct":26.58,"lk_spin_cyc_per_contended":329,"seq_retries":0,"spin_pct":8.31}
+I (18208) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_sharded_seqlock","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":431552,"core0_ops_per_s":215801,"core1_ops_per_s":215751,"p50_ns":3945,"p99_ns":13525,"p999_ns":20287,"lk_acq":172622,"lk_contended_pct":24.10,"lk_spin_cyc_per_contended":334,"seq_retries":15875,"spin_pct":7.25}
+I (18675) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"direct","scenario":"quiet","design":"2c_owned_nolock","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":514997,"core0_ops_per_s":256966,"core1_ops_per_s":258031,"p50_ns":3666,"p99_ns":4120,"p999_ns":13666,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (19145) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3983 slots (15928 B), 2 shard(s), heap left 44428
+RESULT {"part":"queue","scenario":"quiet","design":"ring_2w_routed","workload":"g90_uniform","workers":2,"batch":1,"handoff":"spsc_ring","ops_per_s":441492,"w0_ops_per_s":217823,"w1_ops_per_s":223668,"lat_p50_us":469,"lat_p99_us":988,"lat_p999_us":1016,"cpu0_pct":100.0,"cpu1_pct":100.0}
+I (19665) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3999 slots (15996 B), 1 shard(s), heap left 45112
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"1c_nolock","workload":"g90_uniform","ntasks":1,"nshards":1,"ops_per_s":283220,"core0_ops_per_s":0,"core1_ops_per_s":283220,"p50_ns":3270,"p99_ns":4091,"p999_ns":9041,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (20123) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3999 slots (15996 B), 1 shard(s), heap left 45112
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_shared_cas","workload":"g90_uniform","ntasks":2,"nshards":1,"ops_per_s":243231,"core0_ops_per_s":94067,"core1_ops_per_s":149164,"p50_ns":5983,"p99_ns":11275,"p999_ns":835529,"lk_acq":97293,"lk_contended_pct":76.80,"lk_spin_cyc_per_contended":886,"seq_retries":0,"spin_pct":34.49}
+I (20603) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41148
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_sharded_cas","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":290199,"core0_ops_per_s":121228,"core1_ops_per_s":168970,"p50_ns":3995,"p99_ns":8895,"p999_ns":835262,"lk_acq":116081,"lk_contended_pct":29.28,"lk_spin_cyc_per_contended":1295,"seq_retries":0,"spin_pct":22.93}
+I (21087) kv_opt: arena 37 pages (148 KiB) in 3 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41144
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_sharded_rw","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":320402,"core0_ops_per_s":139926,"core1_ops_per_s":180476,"p50_ns":3804,"p99_ns":6379,"p999_ns":830137,"lk_acq":128162,"lk_contended_pct":6.75,"lk_spin_cyc_per_contended":3419,"seq_retries":0,"spin_pct":15.40}
+I (21569) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41148
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_sharded_seqlock","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":397295,"core0_ops_per_s":144011,"core1_ops_per_s":253283,"p50_ns":3604,"p99_ns":8033,"p999_ns":834241,"lk_acq":158919,"lk_contended_pct":3.58,"lk_spin_cyc_per_contended":823,"seq_retries":3337,"spin_pct":2.44}
+I (22053) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41148
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_owned_nolock","workload":"g90_uniform","ntasks":2,"nshards":2,"ops_per_s":413955,"core0_ops_per_s":149504,"core1_ops_per_s":264451,"p50_ns":3641,"p99_ns":4179,"p999_ns":16591,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (22541) kv_opt: arena 37 pages (148 KiB) in 3 blocks, index 3896 slots (15584 B), 1 shard(s), heap left 41148
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"1c_nolock","workload":"g50_uniform","ntasks":1,"nshards":1,"ops_per_s":283918,"core0_ops_per_s":0,"core1_ops_per_s":283918,"p50_ns":3270,"p99_ns":4079,"p999_ns":8745,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (23007) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3999 slots (15996 B), 1 shard(s), heap left 45112
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_shared_cas","workload":"g50_uniform","ntasks":2,"nshards":1,"ops_per_s":259488,"core0_ops_per_s":101501,"core1_ops_per_s":157986,"p50_ns":5437,"p99_ns":11000,"p999_ns":838233,"lk_acq":103796,"lk_contended_pct":77.75,"lk_spin_cyc_per_contended":731,"seq_retries":0,"spin_pct":30.76}
+I (23489) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41148
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_sharded_cas","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":303511,"core0_ops_per_s":124088,"core1_ops_per_s":179423,"p50_ns":3950,"p99_ns":9637,"p999_ns":844166,"lk_acq":121406,"lk_contended_pct":30.67,"lk_spin_cyc_per_contended":1026,"seq_retries":0,"spin_pct":19.90}
+I (23973) kv_opt: arena 37 pages (148 KiB) in 3 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41144
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_sharded_rw","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":304223,"core0_ops_per_s":131056,"core1_ops_per_s":173166,"p50_ns":3862,"p99_ns":7979,"p999_ns":832275,"lk_acq":121690,"lk_contended_pct":23.59,"lk_spin_cyc_per_contended":1281,"seq_retries":0,"spin_pct":19.16}
+I (24457) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41148
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_sharded_seqlock","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":328488,"core0_ops_per_s":123436,"core1_ops_per_s":205051,"p50_ns":3920,"p99_ns":14254,"p999_ns":840708,"lk_acq":131396,"lk_contended_pct":18.68,"lk_spin_cyc_per_contended":891,"seq_retries":9458,"spin_pct":11.40}
+I (24941) kv_opt: arena 37 pages (148 KiB) in 2 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41148
+RESULT {"part":"direct","scenario":"wifisim_core0","design":"2c_owned_nolock","workload":"g50_uniform","ntasks":2,"nshards":2,"ops_per_s":413015,"core0_ops_per_s":148784,"core1_ops_per_s":264231,"p50_ns":3650,"p99_ns":7408,"p999_ns":829937,"lk_acq":0,"lk_contended_pct":0.00,"lk_spin_cyc_per_contended":0,"seq_retries":0,"spin_pct":0.00}
+I (25429) kv_opt: arena 37 pages (148 KiB) in 3 blocks, index 3896 slots (15584 B), 2 shard(s), heap left 41144
+RESULT {"part":"queue","scenario":"wifisim_core0","design":"ring_2w_routed","workload":"g90_uniform","workers":2,"batch":1,"handoff":"spsc_ring","ops_per_s":251511,"w0_ops_per_s":123211,"w1_ops_per_s":128299,"lat_p50_us":522,"lat_p99_us":1847,"lat_p999_us":1887,"cpu0_pct":100.0,"cpu1_pct":100.0}
+DONE (engine-only build, WiFi disabled)

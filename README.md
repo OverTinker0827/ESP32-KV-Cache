@@ -34,6 +34,11 @@ Multicore (both cores, 90 % GET, vs one core without a lock):
 | receiver → lock-free ring → 2 shard-owning workers | 1.53× |
 | 2 shards each owned by one core, no lock (ceiling: shared SRAM bus) | 1.78× |
 
+Load imbalance (one skewed request stream, 8 shards over 2 workers): when one shard holds 91 % of the
+load, spill-over balancing recovers **1.59×** over static hashing and hot-key replication 1.53×, while
+shard migration (with hysteresis) is best for spread-out skew (1.18×). With WiFi-like load on core 0,
+only the lock-free shared-nothing design keeps a solid dual-core gain (1.46× over one core).
+
 Network benchmarks (throughput, p95/p99 latency, CPU per core) are pending a power fix on the
 test board; see [Hardware notes](#hardware-notes).
 

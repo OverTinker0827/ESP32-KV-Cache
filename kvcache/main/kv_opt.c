@@ -29,7 +29,7 @@ static const char *TAG = "kv_opt";
 /* Multicore harness build: shard count and lock discipline are chosen at runtime
  * (kv_mc_set_mode) so every design runs from one firmware under identical conditions. */
 #include "esp_cpu.h"
-#define MAXSHARDS 2
+#define MAXSHARDS 8 /* power of two; shard = bits 11.. of the hash (independent of tag and home slot) */
 static int g_nshards = 1;
 static int g_lock = KV_LOCK_NONE;
 #define NSH g_nshards
@@ -290,7 +290,7 @@ static inline HOT uint32_t home(const shard_t *sh, uint32_t h)
 static inline HOT shard_t *shard_of(uint32_t h)
 {
 #if CONFIG_KV_MC_BENCH
-    return &shards[g_nshards > 1 ? (h >> 11) & 1 : 0];
+    return &shards[(h >> 11) & (uint32_t)(g_nshards - 1)];
 #elif MAXSHARDS > 1
     return &shards[(h >> 11) & 1];
 #else
@@ -938,7 +938,9 @@ void kv_stats(kv_stats_t *st)
 /* ------------------------------------------------------------ harness API */
 void kv_mc_set_mode(int nshards, int lock_mode)
 {
-    g_nshards = nshards < 1 ? 1 : (nshards > MAXSHARDS ? MAXSHARDS : nshards);
+    int n = 1;
+    while (n < nshards && n < MAXSHARDS) n <<= 1; /* round up to a power of two */
+    g_nshards = n;
     g_lock = lock_mode;
 }
 

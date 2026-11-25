@@ -310,3 +310,123 @@ They are not comparable to the direct designs' per-operation latencies.
   a Phase 4 measurement.
 
 Raw data: `results/entry3_mc.jsonl`; tables: `python tools/summarize_mc.py entry3_mc.jsonl`.
+
+---
+
+## Entry 4 — 2026-11-25 — Phase 2: load imbalance and adaptive balancing; Phase 1 designs under WiFi-like load
+
+**Method.** Harness Phase 2 (`variants/opt + nowifi + mc + mc2`). A receiver task on core 0 (where the
+network stack lives) routes **one** request stream into two lock-free SPSC rings; worker 0 runs on core 0
+next to the receiver, worker 1 on core 1. The table is split into **8 shards**; `owner[shard]` says which
+worker executes it (initially even shards → worker 0, odd → worker 1). 1,024 random keys, 32 B values,
+90 % GET unless noted, 0.4 s per run. The receiver is saturating, so throughput is limited by whichever
+worker is busiest.
+
+Workloads: `uniform`; `zipf099` / `zipf12` (Zipf θ = 0.99 / 1.2, hot keys placed randomly over shards,
+**3 repetitions with a fresh placement each**; within a repetition every design runs on the same placement
+and the same request stream); `hotshard_zipf12` (θ = 1.2 with all the hottest keys in shard 0, owned by the
+receiver's core: 91 % of the load lands on worker 0); `hotshard_zipf12_g50` (same, 50 % GET).
+
+Designs:
+
+| design | idea | how it works |
+|---|---|---|
+| static_hash | baseline (Phase 1 best) | owner never changes, no lock |
+| roundrobin_rw | work sharing | requests alternate between workers; RW lock per shard |
+| spill_rw | **teammate: adaptive load balancing** | send to the owner unless its ring holds > 32 more requests than the other's; RW lock per shard |
+| migrate | **teammate: adaptive load balancing** (ownership migration) | every 2,048 requests, if the busier ring's average backlog exceeds the other's by > 8, move the busy worker's least-used shard to the other worker. **Lock-free hand-over:** the shard's new requests wait in a side buffer until the old owner has executed everything routed to it before the decision, so requests for one key are never reordered |
+| migrate_hyst | same, with hysteresis | imbalance > 32 for 2 epochs in a row, then 4 epochs of cool-down |
+| hotrep_rw | **mine: hot-key replication** | top-8 keys per 2,048 requests are hot; their GETs go to the less loaded worker, which serves them from a replica (seqlock, written only by the key's owner on SET / first GET); RW lock per shard for the rare fallback |
+
+### Throughput (mean ops/s) and speed-up vs static_hash on the same placement [min–max over repetitions]
+
+| design | uniform | zipf099 (n=3) | zipf12 (n=3) | hotshard_zipf12 | hotshard_zipf12_g50 |
+|---|---:|---:|---:|---:|---:|
+| static_hash | 370,743 (1.00×) | 364,514 (1.00×) | 350,060 (1.00×) | 228,121 (1.00×) | 226,312 (1.00×) |
+| roundrobin_rw | 362,692 (0.98×) | 363,222 (1.00× [0.93–1.06]) | 363,025 (1.05× [0.89–1.15]) | 358,544 (1.57×) | **338,192 (1.49×)** |
+| spill_rw | 376,207 (1.01×) | 376,390 (1.04× [0.98–1.09]) | 382,411 (1.10× [1.00–1.17]) | **361,909 (1.59×)** | 335,064 (1.48×) |
+| migrate | **390,513 (1.05×)** | **403,982 (1.11× [1.03–1.18])** | 408,042 (1.18× [1.00–1.28]) | 241,779 (1.06×) | 238,945 (1.06×) |
+| migrate_hyst | 371,168 (1.00×) | 396,567 (1.09× [1.00–1.17]) | **408,104 (1.18× [1.05–1.24])** | 240,195 (1.05×) | 237,415 (1.05×) |
+| hotrep_rw | 336,624 (0.91×) | 381,670 (1.05× [0.98–1.11]) | 406,468 (1.17× [1.08–1.24]) | 348,385 (1.53×) | 257,771 (1.14×) |
+
+### Balancing activity (mean over repetitions)
+
+| design | workload | w0 / w1 ops/s | spills | migrations | replica hits / fallbacks | lock contended |
+|---|---|---:|---:|---:|---:|---:|
+| static_hash | hotshard_zipf12 | 207,684 / 20,436 | – | – | – | – |
+| spill_rw | hotshard_zipf12 | 170,678 / 191,231 | 64,482 | – | – | 7.5 % |
+| migrate | hotshard_zipf12 | 205,902 / 35,876 | – | 3 (all other shards moved off w0) | – | – |
+| hotrep_rw | hotshard_zipf12 | 154,193 / 194,192 | – | – | 65,188 / 2 | 0.0 % |
+| roundrobin_rw | hotshard_zipf12_g50 | 169,094 / 169,097 | – | – | – | 30.1 % |
+| migrate | uniform | 181,156 / 209,356 | – | **61** | – | – |
+| migrate_hyst | uniform | 188,334 / 182,834 | – | **0** | – | – |
+| migrate | zipf12 | 182,294 / 225,747 | – | 28 | – | – |
+| migrate_hyst | zipf12 | 183,024 / 225,079 | – | **2** | – | – |
+| hotrep_rw | zipf12 | 164,143 / 242,325 | – | – | 36,543 / 149 | 0.0 % |
+
+(full table: `results/entry4_tables.md`)
+
+### Phase 1 designs under WiFi-like load on core 0 (simulator at 40 % duty, Entry 2)
+
+| design | workload | quiet ops/s | under load | change | vs 1 core under load | p99.9 core 0 µs quiet → load | p99.9 core 1 µs quiet → load | lock contended under load |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| 1c_nolock (core 1) | g90 | 290,353 | 283,316 | −2 % | 1.00× | – | 7.5 → 9.0 | – |
+| 2c_shared_cas | g90 | 325,820 | 250,290 | −23 % | **0.88×** | 17.9 → 836.1 | 17.7 → 17.8 | 74.7 % |
+| 2c_sharded_cas | g90 | 420,296 | 286,442 | −32 % | 1.01× | 16.0 → 848.1 | 17.3 → **833.7** | 30.1 % |
+| 2c_sharded_rw | g90 | 487,641 | 324,670 | −33 % | 1.15× | 14.4 → 849.9 | 13.2 → 17.3 | 6.5 % |
+| 2c_sharded_seqlock | g90 | 497,852 | 395,450 | −21 % | 1.40× | 13.8 → 836.9 | 12.5 → 16.1 | 3.6 % |
+| **2c_owned_nolock** | g90 | 517,301 | **414,010** | −20 % | **1.46×** | 14.5 → 830.5 | 12.7 → 16.0 | – |
+| 2c_shared_cas | g50 | 350,148 | 260,386 | −26 % | 0.92× | 17.1 → 839.9 | 17.2 → 17.2 | 77.4 % |
+| 2c_sharded_rw | g50 | 455,595 | 306,662 | −33 % | 1.08× | 15.3 → 840.7 | 14.2 → 16.8 | 23.3 % |
+| 2c_sharded_seqlock | g50 | 432,715 | 333,829 | −23 % | 1.18× | 20.1 → 831.8 | 20.0 → 22.0 | 18.1 % |
+| 2c_owned_nolock | g50 | 516,854 | 413,870 | −20 % | 1.46× | 14.1 → 829.5 | 12.7 → 12.7 | – |
+| ring_2w_routed | g90 | 429,215 | 240,041 | −44 % | 0.85× | queue-bound | queue-bound | – |
+
+### Findings
+
+1. **Imbalance is real only when hot keys concentrate.** With Zipf skew and random placement, the 8-shard
+   static map stays near 52/48 on average, but individual placements vary (ratios range 0.89–1.28×), so a
+   single run is not enough; this entry uses 3 placements.
+2. **For a hot shard, sharing work beats moving ownership.** When 91 % of the load sits in one shard,
+   spill-over (teammate) gives **1.59×** and round-robin 1.57×, hot-key replication 1.53×. Migration gives
+   only 1.06×: it correctly moves every other shard away (final owners `01111111`), but cannot split the hot
+   shard itself. **Ownership granularity limits migration.**
+3. **For spread-out skew, migration wins and costs nothing when idle.** On Zipf 1.2 with random placement,
+   migration gives 1.18× (best repetition 1.28×), versus 1.10× for spill-over. Migration takes no locks,
+   whereas spill-over and round-robin pay RW-lock cost on every request (round-robin is 0.98× on uniform).
+4. **Plain migration thrashes; hysteresis fixes it.** v1 made 28–61 migrations in 0.4 s (each one stalls a
+   shard while its old owner drains); with hysteresis: 0–2, the same 1.18× on Zipf 1.2, and no drift on
+   uniform traffic.
+5. **Hot-key replication (mine) helps reads, not writes.** 1.53× on the hot shard at 90 % GET, but 1.14×
+   at 50 % GET, because SETs must go to the owner and refresh the replica. It costs 9 % on uniform traffic
+   (RW locks + routing). A first version was receiver-bound (0.66× on uniform) because hot-key detection
+   rescanned all counters 8× per epoch; v2 uses a one-pass top-8.
+6. **No single policy wins everywhere.** Spill-over is the safest (mean never below 1.01× here, worst
+   single placement 0.98×, best on hot shards); migration with hysteresis is best for spread-out skew and free otherwise. The two are
+   complementary: migrate coarse imbalance, spill or replicate what one shard cannot hold.
+7. **Under WiFi-like load on core 0, the lock-free shared-nothing design is the only one that keeps a
+   solid dual-core gain: 1.46× over one core** (owned, 414k vs 283k ops/s). It loses exactly core 0's lost
+   capacity (−20 %). Lock-based designs lose more (−23 to −33 %) because core 1 spins while a preempted
+   core-0 lock holder waits for the simulator's burst; a shared table with a CAS lock becomes **slower than
+   one core (0.88×)**. Core 1's p99.9 mostly stays at 16–22 µs; one run (sharded CAS) shows the
+   lock-holder stall reaching core 1 at p99.9 (834 µs). Core 0's own p99.9 is ~830 µs in every design:
+   anything sharing the WiFi core inherits its bursts.
+8. **The receiver → ring design loses 44 % under load** because its receiver lives on the loaded core:
+   the serial stage (Amdahl) is exactly where the network stack runs.
+
+### Corrections
+
+- In the chat summary of the first Phase 2 run I stated that the lock-free design kept p99.9 at 16.6 µs under
+  WiFi-like load while lock-based designs went to ~835 µs. With per-core latency (added in this entry) that
+  is wrong: the ~835 µs tails are core 0's own preemption and appear in all designs, including the
+  lock-free one. The lock effect shows mainly as lost throughput.
+- First Phase 2 runs (single placement, v1 hot-key detector, no hysteresis variant) are kept as
+  `results/entry4_p2_v1.jsonl` and `entry4_p2_v2.jsonl`; this entry uses `results/entry4_p2.jsonl`.
+
+### Limitations
+
+- WiFi is simulated (Entry 2); the receiver produces requests from memory instead of parsing packets.
+- Replicas trade consistency: a GET served from a replica may miss a SET still queued at the owner.
+- 2 workers only; with more shards per worker the migration granularity problem shrinks.
+
+Raw data: `results/entry4_p2.jsonl`; tables: `python tools/summarize_p2.py` (saved as `results/entry4_tables.md`).
