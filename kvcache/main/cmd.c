@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include "cmd.h"
 #include "kv.h"
+#include "route.h"
 #include "sysmon.h"
 #include "esp_heap_caps.h"
 
@@ -112,7 +113,7 @@ static HOT void do_set(int argc, const arg_t *argv, obuf_t *o)
             return;
         }
     }
-    int rc = kv_set(argv[1].p, argv[1].n, argv[2].p, argv[2].n, ttl, flags);
+    int rc = r_set(argv[1].p, argv[1].n, argv[2].p, argv[2].n, ttl, flags);
     if (likely(rc == KV_OK)) PUTS(o, "+OK\r\n");
     else if (rc == KV_NOTSET) PUTS(o, "$-1\r\n");
     else reply_kv_err(o, rc);
@@ -131,7 +132,7 @@ static int do_info(obuf_t *o)
         for (int b = 0; b < 24; b++) g.svc_hist[b] += g_stats[i].svc_hist[b];
     }
     kv_stats_t st;
-    kv_stats(&st);
+    r_stats(&st);
     uint64_t up, i0, i1;
     sysmon_cpu(&up, &i0, &i1);
     int n = snprintf(tmp, sizeof tmp,
@@ -168,7 +169,7 @@ HOT int cmd_exec(int argc, const arg_t *argv, obuf_t *o)
     case 'G':
         if (EQ(c, "GET")) {
             if (argc != 2) goto arity;
-            return kv_get_resp(argv[1].p, argv[1].n, o) == KV_ENOROOM ? KV_ENOROOM : 0;
+            return r_get_resp(argv[1].p, argv[1].n, o) == KV_ENOROOM ? KV_ENOROOM : 0;
         }
         break;
     case 'S':
@@ -183,7 +184,7 @@ HOT int cmd_exec(int argc, const arg_t *argv, obuf_t *o)
                 put_err(o, "ERR invalid expire time in 'setex' command");
                 return 0;
             }
-            int rc = kv_set(argv[1].p, argv[1].n, argv[3].p, argv[3].n, (uint32_t)v * 1000, 0);
+            int rc = r_set(argv[1].p, argv[1].n, argv[3].p, argv[3].n, (uint32_t)v * 1000, 0);
             if (rc == KV_OK) PUTS(o, "+OK\r\n");
             else reply_kv_err(o, rc);
             return 0;
@@ -198,13 +199,13 @@ HOT int cmd_exec(int argc, const arg_t *argv, obuf_t *o)
         if (EQ(c, "DEL")) {
             if (argc < 2) goto arity;
             int64_t n = 0;
-            for (int i = 1; i < argc; i++) n += kv_del(argv[i].p, argv[i].n);
+            for (int i = 1; i < argc; i++) n += r_del(argv[i].p, argv[i].n);
             put_int(o, n);
             return 0;
         }
         if (EQ(c, "DBSIZE")) {
             kv_stats_t st;
-            kv_stats(&st);
+            r_stats(&st);
             put_int(o, st.keys);
             return 0;
         }
@@ -217,20 +218,20 @@ HOT int cmd_exec(int argc, const arg_t *argv, obuf_t *o)
         }
         if (EQ(c, "PTTL")) {
             if (argc != 2) goto arity;
-            put_int(o, kv_pttl(argv[1].p, argv[1].n));
+            put_int(o, r_pttl(argv[1].p, argv[1].n));
             return 0;
         }
         if (EQ(c, "PEXPIRE")) {
             if (argc != 3) goto arity;
             if (to_i64(&argv[2], &v) || v < 0 || v > 0x7FFFFFFF) goto badint;
-            put_int(o, kv_expire(argv[1].p, argv[1].n, (uint32_t)v));
+            put_int(o, r_expire(argv[1].p, argv[1].n, (uint32_t)v));
             return 0;
         }
         break;
     case 'T':
         if (EQ(c, "TTL")) {
             if (argc != 2) goto arity;
-            int64_t ms = kv_pttl(argv[1].p, argv[1].n);
+            int64_t ms = r_pttl(argv[1].p, argv[1].n);
             put_int(o, ms < 0 ? ms : (ms + 500) / 1000);
             return 0;
         }
@@ -239,14 +240,14 @@ HOT int cmd_exec(int argc, const arg_t *argv, obuf_t *o)
         if (EQ(c, "EXISTS")) {
             if (argc < 2) goto arity;
             int64_t n = 0;
-            for (int i = 1; i < argc; i++) n += kv_exists(argv[i].p, argv[i].n);
+            for (int i = 1; i < argc; i++) n += r_exists(argv[i].p, argv[i].n);
             put_int(o, n);
             return 0;
         }
         if (EQ(c, "EXPIRE")) {
             if (argc != 3) goto arity;
             if (to_i64(&argv[2], &v) || v < 0 || v > 0x7FFFFFFF / 1000) goto badint;
-            put_int(o, kv_expire(argv[1].p, argv[1].n, (uint32_t)v * 1000));
+            put_int(o, r_expire(argv[1].p, argv[1].n, (uint32_t)v * 1000));
             return 0;
         }
         if (EQ(c, "ECHO")) {
@@ -256,7 +257,7 @@ HOT int cmd_exec(int argc, const arg_t *argv, obuf_t *o)
         break;
     case 'F':
         if (EQ(c, "FLUSHALL") || EQ(c, "FLUSHDB")) {
-            kv_flush();
+            r_flush();
             PUTS(o, "+OK\r\n");
             return 0;
         }

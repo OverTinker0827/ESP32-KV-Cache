@@ -31,6 +31,10 @@ PATCHES = {
     "commands/__init__.py": [("const(", "(")],
     # MicroPython bytearray has no slice deletion; clearing by rebinding is equivalent
     "core/response.py": [("del self._buffer[:]", "self._buffer = bytearray()")],
+    # MicroPython's StreamWriter.get_extra_info() takes no default argument; with it, every
+    # accepted connection raised TypeError (found in Entry 7, the first time the server ran)
+    "main.py": [("get_extra_info('peername', ('unknown', 0))", "get_extra_info('peername')")],
+    "network/connection.py": [("get_extra_info('peername', ('unknown', 0))", "get_extra_info('peername')")],
 }
 # Runtime dependency missing from stock MicroPython: install with `mpremote mip install bisect`
 BUILD_SRC = ROOT / "build" / "microredis_src_patched"

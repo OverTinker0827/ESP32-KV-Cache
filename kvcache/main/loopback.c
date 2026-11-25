@@ -26,8 +26,14 @@
 #include "server.h"
 #include "sysmon.h"
 #include "wifisim.h"
+#if CONFIG_LWIP_STATS
+#include "lwip/stats.h"
+#include "lwip/priv/tcp_priv.h"
+#endif
 
-#define RUN_MS 1000
+static int g_lb_run_ms = 1000; /* final mode: 2000 */
+#define RUN_MS g_lb_run_ms
+static int g_rep;
 #if CONFIG_LWIP_TCPIP_CORE_LOCKING
 #define CORE_LOCKING_ON 1
 #else
@@ -71,12 +77,16 @@ static int send_all(int fd, const void *p, size_t n)
     return 0;
 }
 
+static size_t g_recv_got; /* diagnostics: bytes received by the last failing recv_n */
 static int recv_n(int fd, uint8_t *b, size_t n)
 {
     size_t got = 0;
     while (got < n) {
         int r = recv(fd, b + got, n - got, 0);
-        if (r <= 0) return -1;
+        if (r <= 0) {
+            g_recv_got = got;
+            return -1;
+        }
         got += r;
     }
     return 0;
@@ -221,7 +231,9 @@ static void client_task(void *arg)
     cli_t *c = arg;
     static const char *vstr = "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv";
     uint8_t rb[MAXP * 48];
+    int64_t tc0 = esp_timer_get_time();
     int fd = lb_connect();
+    int connect_us = (int)(esp_timer_get_time() - tc0);
     char *rq = malloc(NBATCH * MAXP * 96);
     int blen[NBATCH];
     if (fd < 0 || !rq) {
@@ -231,26 +243,32 @@ static void client_task(void *arg)
         xSemaphoreGive(done);
         vTaskDelete(NULL);
     }
-    uint32_t k = c->id * 7919;
+    uint32_t k = c->id * 7919, j = c->id;
+    int rlen[NBATCH];
     for (int b = 0; b < NBATCH; b++) {
         int n = 0;
+        rlen[b] = 0;
         char *base = rq + b * MAXP * 96;
         for (int i = 0; i < c->P; i++) {
             char key[20];
             snprintf(key, sizeof key, "key:%012" PRIu32, (k++ % NKEYS));
-            const char *av[] = {c->set ? "SET" : "GET", key, vstr};
-            n += resp(base + n, c->set ? 3 : 2, av, NULL);
+            int is_set = c->set == 1 || (c->set == 2 && (j++ % 10) == 0);
+            const char *av[] = {is_set ? "SET" : "GET", key, vstr};
+            n += resp(base + n, is_set ? 3 : 2, av, NULL);
+            rlen[b] += is_set ? 5 : 5 + VALLEN + 2; /* "+OK\r\n" or "$32\r\n<32>\r\n" */
         }
         blen[b] = n;
     }
-    int replen = c->set ? 5 : 5 + VALLEN + 2; /* "+OK\r\n" or "$32\r\n<32>\r\n" */
     uint32_t bi = 0;
     while (!go) vTaskDelay(1);
     while (!stop) {
         int b = bi++ % NBATCH;
         int64_t t0 = esp_timer_get_time();
-        if (send_all(fd, rq + b * MAXP * 96, blen[b]) < 0 || recv_n(fd, rb, (size_t)replen * c->P) < 0) {
-            printf("LBDIAG client %d io failed after %" PRIu32 " ops errno=%d\n", c->id, c->ops, errno);
+        int sfail = send_all(fd, rq + b * MAXP * 96, blen[b]) < 0;
+        if (sfail || recv_n(fd, rb, (size_t)rlen[b]) < 0) {
+            printf("LBDIAG client %d io failed after %" PRIu32 " ops errno=%d in=%s got=%u/%d fd=%d connect_us=%d "
+                   "fail_after_us=%d\n", c->id, c->ops, errno, sfail ? "send" : "recv", (unsigned)g_recv_got, rlen[b],
+                   fd, connect_us, (int)(esp_timer_get_time() - t0));
             c->err = 2;
             break;
         }
@@ -281,7 +299,13 @@ static void preload(void)
         const char *av[] = {"SET", key, "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"};
         int n = resp(rq, 3, av, NULL);
         send_all(fd, rq, n);
-        recv_n(fd, rb, 5);
+        /* every SET must be acknowledged: an earlier version ignored "-OOM" replies, so benchmark
+           GETs later found missing keys ("$-1", 5 bytes), waited for 39 and timed out */
+        if (recv_n(fd, rb, 5) < 0 || memcmp(rb, "+OK\r\n", 5) != 0) {
+            printf("LBDIAG preload SET %d failed: '%.5s'\n", i, (const char *)rb);
+            close(fd);
+            return;
+        }
     }
     close(fd);
 }
@@ -328,10 +352,10 @@ static void bench(const char *scen, int conns, int P, int set)
         cyc += g_stats[i].exec_cycles;
     }
     printf("RESULT {\"part\":\"loopback\",\"scenario\":\"%s\",\"server\":\"%s\",\"cores\":\"%s\",\"engine\":\"%s\","
-           "\"cmd\":\"%s\",\"conns\":%d,\"P\":%d,\"ops_per_s\":%" PRIu64 ",\"batch_p50_us\":%" PRIu32
+           "\"cmd\":\"%s\",\"rep\":%d,\"run_ms\":%d,\"conns\":%d,\"P\":%d,\"ops_per_s\":%" PRIu64 ",\"batch_p50_us\":%" PRIu32
            ",\"batch_p99_us\":%" PRIu32 ",\"batch_p999_us\":%" PRIu32 ",\"cpu0_pct\":%.1f,\"cpu1_pct\":%.1f,"
            "\"server_cmds_per_batch\":%.2f,\"server_exec_us_per_cmd\":%.3f,\"errors\":%d,\"heap_free\":%u}\n",
-           scen, variant_server_name(), variant_cores_name(), kv_engine_name(), set ? "SET" : "GET", conns, P,
+           scen, variant_server_name(), variant_cores_name(), kv_engine_name(), set == 2 ? "MIX90" : set ? "SET" : "GET", g_rep, RUN_MS, conns, P,
            (uint64_t)ops * 1000000 / win, n ? all[n / 2] : 0, n ? all[n * 99 / 100] : 0,
            n ? all[n * 999 / 1000] : 0, 100.0 * (1.0 - (double)(a1 - a0) / win),
            100.0 * (1.0 - (double)(b1 - b0) / win), srv_batches ? (double)srv_cmds / srv_batches : 0.0,
@@ -350,6 +374,15 @@ static void bench(const char *scen, int conns, int P, int set)
         vTaskGetRunTimeStats(buf);
         printf("TASKSTATS\n%s\nTASKSTATS END\n", buf);
     }
+#endif
+#if CONFIG_LWIP_STATS
+    int n_act = 0, n_tw = 0;
+    for (struct tcp_pcb *q = tcp_active_pcbs; q; q = q->next) n_act++; /* diagnostic, unlocked read */
+    for (struct tcp_pcb *q = tcp_tw_pcbs; q; q = q->next) n_tw++;
+    printf("LWIPDIAG tcp xmit=%u recv=%u drop=%u memerr=%u proterr=%u err=%u | pcbs active=%d time_wait=%d"
+           " | link drop=%u\n",
+           lwip_stats.tcp.xmit, lwip_stats.tcp.recv, lwip_stats.tcp.drop, lwip_stats.tcp.memerr,
+           lwip_stats.tcp.proterr, lwip_stats.tcp.err, n_act, n_tw, lwip_stats.link.drop);
 #endif
     /* wait until the server has closed every connection of this run (max 2 s) */
     extern volatile int srv_active[2];
@@ -406,12 +439,237 @@ static void echo_baseline(int core)
     vTaskDelay(pdMS_TO_TICKS(50));
 }
 
+/* ---- concurrent consistency test: 4 clients x 3 s, 8 pipelined requests, 50 % SET.
+ * Key "chk:NNNN" is written only by client NNNN % 4, with increasing versions; every value is
+ * "kkkk:vvvvvvvv:fffffffff:cccccccc" (key, version, fill, checksum), 32 bytes. Every GET checks
+ * the key and checksum (torn/corrupted), that the version was published (writers publish BEFORE
+ * sending) and that it never goes backwards for that reader; at the end every key must hold its
+ * writer's last version. Run against the real server, so it covers every server model. */
+#define CK 512
+#define CC 4
+static volatile uint32_t ck_pub[CK];
+static uint32_t ck_seen[CC][CK];
+typedef struct {
+    int id;
+    uint32_t gets, sets, torn, future, backwards, misses, errors;
+} ckc_t;
+static ckc_t ckc[CC];
+
+static uint32_t ck_sum(const char *p, int n)
+{
+    uint32_t h = 2166136261u;
+    while (n--) h = (h ^ (uint8_t)*p++) * 16777619u;
+    return h;
+}
+
+static void ck_val(char *v, int k, uint32_t ver)
+{
+    char tmp[24];
+    snprintf(tmp, sizeof tmp, "%04x:%08" PRIx32 ":%09" PRIu32, k, ver, (uint32_t)(k * 2654435761u ^ ver) % 1000000000u);
+    memcpy(v, tmp, 23);
+    snprintf(v + 23, 10, ":%08" PRIx32, ck_sum(v, 23));
+}
+
+/* parse one GET reply at p (n bytes available); returns bytes consumed or -1 */
+static int ck_reply(ckc_t *c, int k, const uint8_t *p, int n)
+{
+    if (n >= 5 && memcmp(p, "$-1\r\n", 5) == 0) {
+        c->misses++;
+        return 5;
+    }
+    if (n < 39 || memcmp(p, "$32\r\n", 5) != 0) return -1;
+    const char *v = (const char *)p + 5;
+    unsigned kk;
+    uint32_t ver, sum;
+    if (sscanf(v, "%4x:%8" SCNx32, &kk, &ver) != 2 || sscanf(v + 24, "%8" SCNx32, &sum) != 1 || (int)kk != k ||
+        sum != ck_sum(v, 23)) {
+        c->torn++;
+        return 39;
+    }
+    if (ver > ck_pub[k]) c->future++;
+    if (ver < ck_seen[c->id][k]) c->backwards++;
+    ck_seen[c->id][k] = ver;
+    return 39;
+}
+
+static void ck_task(void *arg)
+{
+    ckc_t *c = arg;
+    int fd = lb_connect();
+    char *rq = malloc(8 * 90);
+    uint8_t *rb = malloc(8 * 48);
+    uint32_t x = 2463534242u ^ (c->id * 977);
+    if (fd < 0 || !rq || !rb) {
+        c->errors++;
+        goto out;
+    }
+    while (!go) vTaskDelay(1);
+    while (!stop) {
+        int n = 0, ks[8], isset[8], want = 0;
+        for (int i = 0; i < 8; i++) {
+            x ^= x << 13;
+            x ^= x >> 17;
+            x ^= x << 5;
+            int k = x % CK;
+            char key[12], val[33];
+            snprintf(key, sizeof key, "chk:%04d", k);
+            isset[i] = (x >> 20) & 1 && (k % CC) == c->id; /* only the key's own writer SETs it */
+            ks[i] = k;
+            if (isset[i]) {
+                uint32_t ver = ck_pub[k] + 1; /* this client is the only writer of k */
+                ck_val(val, k, ver);
+                ck_pub[k] = ver; /* publish before sending: readers may see it immediately */
+                const char *av[] = {"SET", key, val};
+                n += resp(rq + n, 3, av, NULL);
+                want += 5;
+                c->sets++;
+            } else {
+                const char *av[] = {"GET", key};
+                n += resp(rq + n, 2, av, NULL);
+                want += 39; /* "$32\r\n" + 32 + "\r\n" (a miss is shorter: handled below) */
+                c->gets++;
+            }
+        }
+        if (send_all(fd, rq, n) < 0) {
+            c->errors++;
+            break;
+        }
+        int got = 0, off = 0;
+        for (int i = 0; i < 8; i++) { /* read reply by reply */
+            int need = isset[i] ? 5 : 5;
+            while (got - off < need) {
+                int r = recv(fd, rb + got, 8 * 48 - got, 0);
+                if (r <= 0) {
+                    c->errors++;
+                    goto out;
+                }
+                got += r;
+            }
+            if (isset[i]) {
+                if (memcmp(rb + off, "+OK\r\n", 5) != 0) c->errors++;
+                off += 5;
+                continue;
+            }
+            if (memcmp(rb + off, "$-1\r\n", 5) != 0)
+                while (got - off < 39) {
+                    int r = recv(fd, rb + got, 8 * 48 - got, 0);
+                    if (r <= 0) {
+                        c->errors++;
+                        goto out;
+                    }
+                    got += r;
+                }
+            int u = ck_reply(c, ks[i], rb + off, got - off);
+            if (u < 0) {
+                c->errors++;
+                goto out;
+            }
+            off += u;
+        }
+        (void)want;
+    }
+out:
+    if (fd >= 0) close(fd);
+    free(rq);
+    free(rb);
+    xSemaphoreGive(done);
+    vTaskDelete(NULL);
+}
+
+static void consistency_test(void)
+{
+    int fd = lb_connect();
+    char rq[96], key[12], val[33];
+    uint8_t rb[64];
+    for (int k = 0; k < CK; k++) { /* version 0 everywhere */
+        snprintf(key, sizeof key, "chk:%04d", k);
+        ck_val(val, k, 0);
+        const char *av[] = {"SET", key, val};
+        send_all(fd, rq, resp(rq, 3, av, NULL));
+        recv_n(fd, rb, 5);
+        ck_pub[k] = 0;
+        for (int c = 0; c < CC; c++) ck_seen[c][k] = 0;
+    }
+    memset(ckc, 0, sizeof ckc);
+    for (int c = 0; c < CC; c++) {
+        ckc[c].id = c;
+        xTaskCreatePinnedToCore(ck_task, "ck", 4096, &ckc[c], 5, NULL, 0);
+    }
+    vTaskDelay(pdMS_TO_TICKS(100));
+    go = 1;
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    stop = 1;
+    for (int c = 0; c < CC; c++) xSemaphoreTake(done, portMAX_DELAY);
+    go = stop = 0;
+    /* final state: every key must hold its writer's last version */
+    uint32_t final_bad = 0, unreadable = 0;
+    ckc_t fin = {.id = 0};
+    for (int k = 0; k < CK; k++) {
+        snprintf(key, sizeof key, "chk:%04d", k);
+        const char *av[] = {"GET", key};
+        send_all(fd, rq, resp(rq, 2, av, NULL));
+        if (recv_n(fd, rb, 5) < 0 || memcmp(rb, "$32\r\n", 5) != 0 || recv_n(fd, rb + 5, 34) < 0) {
+            unreadable++;
+            continue;
+        }
+        unsigned kk;
+        uint32_t ver, sum;
+        const char *v = (const char *)rb + 5;
+        if (sscanf(v, "%4x:%8" SCNx32, &kk, &ver) != 2 || sscanf(v + 24, "%8" SCNx32, &sum) != 1 ||
+            (int)kk != k || sum != ck_sum(v, 23)) {
+            unreadable++;
+            continue;
+        }
+        if (ver != ck_pub[k]) final_bad++;
+    }
+    /* clean up: the store must have room for the benchmark keys that are preloaded next */
+    for (int k = 0; k < CK; k++) {
+        snprintf(key, sizeof key, "chk:%04d", k);
+        const char *av[] = {"DEL", key};
+        send_all(fd, rq, resp(rq, 2, av, NULL));
+        recv_n(fd, rb, 4); /* ":1\r\n" */
+    }
+    close(fd);
+    (void)fin;
+    /* wait until the server has closed the test's connections: the first benchmark run of the
+       previous version started while they were still open and hit the 8-connection limit */
+    extern volatile int srv_active[2];
+    for (int w = 0; w < 300 && (srv_active[0] + srv_active[1]) > 0; w++) vTaskDelay(pdMS_TO_TICKS(10));
+    ckc_t a = {0};
+    for (int c = 0; c < CC; c++) {
+        a.gets += ckc[c].gets, a.sets += ckc[c].sets, a.torn += ckc[c].torn, a.future += ckc[c].future;
+        a.backwards += ckc[c].backwards, a.misses += ckc[c].misses, a.errors += ckc[c].errors;
+    }
+    int ok = !a.torn && !a.future && !a.backwards && !a.misses && !a.errors && !final_bad && !unreadable;
+    printf("RESULT {\"part\":\"lb_consistency\",\"server\":\"%s\",\"cores\":\"%s\",\"engine\":\"%s\",\"clients\":%d,"
+           "\"run_ms\":3000,\"gets_checked\":%" PRIu32 ",\"sets\":%" PRIu32 ",\"torn\":%" PRIu32 ",\"future\":%" PRIu32
+           ",\"backwards\":%" PRIu32 ",\"misses\":%" PRIu32 ",\"io_errors\":%" PRIu32 ",\"final_mismatch\":%" PRIu32
+           ",\"final_unreadable\":%" PRIu32 ",\"pass\":%d}\n",
+           variant_server_name(), variant_cores_name(), kv_engine_name(), CC, a.gets, a.sets, a.torn, a.future,
+           a.backwards, a.misses, a.errors, final_bad, unreadable, ok);
+}
+
 void loopback_run(void)
 {
     done = xSemaphoreCreateCounting(8, 0);
     vTaskPrioritySet(NULL, 20); /* controller preempts the busy client tasks */
     functional();
 #if CONFIG_KV_LOOPBACK_FUNCTIONAL_ONLY
+    return;
+#endif
+#if CONFIG_KV_LOOPBACK_FINAL
+    /* Entry 7: correctness under concurrency, then 5 repetitions x 2 s of each workload */
+    consistency_test();
+    preload();
+    g_lb_run_ms = 2000;
+    for (g_rep = 0; g_rep < 5; g_rep++) {
+        bench("quiet", 1, 1, 0);  /* GET, one request in flight */
+        bench("quiet", 4, 1, 0);  /* GET, 4 connections, one in flight each (comparable to microredis) */
+        bench("quiet", 4, 1, 2);  /* 90/10 mix, 4 connections, one in flight each */
+        bench("quiet", 4, 16, 0); /* GET, 4 connections x 16 pipelined */
+        bench("quiet", 4, 16, 1); /* SET */
+        bench("quiet", 4, 16, 2); /* 90/10 GET/SET mix */
+    }
     return;
 #endif
     echo_baseline(1); /* echo task on core 1: socket calls cross to lwIP's core 0 */

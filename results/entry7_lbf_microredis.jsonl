@@ -1,0 +1,16 @@
+{"pass": 10, "fails": ["(b'*2\\r\\n$3\\r\\nTTL\\r\\n$1\\r\\ne\\r\\n', b':9\\r\\n')"], "part": "mr_functional", "fail": 1}
+{"mem_free": 27696, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 0, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+{"mem_free": 31024, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 0, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 26320, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 0, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 27088, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 1, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+{"mem_free": 29984, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 1, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 29952, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 1, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 30768, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 2, "run_ms": 2000, "ops_per_s": 25, "errors": 0}
+{"mem_free": 26240, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 2, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 2, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 27056, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 3, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+{"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 3, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 3, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 27056, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 4, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+{"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 4, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+{"mem_free": 26240, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 4, "run_ms": 2000, "ops_per_s": 0, "errors": 4}

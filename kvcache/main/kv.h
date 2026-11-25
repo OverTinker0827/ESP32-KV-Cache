@@ -28,6 +28,7 @@ int kv_exists(const uint8_t *k, size_t kl); /* 1 if present */
 int64_t kv_pttl(const uint8_t *k, size_t kl); /* -2 missing, -1 no expiry, else ms */
 int kv_expire(const uint8_t *k, size_t kl, uint32_t ttl_ms); /* 1 if set */
 void kv_active_expire(int budget);
+void kv_active_expire_mask(int budget, uint32_t shard_mask);
 void kv_set_evict(int on); /* 1 = allkeys-lru (CLOCK), 0 = noeviction */
 /* Phase 3 engine (kv_opt.c v2 only) */
 void kv_set_prefix(int on); /* prefix compression; change only on an empty store */

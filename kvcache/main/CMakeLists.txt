@@ -1,4 +1,4 @@
-set(srcs main.c cmd.c resp.c sysmon.c engine_bench.c wifisim.c mc_bench.c loopback.c engine_test.c p3_bench.c)
+set(srcs main.c cmd.c resp.c sysmon.c engine_bench.c wifisim.c mc_bench.c loopback.c engine_test.c p3_bench.c route.c)
 
 if(CONFIG_KV_ENGINE_BASIC)
     list(APPEND srcs kv_basic.c)
@@ -18,7 +18,7 @@ endif()
 
 idf_component_register(SRCS ${srcs}
                        INCLUDE_DIRS "."
-                       PRIV_REQUIRES esp_wifi esp_netif nvs_flash esp_timer lwip freertos heap esp_driver_gptimer)
+                       PRIV_REQUIRES esp_wifi esp_netif nvs_flash esp_timer lwip freertos heap esp_driver_gptimer vfs)
 
 # WiFi credentials come from the git-ignored ../../wifi_secrets.json (never from sdkconfig)
 set(SECRETS "${CMAKE_CURRENT_LIST_DIR}/../../wifi_secrets.json")

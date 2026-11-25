@@ -1,4 +1,4 @@
-﻿/* Optimized engine v2 (Phase 3: memory), designed around the ESP32's constraints.
+/* Optimized engine v2 (Phase 3: memory), designed around the ESP32's constraints.
  * The Entry 5 version is frozen as kv_opt1.c for before/after comparisons.
  *
  * Memory
@@ -283,6 +283,10 @@ static void default_mode(void)
     g_nshards = 1, g_lock = KV_LOCK_SEQ;
 #elif CONFIG_KV_CORES_SHARDED
     g_nshards = 8, g_lock = KV_LOCK_SEQ;
+#elif CONFIG_KV_CORES_OWNER
+    g_nshards = 8, g_lock = KV_LOCK_NONE; /* single owner per shard: routing replaces locking */
+#elif CONFIG_KV_CORES_DISPATCH
+    g_nshards = 1, g_lock = KV_LOCK_NONE; /* the dispatch worker owns everything */
 #else
     g_nshards = 1, g_lock = KV_LOCK_NONE;
 #endif
@@ -1218,10 +1222,14 @@ int kv_expire(const uint8_t *k, size_t kl, uint32_t ttl_ms)
     return r;
 }
 
-void kv_active_expire(int budget)
+void kv_active_expire(int budget) { kv_active_expire_mask(budget, 0xFF); }
+
+/* sweep only the shards in `mask` (owner mode: a loop sweeps the shards it owns) */
+void kv_active_expire_mask(int budget, uint32_t mask)
 {
     uint32_t now = kv_now_ms();
     for (int s = 0; s < NSH; s++) {
+        if (!(mask >> s & 1)) continue;
         shard_t *sh = &shards[s];
         SH_LOCK(sh);
         for (int b = 0; b < budget; b++) {

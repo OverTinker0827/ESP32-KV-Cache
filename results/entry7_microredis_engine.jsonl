@@ -1,0 +1,12 @@
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 0, "workload": "g90_uniform", "ops_per_s": 6969, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 1, "workload": "g90_uniform", "ops_per_s": 6897, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 2, "workload": "g90_uniform", "ops_per_s": 6894, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 3, "workload": "g90_uniform", "ops_per_s": 6897, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 4, "workload": "g90_uniform", "ops_per_s": 6894, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 0, "workload": "g50_uniform", "ops_per_s": 4151, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 1, "workload": "g50_uniform", "ops_per_s": 4182, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 2, "workload": "g50_uniform", "ops_per_s": 4274, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 3, "workload": "g50_uniform", "ops_per_s": 4276, "run_ms": 3000}
+{"design": "microredis", "freq": 240000000, "part": "final", "rep": 4, "workload": "g50_uniform", "ops_per_s": 4275, "run_ms": 3000}
+{"workload": "g90_uniform", "pass": 1, "part": "final_check", "run_ms": 3000, "sets": 541, "keys": 512, "wrong_value": 0, "final_mismatch": 0, "gets_checked": 4522, "design": "microredis"}
+{"workload": "g50_uniform", "pass": 1, "part": "final_check", "run_ms": 3000, "sets": 2576, "keys": 512, "wrong_value": 0, "final_mismatch": 0, "gets_checked": 2632, "design": "microredis"}

@@ -33,6 +33,10 @@ menu "ESP32 KV Cache"
             bool "shared: one loop per core, one table, one global spinlock"
         config KV_CORES_SHARDED
             bool "sharded: one loop per core, table split into 2 shards, per-shard lock"
+        config KV_CORES_OWNER
+            bool "owner: one loop per core, each owns half the shards; foreign keys forwarded, no locks"
+        config KV_CORES_DISPATCH
+            bool "dispatch: receiver loop on core 0 parses, a worker on core 1 executes everything"
     endchoice
 
     config KV_HOT_IRAM
@@ -67,6 +71,11 @@ menu "ESP32 KV Cache"
         int "Adaptive reserve: take pages back above this much free heap (KB)"
         depends on KV_ADAPTIVE_RESERVE
         default 104
+
+    config KV_LOOPBACK_FINAL
+        bool "Loopback test: Entry 7 mode (functional + consistency + 5 x 2 s repeated workloads)"
+        depends on KV_LOOPBACK_TEST
+        default n
 
     config KV_LOOPBACK_FUNCTIONAL_ONLY
         bool "Loopback test: run only the functional suite (fits the deployment heap reserve)"

@@ -1,0 +1,525 @@
+[MicroRedis] Initialized on 127.0.0.1:6380
+[MicroRedis] Starting on 127.0.0.1:6380
+[MicroRedis] Server started on 127.0.0.1:6380
+[MicroRedis] Memory: 31KB free
+[Snapshot] File not found: microredis.mrdb
+[MicroRedis] Started active expiry loop
+[MicroRedis] Started auto-save loop
+[MicroRedis] Client connected: ('127.0.0.1', 57386) (1/8)
+[MicroRedis] Memory: 25KB free
+RESULT {"pass": 10, "fails": ["(b'*2\\r\\n$3\\r\\nTTL\\r\\n$1\\r\\ne\\r\\n', b':9\\r\\n')"], "part": "mr_functional", "fail": 1}
+[MicroRedis] Client connected: ('127.0.0.1', 57387) (2/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57386) (1/8)
+[MicroRedis] Client disconnected: ('127.0.0.1', 57387) (0/8)
+heap free before benchmarks: 28976
+[MicroRedis] Client connected: ('127.0.0.1', 57388) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57388) (0/8)
+RESULT {"mem_free": 27696, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 0, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+[MicroRedis] Client connected: ('127.0.0.1', 57389) (1/8)
+[MicroRedis] Memory: 10KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57389) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8340>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57390) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57390) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0d70>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57391) (1/8)
+[MicroRedis] Memory: 18KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57391) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0f70>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57392) (1/8)
+[MicroRedis] Memory: 18KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57392) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0fe0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 31024, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 0, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57394) (1/8)
+[MicroRedis] Memory: 16KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57394) (0/8)
+client 0 error [Errno 104] ECONNRESET
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0ec0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57395) (1/8)
+[MicroRedis] Memory: 15KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57395) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffffab0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57396) (1/8)
+[MicroRedis] Memory: 18KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57396) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8340>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 26320, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 0, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57397) (1/8)
+[MicroRedis] Memory: 22KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57397) (0/8)
+RESULT {"mem_free": 27088, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 1, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+[MicroRedis] Client connected: ('127.0.0.1', 57398) (1/8)
+[MicroRedis] Memory: 8KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57398) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8dc0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57399) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57399) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0fb0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57400) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57400) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe10e0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57401) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57401) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe1150>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 29984, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 1, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57402) (1/8)
+[MicroRedis] Memory: 9KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57402) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8340>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57403) (1/8)
+[MicroRedis] Memory: 15KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57403) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe09f0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57404) (1/8)
+[MicroRedis] Memory: 15KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57404) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0dd0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57405) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57405) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0fc0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 29952, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 1, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57406) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57406) (0/8)
+RESULT {"mem_free": 30768, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 2, "run_ms": 2000, "ops_per_s": 25, "errors": 0}
+[MicroRedis] Client connected: ('127.0.0.1', 57407) (1/8)
+[MicroRedis] Memory: 8KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57407) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8dc0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57408) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57408) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0d10>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57409) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57409) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0ee0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57410) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57410) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fffc880>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 26240, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 2, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57411) (1/8)
+[MicroRedis] Memory: 8KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57411) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fffdbf0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57412) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57412) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0e20>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57413) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57413) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0bb0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57414) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57414) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fffdbf0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+[MicroRedis] Memory check: 18KB free, 158KB allocated
+[MicroRedis] Low memory detected (18KB), forcing GC...
+[MicroRedis] After GC: 26KB free
+RESULT {"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 2, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57415) (1/8)
+[MicroRedis] Memory: 22KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57415) (0/8)
+RESULT {"mem_free": 27056, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 3, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+[MicroRedis] Client connected: ('127.0.0.1', 57416) (1/8)
+[MicroRedis] Memory: 7KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57416) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8dc0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57417) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57417) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe11d0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57418) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57418) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe13c0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57419) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57419) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fffdbf0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 3, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57420) (1/8)
+[MicroRedis] Memory: 9KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57420) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fffd640>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57421) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57421) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0d50>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57422) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57422) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0ee0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57423) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57423) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fffdbf0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 3, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57424) (1/8)
+[MicroRedis] Memory: 22KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57424) (0/8)
+RESULT {"mem_free": 27056, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 1, "rep": 4, "run_ms": 2000, "ops_per_s": 26, "errors": 0}
+[MicroRedis] Client connected: ('127.0.0.1', 57425) (1/8)
+[MicroRedis] Memory: 8KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57425) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8dc0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57426) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57426) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0d40>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57427) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57427) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0e90>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 0 error [Errno 104] ECONNRESET
+[MicroRedis] Client connected: ('127.0.0.1', 57428) (1/8)
+[MicroRedis] Memory: 17KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57428) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fffdbf0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 26272, "P": 1, "part": "loopback", "server": "microredis", "cmd": "GET", "conns": 4, "rep": 4, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+[MicroRedis] Client connected: ('127.0.0.1', 57430) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57430) (0/8)
+client 0 error [Errno 104] ECONNRESET
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe15f0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57431) (1/8)
+[MicroRedis] Memory: 14KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57431) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3ffe0940>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+[MicroRedis] Client connected: ('127.0.0.1', 57432) (1/8)
+[MicroRedis] Memory: 19KB free
+[MicroRedis] Client disconnected: ('127.0.0.1', 57432) (0/8)
+Task exception wasn't retrieved
+future: <Task> coro= <generator object '_client_connected' at 3fff8dc0>
+Traceback (most recent call last):
+  File "asyncio/core.py", line 1, in run_until_complete
+  File "main.py", line 282, in _client_connected
+  File "network/connection.py", line 309, in handle_client
+  File "network/connection.py", line 84, in __init__
+  File "core/protocol.py", line 73, in __init__
+MemoryError: memory allocation failed, allocating 4096 bytes
+client 1 error [Errno 104] ECONNRESET
+RESULT {"mem_free": 26240, "P": 1, "part": "loopback", "server": "microredis", "cmd": "MIX90", "conns": 4, "rep": 4, "run_ms": 2000, "ops_per_s": 0, "errors": 4}
+MRLBDONE

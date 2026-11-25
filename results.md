@@ -681,3 +681,203 @@ Functional suite at the **real 40 KB deployment reserve**: Entry 5 engine 30/34 
 
 Raw data: `results/entry6_p3_*.jsonl`, `results/entry6_lb_*.jsonl`; tables: `python tools/summarize_p3.py entry6`
 (saved as `results/entry6_tables.md`).
+
+## Entry 7 — 2026-11-25 — Final comparison: shared vs sharded vs owner vs queue dispatch, with and without network, against microredis (all re-measured)
+
+Everything in this entry was measured again today on the same board (ESP32-D0WD-V3, 240 MHz, no PSRAM, radio
+off). Nothing is copied from earlier entries. Each design was rebuilt, flashed and run on its own boot.
+
+**What was compared**
+
+| design | what it does |
+|---|---|
+| single (core) | one task/loop does everything on core 1 (the deployed default) |
+| shared (seqlock / rw) | two loops (one per core), one table, readers optimistic (seqlock) or reader-writer lock |
+| sharded8 (seqlock / rw) | two loops, table split into 8 shards, each with its own lock |
+| owner | 8 shards; each core owns 4 and never locks; a key owned by the other core is forwarded to it (lock-free ring + wake-up) |
+| dispatch (queue) | one receiver hands every request to worker(s) through a queue: 1 worker, 2 owner workers, or a shared worker pool |
+| basic C | Entry 1's straightforward C (malloc per entry, task per client) |
+| microredis | the upstream MicroPython server this project started from |
+
+**Method.** No network: the engine harness from Phases 1–3; 1024 random 16 B keys, 32 B values, 90/10 and
+50/50 GET/SET, **5 runs × 3 s** per design, then one extra **checked** run per workload. The checker makes every
+value self-describing (key, version, checksum). One writer per key publishes versions before writing. Every GET
+is verified: not torn, not a version nobody wrote, not older than one already seen, not missing. At the end
+every key's final value is checked. Network: the real server over lwIP TCP loopback (127.0.0.1); client tasks run
+on core 0 of the same chip. Functional suite (34 checks), then a 4-client concurrent **consistency test** (the
+same checks over TCP, 3 s), then **5 runs × 2 s** of six workloads. microredis ran the same engine workload on
+MicroPython v1.29.0 and its real asyncio server over loopback, also 5 × 2 s.
+
+### No network (engine only)
+
+### No network, g90_uniform (5 runs x 3 s each)
+
+| design | ops/s mean | std dev | min - max | vs single core | p50 / p99 / p99.9 µs | CPU core0 / core1 |
+|---|---:|---:|---:|---:|---:|---:|
+| single_core | 299,774 | 57 (0.0 %) | 299,694 - 299,846 | 1.00× | 3.18 / 3.60 / 7.21 | 0 % / 100 % |
+| shared_seqlock | 447,320 | 1,447 (0.3 %) | 445,512 - 449,211 | 1.49× | 3.91 / 11.02 / 15.68 | 100 % / 100 % |
+| shared_rw | 440,022 | 1,626 (0.4 %) | 438,854 - 442,876 | 1.47× | 4.05 / 6.85 / 14.74 | 100 % / 100 % |
+| sharded8_seqlock | 477,230 | 342 (0.1 %) | 476,881 - 477,658 | 1.59× | 3.94 / 8.19 / 13.79 | 100 % / 100 % |
+| sharded8_rw | 471,926 | 192 (0.0 %) | 471,722 - 472,209 | 1.57× | 4.04 / 6.15 / 13.73 | 100 % / 100 % |
+| owner | 543,553 | 383 (0.1 %) | 542,987 - 544,012 | 1.81× | 3.50 / 4.01 / 13.29 | 100 % / 100 % |
+| dispatch_1worker | 275,761 | 84 (0.0 %) | 275,713 - 275,908 | 0.92× | – | 100 % / 100 % |
+| dispatch_2owners | 488,448 | 4,512 (0.9 %) | 481,590 - 493,558 | 1.63× | – | 100 % / 100 % |
+| dispatch_pool | 377,183 | 1,240 (0.3 %) | 376,293 - 379,055 | 1.26× | – | 100 % / 97 % |
+| microredis | 6,910 | 33 (0.5 %) | 6,894 - 6,969 | 0.02× | – | one core (MicroPython) |
+
+### No network, g50_uniform (5 runs x 3 s each)
+
+| design | ops/s mean | std dev | min - max | vs single core | p50 / p99 / p99.9 µs | CPU core0 / core1 |
+|---|---:|---:|---:|---:|---:|---:|
+| single_core | 296,909 | 74 (0.0 %) | 296,798 - 296,986 | 1.00× | 3.26 / 3.63 / 7.12 | 0 % / 100 % |
+| shared_seqlock | 332,185 | 1,029 (0.3 %) | 330,850 - 333,375 | 1.12× | 4.32 / 25.15 / 42.21 | 100 % / 100 % |
+| shared_rw | 345,044 | 1,025 (0.3 %) | 343,930 - 346,325 | 1.16× | 6.28 / 7.17 / 17.14 | 100 % / 100 % |
+| sharded8_seqlock | 447,679 | 674 (0.2 %) | 446,993 - 448,609 | 1.51× | 4.20 / 9.10 / 14.57 | 100 % / 100 % |
+| sharded8_rw | 462,213 | 94 (0.0 %) | 462,062 - 462,297 | 1.56× | 4.04 / 6.54 / 14.18 | 100 % / 100 % |
+| owner | 536,184 | 160 (0.0 %) | 536,014 - 536,416 | 1.81× | 3.57 / 4.01 / 13.36 | 100 % / 100 % |
+| dispatch_1worker | 273,083 | 14 (0.0 %) | 273,068 - 273,093 | 0.92× | – | 100 % / 100 % |
+| dispatch_2owners | 487,117 | 4,474 (0.9 %) | 481,870 - 491,592 | 1.64× | – | 100 % / 100 % |
+| dispatch_pool | 301,763 | 1,238 (0.4 %) | 300,597 - 303,438 | 1.02× | – | 100 % / 96 % |
+| microredis | 4,232 | 60 (1.4 %) | 4,151 - 4,276 | 0.01× | – | one core (MicroPython) |
+
+### No network, correctness (one checked 3 s run per design and workload)
+
+| design | workload | GETs checked | SETs | torn | unpublished version | went backwards | misses | final state wrong | verdict |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---|
+| single_core | g90_uniform | 421,740 | 49,731 | 0 | 0 | 0 | 0 | 0 | PASS |
+| shared_seqlock | g90_uniform | 806,912 | 41,756 | 0 | 0 | 0 | 0 | 0 | PASS |
+| shared_rw | g90_uniform | 791,729 | 41,392 | 0 | 0 | 0 | 0 | 0 | PASS |
+| sharded8_seqlock | g90_uniform | 816,362 | 43,790 | 0 | 0 | 0 | 0 | 0 | PASS |
+| sharded8_rw | g90_uniform | 808,309 | 38,663 | 0 | 0 | 0 | 0 | 0 | PASS |
+| owner | g90_uniform | 822,489 | 88,887 | 0 | 0 | 0 | 0 | 0 | PASS |
+| dispatch_1worker | g90_uniform | 409,477 | 44,930 | 0 | 0 | 0 | 0 | 0 | PASS |
+| dispatch_2owners | g90_uniform | 766,044 | 88,917 | 0 | 0 | 0 | 0 | 0 | PASS |
+| dispatch_pool | g90_uniform | 684,443 | 71,605 | 0 | 0 | 0 | 0 | 0 | PASS |
+| single_core | g50_uniform | 236,875 | 237,077 | 0 | 0 | 0 | 0 | 0 | PASS |
+| shared_seqlock | g50_uniform | 597,233 | 194,715 | 0 | 0 | 0 | 0 | 0 | PASS |
+| shared_rw | g50_uniform | 613,067 | 200,274 | 0 | 0 | 0 | 0 | 0 | PASS |
+| sharded8_seqlock | g50_uniform | 633,362 | 208,020 | 0 | 0 | 0 | 0 | 0 | PASS |
+| sharded8_rw | g50_uniform | 619,495 | 216,159 | 0 | 0 | 0 | 0 | 0 | PASS |
+| owner | g50_uniform | 452,876 | 454,161 | 0 | 0 | 0 | 0 | 0 | PASS |
+| dispatch_1worker | g50_uniform | 222,098 | 228,725 | 0 | 0 | 0 | 0 | 0 | PASS |
+| dispatch_2owners | g50_uniform | 435,862 | 424,911 | 0 | 0 | 0 | 0 | 0 | PASS |
+| dispatch_pool | g50_uniform | 353,395 | 344,573 | 0 | 0 | 0 | 0 | 0 | PASS |
+| microredis (512 keys) | g90_uniform | 4,522 | 541 | – | – | – | 0 wrong | 0 | PASS |
+| microredis (512 keys) | g50_uniform | 2,632 | 2,576 | – | – | – | 0 wrong | 0 | PASS |
+
+(Dispatch designs time the whole request, so they have no per-operation latency percentiles. The microredis
+checked run uses 512 keys, see bug 3 below.)
+
+### Network (real server over loopback TCP)
+
+### Network (real server over loopback TCP), 5 runs x 2 s each: ops/s mean (std dev %) [min - max]
+
+| design | GET 1×1 | GET 4×1 | MIX90 4×1 | GET 4×16 | SET 4×16 | MIX90 4×16 |
+|---|---:|---:|---:|---:|---:|---:|
+| single | 1,218 (3.2 %) [1,166 - 1,264] | 1,153 (1.0 %) [1,134 - 1,162] | 1,136 (1.2 %) [1,116 - 1,153] | 19,544 (1.1 %) [19,318 - 19,716] | 18,926 (0.7 %) [18,768 - 19,104] | 19,440 (0.9 %) [19,239 - 19,608] |
+| shared | 1,144 (16.5 %) [936 - 1,301] | 873 (0.5 %) [867 - 878] | 877 (0.8 %) [870 - 888] | 12,718 (0.3 %) [12,672 - 12,767] | 12,701 (0.4 %) [12,640 - 12,768] | 12,723 (0.4 %) [12,664 - 12,792] |
+| sharded | 1,144 (16.8 %) [932 - 1,301] | 876 (0.5 %) [870 - 881] | 879 (0.9 %) [873 - 892] | 12,728 (0.6 %) [12,600 - 12,800] | 12,678 (0.1 %) [12,664 - 12,688] | 12,758 (0.6 %) [12,680 - 12,856] |
+| owner | 766 (8.2 %) [701 - 836] | 668 (0.7 %) [663 - 673] | 668 (0.7 %) [663 - 675] | 5,137 (6.3 %) [4,704 - 5,471] | 5,234 (5.2 %) [4,912 - 5,496] | 5,150 (4.8 %) [4,864 - 5,416] |
+| dispatch | 927 (0.9 %) [918 - 936] | 692 (4.1 %) [667 - 736] | 699 (2.8 %) [668 - 715] | 10,354 (2.2 %) [10,040 - 10,584] | 10,081 (1.0 %) [9,992 - 10,240] | 10,158 (1.5 %) [10,000 - 10,336] |
+| basic | 572 (0.6 %) [569 - 576] | 950 (1.5 %) [937 - 974] | 941 (1.2 %) [925 - 953] | 82 (28.1 %) [48 - 112] | 141 (82.2 %) [48 - 328] | 104 (87.0 %) [32 - 240] |
+| microredis | 26 (1.7 %) [25 - 26] | 0 (0.0 %) [0 - 0] ⚠ | 0 (0.0 %) [0 - 0] ⚠ | - | - | - |
+
+### Network, latency (batch round trip, mean over runs): p50 / p99 µs
+
+| design | GET 1×1 | GET 4×1 | MIX90 4×1 | GET 4×16 | SET 4×16 | MIX90 4×16 |
+|---|---:|---:|---:|---:|---:|---:|
+| single | 805 / 981 | 3,707 / 5,406 | 3,773 / 5,529 | 3,280 / 4,964 | 3,261 / 6,044 | 3,265 / 5,494 |
+| shared | 869 / 1,490 | 3,889 / 13,453 | 3,851 / 13,532 | 4,504 / 15,487 | 4,129 / 17,103 | 4,553 / 16,498 |
+| sharded | 869 / 1,592 | 3,866 / 13,494 | 3,863 / 13,827 | 4,442 / 16,448 | 4,177 / 16,301 | 4,568 / 16,690 |
+| owner | 1,469 / 1,944 | 5,227 / 17,446 | 5,161 / 17,681 | 11,264 / 35,922 | 10,652 / 37,758 | 10,743 / 37,861 |
+| dispatch | 1,077 / 1,084 | 5,173 / 9,187 | 5,277 / 9,142 | 5,665 / 13,446 | 5,778 / 12,912 | 5,781 / 13,200 |
+| basic | 1,742 / 2,004 | 3,962 / 7,955 | 4,045 / 7,638 | 1,036,085 / 3,100,487 | 1,176,917 / 3,114,543 | 1,900,053 / 3,315,203 |
+| microredis | – | – | – | – | – | – |
+
+### Network, correctness
+
+| design | functional suite | consistency: GETs checked | SETs | torn | unpublished | backwards | final wrong | io errors | verdict |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---|
+| single | see log | 18,103 | 2,729 | 0 | 0 | 0 | 0 | 0 | PASS |
+| shared | see log | 14,127 | 2,105 | 0 | 0 | 0 | 0 | 0 | PASS |
+| sharded | see log | 14,130 | 2,102 | 0 | 0 | 0 | 0 | 0 | PASS |
+| owner | see log | 6,280 | 952 | 0 | 0 | 0 | 0 | 0 | PASS |
+| dispatch | see log | 10,397 | 1,587 | 0 | 0 | 0 | 0 | 0 | PASS |
+| basic | see log | 139 | 29 | 0 | 0 | 0 | 0 | 0 | PASS |
+| microredis | 10/11 | not run | | | | | | | |
+
+Functional suite: single 34/34, shared 34/34, **sharded 32/34, owner 32/34** (both fail `set_10k`/`get_10k`, see
+finding 5), dispatch 34/34, basic C 33/33, microredis 10/11 (`TTL` answered 9 right after `SET ... EX 10`;
+Redis rounds to 10). All six C designs passed the TCP consistency test with 0 errors. microredis could not run it,
+because it cannot hold 4 connections (below).
+
+### Findings
+
+1. **Without network, owner-based sharding is the best design: 1.81× one core on both mixes** (543,553 and
+   536,184 ops/s) with the tightest tail (p99 4.0 µs). No locks at all; forwarding is rare because each core's
+   stream is mostly its own keys. That is the same 1.78–1.81× SRAM-bus ceiling seen in Phase 1. Nothing went past it.
+2. **Locks cost most under writes.** Shared seqlock falls from 1.49× (90 % GET) to 1.12× (50 % GET, p99 25 µs:
+   readers retry while writers hold the line). A reader-writer lock is steadier under writes (1.16×). Splitting
+   into 8 shards removes most of the contention (1.51–1.59×).
+3. **A queue in front of the work is a loss unless the receiver also works.** One receiver + one worker is
+   *slower* than one core (0.92×): the FreeRTOS queue handoff (~6.5 µs, Phase 2) costs more than the ~3 µs
+   operation. Two owner workers reach 1.63×, a shared worker pool 1.02–1.26×.
+4. **With network, the single loop wins every workload.** 1,218 ops/s with one request in flight, ~19,500
+   pipelined. Two loops (shared or sharded) lose 24 % at 4×1 and 35 % pipelined. Owner loses 42 % / 74 %
+   (forwarding plus a wake-up per foreign key, and replies wait for the other core). Dispatch loses 40 % / 47 %.
+   About 93 % of a request is lwIP/socket work (Entry 5), done by lwIP's single thread on core 0. A second loop on
+   core 0 competes with that thread instead of adding capacity. One loop on core 1 leaves core 0 to lwIP: in effect
+   **the network stack is the "second worker"**. GET 1×1 on the two-loop designs varies run to run (936–1,301),
+   depending on which core the connection lands on.
+5. **8-shard designs cannot store a 10 KB value in the loopback build.** Each shard gets its own slice of the
+   page pool. The loopback build has 18 pages (72 KiB, because 120 KB of heap is reserved for the on-chip
+   clients), i.e. ~2 pages (8 KiB) per shard, so a 10 KB value does not fit one shard. Owner mode also disables
+   value streaming (streaming touches the engine directly, not through the router). This is a real cost of
+   per-shard memory: the largest value becomes about 1/8 of the arena.
+6. **Against microredis** (same chip, same workloads, measured today):
+
+| | microredis | basic C | final C (single) | final C best (owner) |
+|---|---:|---:|---:|---:|
+| engine, 90/10 GET/SET (ops/s) | 6,910 | – | 299,774 (**43×**) | 543,553 (**79×**) |
+| engine, 50/50 (ops/s) | 4,232 | – | 296,909 (**70×**) | 536,184 (**127×**) |
+| server, GET, 1 client, 1 in flight (ops/s) | 26 | 572 | 1,218 (**47×**) | 766 |
+| server, GET, 4 clients (ops/s) | fails: out of memory | 950 | 1,153 | 668 |
+| server, GET, 4 clients × 16 pipelined (ops/s) | not supported (one command per read) | 82 | 19,544 (**~750× microredis's 1-client rate**) | 5,137 |
+| correctness | engine PASS (512 keys); server functional 10/11 | 33/33, consistency PASS | 34/34, all checks PASS | 32/34 (10 KB), all checks PASS |
+
+   microredis's server costs ~37 ms per request over loopback. A bare MicroPython asyncio echo server on the same
+   loopback takes **~17 ms** (control run), so about half of that is MicroPython's event loop, not microredis.
+   A real external client over WiFi would change both numbers. Each microredis connection allocates a 4 KB
+   buffer, and with ~26–31 KB of heap left the fragmented heap refused it in every 4-client run (38
+   MemoryErrors). (Basic C at 4×16 collapses for a different reason: one segment per reply overflows lwIP's
+   loopback queue, Entry 5.)
+
+**Best design, by environment:** no network → **owner** (1.81×). With this chip running its own network stack →
+**single loop on core 1** (the default). With an external network processor (planned: ESP8266 over SPI), lwIP
+leaves this chip, the situation moves towards the no-network case, and owner/sharded are worth testing again.
+
+### Bugs found (fixed)
+
+1. **In the benchmark harness, not the server.** The first two network attempts had one client time out in the
+   first repetition of the 4-client runs (`errno=11`). Instrumenting it showed 5-byte replies (`$-1`, key
+   missing) where 39 bytes were expected. The new consistency test left its 512 keys behind, so the preload's SETs got
+   `-OOM`, and the preload never checked replies. Now the consistency test deletes its keys and the preload aborts
+   loudly on any reply other than `+OK`. After the fix: 0 errors in all 180 C runs. Ruled out first: server buffer
+   allocation, accept failures, loopback queue size, lwIP drops (lwIP counters showed 0). Earlier attempts are kept
+   in `results/entry7_first_attempt/` and `results/entry7_second_attempt/`.
+2. **microredis's server never ran on MicroPython.** `writer.get_extra_info('peername', default)` takes no default
+   argument in MicroPython, so every accepted connection raised `TypeError`. This is now a 4th build-time patch in
+   `tools/build_mpy.py`. It went unnoticed before because WiFi never came up.
+3. **microredis cannot hold 1024 keys with distinct 32 B values** (MemoryError while preloading). Its timed runs
+   still use 1024 keys because every key shares one value object; the checked run uses 512 keys.
+
+### Corrections
+
+- **Entry 5 says the loopback queue was 32 packets.** lwIP accepts at most 16 (`CONFIG_LWIP_LOOPBACK_MAX_PBUFS`),
+  the 32 was silently ignored, and Entries 5–6 ran with the default 8. Now set to 16. (An unlimited queue made no
+  difference to this entry's numbers.)
+
+Raw data: `results/entry7_nonet.jsonl`, `results/entry7_microredis_engine.jsonl`, `results/entry7_lbf_*.jsonl`,
+`results/entry7_microredis_loopback.log`; tables: `python tools/summarize_final.py nonet|net` (saved as
+`results/entry7_nonet_tables.md`, `results/entry7_net_tables.md`). New server modes: `owner`, `dispatch`
+(`kvcache/variants/owner.cfg`, `dispatch.cfg`, `kvcache/main/route.c`).

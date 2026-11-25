@@ -53,6 +53,10 @@ const char *variant_cores_name(void)
     return "single-core0";
 #elif CONFIG_KV_CORES_SHARED
     return "dual-shared-lock";
+#elif CONFIG_KV_CORES_OWNER
+    return "dual-owner-forward";
+#elif CONFIG_KV_CORES_DISPATCH
+    return "receiver0-worker1";
 #else
     return "dual-sharded";
 #endif

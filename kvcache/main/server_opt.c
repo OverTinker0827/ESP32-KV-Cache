@@ -15,10 +15,11 @@
 #include "server.h"
 #include "cmd.h"
 #include "kv.h"
+#include "route.h"
 
 static const char *TAG = "srv_opt";
 
-#if CONFIG_KV_CORES_SHARED || CONFIG_KV_CORES_SHARDED
+#if CONFIG_KV_CORES_SHARED || CONFIG_KV_CORES_SHARDED || CONFIG_KV_CORES_OWNER
 #define NLOOPS 2
 #else
 #define NLOOPS 1
@@ -188,7 +189,7 @@ static HOT int conn_readable(conn_t *c, srv_stats_t *st)
     if (n <= 0) return -1;
     int64_t t0 = esp_timer_get_time();
     c->rlen += n;
-#if CONFIG_KV_ENGINE_OPT
+#if CONFIG_KV_ENGINE_OPT && !KV_ROUTED
     if (c->streaming) {
         if (stream_feed(c) < 0) return -1;
         if (c->streaming) return 0; /* more value bytes to come */
@@ -206,7 +207,7 @@ static HOT int conn_readable(conn_t *c, srv_stats_t *st)
         size_t need;
         int r = resp_parse(c->rx + off, c->rlen - off, argv, &argc, &need);
         if (r == 0) {
-#if CONFIG_KV_ENGINE_OPT
+#if CONFIG_KV_ENGINE_OPT && !KV_ROUTED /* streaming touches the engine directly */
             /* a SET whose value cannot fit the receive buffer: stream the value into the store */
             const uint8_t *key;
             size_t kl, vl;
@@ -252,7 +253,7 @@ static HOT int conn_readable(conn_t *c, srv_stats_t *st)
             if (send_all(c->fd, o.buf, o.len) < 0) return -1;
             o.len = 0;
             rc = cmd_exec(argc, argv, &o);
-#if CONFIG_KV_ENGINE_OPT
+#if CONFIG_KV_ENGINE_OPT && !KV_ROUTED
             /* a GET reply larger than the transmit buffer: stream it through the same buffer
                (no extra memory), instead of growing the buffer from the heap reserve */
             if (rc == KV_ENOROOM && argc == 2 && argv[0].n == 3 && (argv[0].p[0] | 0x20) == 'g' &&
@@ -284,6 +285,9 @@ static HOT int conn_readable(conn_t *c, srv_stats_t *st)
         if (rc == 1) quit = 1;
         off += r;
         ncmd++;
+#if CONFIG_KV_CORES_OWNER
+        route_service(xPortGetCoreID()); /* forwarded calls from the other loop */
+#endif
     }
     if (o.len && send_all(c->fd, o.buf, o.len) < 0) return -1;
     if (off < c->rlen) memmove(c->rx, c->rx + off, c->rlen - off);
@@ -329,6 +333,12 @@ static void loop_task(void *arg)
                 FD_SET(L->c[i].fd, &rs);
                 if (L->c[i].fd > maxfd) maxfd = L->c[i].fd;
             }
+#if CONFIG_KV_CORES_OWNER
+        int wfd = route_wake_fd(L->id); /* the other loop forwarded a call to us */
+        FD_SET(wfd, &rs);
+        if (wfd > maxfd) maxfd = wfd;
+        route_service(L->id);
+#endif
         struct timeval tv = {.tv_sec = 0, .tv_usec = 20000};
         uint32_t cs0 = ccount();
         int n = maxfd >= 0 ? select(maxfd + 1, &rs, NULL, NULL, &tv) : (vTaskDelay(pdMS_TO_TICKS(20)), 0);
@@ -336,8 +346,19 @@ static void loop_task(void *arg)
         srv_diag[0]++;
         srv_diag[n > 0 ? 1 : n == 0 ? 2 : 3]++;
         if (n < 0) srv_diag[5] = errno;
+#if CONFIG_KV_CORES_OWNER
+        if (n > 0 && FD_ISSET(wfd, &rs)) {
+            route_wake_clear(L->id);
+            n--;
+        }
+        route_service(L->id);
+#endif
         if (n <= 0) {
+#if CONFIG_KV_CORES_OWNER
+            kv_active_expire_mask(64, L->id ? 0xAA : 0x55); /* only the shards this loop owns */
+#elif !CONFIG_KV_CORES_DISPATCH /* dispatch: the worker sweeps */
             kv_active_expire(64); /* idle: incremental TTL sweep */
+#endif
 #if CONFIG_KV_ADAPTIVE_RESERVE
             if (L->id == 0) kv_mem_adjust(CONFIG_KV_ADAPTIVE_LOW_KB * 1024, CONFIG_KV_ADAPTIVE_HIGH_KB * 1024);
 #endif
@@ -371,6 +392,9 @@ static void loop_task(void *arg)
 
 void server_start(void)
 {
+#if KV_ROUTED
+    route_start();
+#endif
     int lfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     int one = 1;
     setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof one);
@@ -387,8 +411,8 @@ void server_start(void)
         for (int i = 0; i < MAXC; i++) L->c[i].fd = -1;
 #if CONFIG_KV_CORES_SINGLE
         L->core = 1;
-#elif CONFIG_KV_CORES_SINGLE_CORE0
-        L->core = 0;
+#elif CONFIG_KV_CORES_SINGLE_CORE0 || CONFIG_KV_CORES_DISPATCH
+        L->core = 0; /* dispatch: the receiver sits next to lwIP, the worker has core 1 */
 #else
         L->core = l; /* loop 0 -> core 0, loop 1 -> core 1 */
 #endif

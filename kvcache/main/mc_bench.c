@@ -32,7 +32,8 @@
 
 #define K 1024
 #define STREAM 4096 /* ops per task stream, replayed cyclically */
-#define RUN_MS 400
+static int g_run_ms = 400; /* per-run window; the final comparison uses 3000 */
+#define RUN_MS g_run_ms
 #define NSAMP 2048
 #define KEYLEN 16
 #define VALLEN 32
@@ -95,7 +96,7 @@ static void build_stream(int t, const wl_t *w, int shard_filter)
 {
     for (int i = 0; i < STREAM;) {
         int k = w->zipf ? zipf_key() : (int)(rnd() % K);
-        if (shard_filter >= 0 && key_shard[k] != shard_filter) continue;
+        if (shard_filter >= 0 && (key_shard[k] & 1) != shard_filter) continue; /* owner = shard parity */
         int set = (int)(rnd() % 100) >= w->get_pct;
         stream[t][i++] = (uint16_t)(k | (set ? 0x8000 : 0));
     }
@@ -904,9 +905,12 @@ static void run_under_wifisim(void)
     g_scen = "quiet";
 }
 
+#include "mc_final.inc"
+
 /* ================================================================== driver */
 static void mc_phase1(void) __attribute__((unused));
 static void mc_phase2(void) __attribute__((unused));
+static void mc_phase3(void) __attribute__((unused));
 
 void mc_bench_run(size_t reserve)
 {
@@ -920,7 +924,9 @@ void mc_bench_run(size_t reserve)
     build_keys();
     /* the controller must preempt the busy worker tasks to end each window */
     vTaskPrioritySet(NULL, 20);
-#if CONFIG_KV_MC_PHASE == 2
+#if CONFIG_KV_MC_PHASE == 3
+    mc_phase3();
+#elif CONFIG_KV_MC_PHASE == 2
     mc_phase2();
 #else
     mc_phase1();
