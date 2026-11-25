@@ -17,6 +17,7 @@ static EventGroupHandle_t wev;
 #define GOT_IP BIT0
 
 void engine_bench_run(size_t reserve);
+void mc_bench_run(size_t reserve);
 
 static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
 {
@@ -62,7 +63,9 @@ void app_main(void)
     size_t reserve = CONFIG_KV_HEAP_RESERVE_KB * 1024;
     printf("VARIANT engine=%s server=%s cores=%s iram=%d\n", kv_engine_name(), variant_server_name(),
            variant_cores_name(), KV_IRAM_ON);
-#if CONFIG_KV_ENGINE_SELFTEST
+#if CONFIG_KV_MC_BENCH
+    mc_bench_run(reserve);
+#elif CONFIG_KV_ENGINE_SELFTEST
     engine_bench_run(reserve);
 #endif
 #if CONFIG_KV_NO_WIFI

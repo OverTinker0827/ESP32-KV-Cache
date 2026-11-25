@@ -63,6 +63,11 @@ menu "ESP32 KV Cache"
         bool "Engine-only build: never start WiFi (board power cannot sustain the radio)"
         default n
 
+    config KV_MC_BENCH
+        bool "Phase 1 multicore harness: runtime lock modes/shards, run designs at boot (opt engine)"
+        depends on KV_ENGINE_OPT
+        default n
+
     config KV_ENGINE_SELFTEST
         bool "Run on-device engine benchmark at boot (before WiFi) and print RESULT"
         default y

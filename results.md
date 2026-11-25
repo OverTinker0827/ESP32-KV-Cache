@@ -183,3 +183,130 @@ Raw data: `results/microredis_engine_ondevice.json`, `results/engine_ondevice_su
 - The WiFi simulator must be re-calibrated against real WiFi once the board's supply is fixed.
 
 Raw data: `results/entry2_<variant>.jsonl` (one RESULT line per scenario), tables via `python tools/summarize.py entry2`.
+
+---
+
+## Entry 3 — 2026-11-25 — Phase 1: multicore designs (on-device, WiFi off)
+
+**Method.** One firmware (`variants/opt.cfg + nowifi.cfg + mc.cfg`, harness `kvcache/main/mc_bench.c`)
+runs every design at boot with the lock discipline and shard count switched at runtime, so all designs
+share the same binary, memory layout and keys. 1,024 random 16 B keys (preloaded), 32 B values,
+workloads 90/10 and 50/50 GET/SET, uniform or Zipf(θ = 0.99). Each run lasts 0.4 s; every 16th
+operation is timed. Baseline `1c_nolock` = one task on core 1, no lock. In the *direct* designs each
+core gets its own request stream (as with two event loops each owning its own connections); the *queue*
+designs have one receiver task on core 0 (standing in for the network stack) feeding workers.
+Lock modes: `mux` = FreeRTOS `portMUX` (disables interrupts), `cas` = plain compare-and-swap spinlock
+(S32C1I), `rw` = readers-writer spinlock, `seqlock` = lock-free optimistic GETs + CAS-locked writers,
+`owned` = each core only receives keys of its own shard, no lock (shared-nothing upper bound).
+
+Note: the baseline here (289k ops/s) is lower than Entry 2's 357k GET/s because this harness mixes
+GET/SET over 1,024 random keys and adds its own loop overhead; compare designs within this entry.
+
+### Direct designs: throughput (ops/s) and speed-up vs 1 core without lock
+
+| design | g90_uniform | g50_uniform | g90_zipf | g50_zipf |
+|---|---:|---:|---:|---:|
+| 1c_nolock | 289,071 (1.00×) | 290,891 (1.00×) | 289,766 (1.00×) | 291,633 (1.00×) |
+| 1c_mux | 227,906 (0.79×) | 229,033 (0.79×) | 228,273 (0.79×) | 229,506 (0.79×) |
+| 1c_cas | 277,178 (0.96×) | 278,916 (0.96×) | 277,938 (0.96×) | 279,586 (0.96×) |
+| 2c_shared_mux | 277,433 (0.96×) | 291,229 (1.00×) | 278,455 (0.96×) | 292,683 (1.00×) |
+| 2c_shared_cas | 325,594 (1.13×) | 346,084 (1.19×) | 326,998 (1.13×) | 347,423 (1.19×) |
+| 2c_sharded_cas | 418,119 (1.45×) | 427,871 (1.47×) | 420,347 (1.45×) | 430,085 (1.47×) |
+| 2c_shared_rw | 471,825 (1.63×) | 394,080 (1.35×) | 473,697 (1.63×) | 395,328 (1.36×) |
+| 2c_sharded_rw | 484,340 (1.68×) | 450,480 (1.55×) | 487,805 (1.68×) | 452,817 (1.55×) |
+| 2c_shared_seqlock | 476,375 (1.65×) | 361,095 (1.24×) | 477,392 (1.65×) | 365,385 (1.25×) |
+| 2c_sharded_seqlock | 489,167 (1.69×) | 426,505 (1.47×) | 491,395 (1.70×) | 427,742 (1.47×) |
+| **2c_owned_nolock** | **515,587 (1.78×)** | **511,989 (1.76×)** | **517,074 (1.78×)** | **513,469 (1.76×)** |
+
+### Direct designs: latency and lock contention
+
+| design | workload | p50 / p99 / p99.9 µs | contended acquisitions | spin cycles per contended | time spinning | seqlock retries |
+|---|---|---:|---:|---:|---:|---:|
+| 1c_nolock | g90_uniform | 3.29 / 3.83 / 7.27 | – | – | – | – |
+| 1c_mux | g90_uniform | 4.21 / 5.02 / 8.43 | 0.0 % | – | 0.0 % | – |
+| 1c_cas | g90_uniform | 3.43 / 3.99 / 7.50 | 0.0 % | – | 0.0 % | – |
+| 2c_shared_mux | g90_uniform | 7.06 / 8.47 / 17.81 | 98.5 % | 593 | 33.8 % | – |
+| 2c_shared_cas | g90_uniform | 5.96 / 6.65 / 17.76 | 99.3 % | 451 | 30.4 % | – |
+| 2c_shared_cas | g50_uniform | 5.51 / 7.39 / 17.40 | 99.3 % | 382 | 27.4 % | – |
+| 2c_sharded_cas | g90_uniform | 4.08 / 6.38 / 15.99 | 34.7 % | 443 | 13.4 % | – |
+| 2c_sharded_cas | g50_uniform | 4.04 / 6.20 / 16.16 | 36.8 % | 358 | 11.7 % | – |
+| 2c_shared_rw | g90_uniform | 3.77 / 5.92 / 14.65 | 15.5 % | 383 | 5.8 % | – |
+| 2c_shared_rw | g50_uniform | 5.12 / 6.12 / 17.07 | 66.6 % | 364 | 19.9 % | – |
+| 2c_sharded_rw | g90_uniform | 3.81 / 5.90 / 14.13 | 8.2 % | 333 | 2.8 % | – |
+| 2c_sharded_rw | g50_uniform | 3.90 / 6.07 / 15.93 | 26.9 % | 341 | 8.6 % | – |
+| 2c_shared_seqlock | g90_uniform | 3.66 / 10.10 / 15.87 | 9.6 % | 383 | 3.6 % | 9,705 |
+| 2c_shared_seqlock | g50_uniform | 3.98 / 21.75 / 34.85 | 50.2 % | 355 | 13.4 % | 35,998 |
+| 2c_sharded_seqlock | g90_uniform | 3.70 / 7.87 / 16.03 | 5.0 % | 353 | 1.8 % | 5,110 |
+| 2c_sharded_seqlock | g50_uniform | 4.00 / 12.49 / 16.65 | 23.8 % | 341 | 7.2 % | 14,860 |
+| 2c_owned_nolock | g90_uniform | 3.66 / 4.07 / 12.87 | – | – | – | – |
+| 2c_owned_nolock | g50_uniform | 3.69 / 4.12 / 13.90 | – | – | – | – |
+
+(Zipf rows are within 2 % of the uniform rows and are in the raw data.)
+
+### Queue designs: receiver task on core 0 hands requests to workers
+
+| design | workload | handoff | ops/s | vs 1c_nolock | worker0 / worker1 ops/s | CPU core0 / core1 |
+|---|---|---|---:|---:|---:|---:|
+| q_1w | g90_uniform | FreeRTOS queue, 1/item | 102,164 | 0.35× | 102,164 / – | 100 % / 100 % |
+| q_2w_shared | g90_uniform | FreeRTOS queue, 1/item | 206,898 | 0.72× | 68,639 / 138,259 | 100 % / 97 % |
+| q_2w_routed | g90_uniform | FreeRTOS queue, 1/item | 190,601 | 0.66× | 91,821 / 98,779 | 100 % / 64 % |
+| q_1w_batch16 | g90_uniform | FreeRTOS queue, 16/item | 250,718 | 0.87× | 250,718 / – | 31 % / 100 % |
+| q_2w_routed_batch16 | g90_uniform | FreeRTOS queue, 16/item | 408,109 | 1.41× | 203,234 / 204,874 | 100 % / 83 % |
+| ring_1w | g90_uniform | SPSC ring, 1/item | 250,039 | 0.86× | 250,039 / – | 100 % / 100 % |
+| **ring_2w_routed** | g90_uniform | SPSC ring, 1/item | **442,547** | **1.53×** | 215,298 / 227,248 | 100 % / 100 % |
+| ring_2w_routed_batch16 | g90_uniform | SPSC ring, 16/publish | 441,237 | 1.53× | 215,318 / 225,918 | 100 % / 100 % |
+| q_2w_routed_batch16 | g90_zipf | FreeRTOS queue, 16/item | 411,357 | 1.42× | 203,318 / 208,038 | 100 % / 84 % |
+| ring_2w_routed | g90_zipf | SPSC ring, 1/item | 429,085 | 1.48× | 216,308 / 212,776 | 100 % / 100 % |
+
+Queue latencies (p50 184–745 µs, in the raw data) are measured at saturation: the receiver keeps the
+queue full, so they equal queue depth × service time (Little's law), not the cost of one handoff.
+They are not comparable to the direct designs' per-operation latencies.
+
+### Statistics counters (2c_owned_nolock, g90_uniform)
+
+| counter design | ops/s | lost updates in 0.4 s |
+|---|---:|---:|
+| per-core counters, combined at the end | 515,549 | 0 |
+| one shared counter, atomic CAS increment | 505,769 (−1.9 %) | 0 |
+| one shared counter, plain `++` | 513,662 | **316** |
+
+### Findings
+
+1. **Two cores top out at 1.78×, even with no lock at all** (`2c_owned_nolock`). Per-operation p50 rises
+   3.29 → 3.66 µs (+11 %) when both cores work at once: the cores share the internal SRAM bus. This is
+   the real ceiling for any dual-core design on this chip (parallel efficiency 89 %).
+2. **A shared table behind FreeRTOS's `portMUX` gives no speed-up (0.96×).** 98.5 % of acquisitions are
+   contended; the cores take turns. `portMUX` alone costs 21 % on one core (it disables interrupts and
+   tracks the owner); a plain CAS spinlock costs 4 %. Lock choice matters more than core count.
+3. **Sharding (teammate's idea) works:** 2 shards with a CAS lock each cut contention from 99 % to 35 %
+   and reach 1.45×. Combined with a readers-writer lock or a seqlock it reaches 1.68–1.70×.
+4. **Read-mostly locks win only when reads dominate.** At 90 % GET, RW lock (1.63×) and seqlock (1.65×)
+   on a single shared table nearly match sharding; at 50 % GET they fall to 1.35× and 1.24×, and the
+   seqlock's p99 doubles (21.8 µs) because readers retry (36k retries in 0.4 s). Sharded RW is the most
+   robust lock-based design across mixes (1.55–1.68×).
+5. **Receiver → queue → workers (teammate's idea): the handoff mechanism decides everything.**
+   One FreeRTOS queue item per request adds ~6.5 µs to a 3.3 µs operation (9.8 µs per request in
+   total) and makes it **3× slower than one core** (0.35×).
+   Batching 16 requests per item: 0.87× (1 worker), 1.41× (2 routed workers). A lock-free SPSC ring:
+   **1.53× without batching**, and batching adds nothing on top of a ring. With per-request FreeRTOS
+   queues the receiver itself becomes the bottleneck (worker 1 idle 36 % in `q_2w_routed`).
+6. **Per-core counters are only 1.9 % faster than one shared atomic counter.** ESP32's internal SRAM has
+   no data cache, so there is no cache-line bouncing; the gain is avoiding the CAS, and it is small. The
+   plain shared counter lost 316 increments in 0.4 s: per-core or atomic is required for correctness.
+7. **Zipf(0.99) skew changed nothing here** (all within 2 %): locks are per shard, not per key, and with
+   2 shards and randomly placed hot keys the two workers stayed balanced (93.8k vs 93.6k ops/s).
+   Load imbalance needs a stronger skew or more shards: Phase 2.
+
+### Limitations
+
+- WiFi off; the direct designs assume requests already arrive per core. The network stack's serial cost
+  (Amdahl) will reduce all speed-ups; measured in Phase 4.
+- The CAS, RW and seqlock locks do not disable interrupts; under WiFi load a preempted lock holder makes
+  the other core spin. To test with the WiFi-load simulator.
+- Seqlock GETs do not set the CLOCK reference bit, so eviction is less LRU-like under that mode.
+- **IRAM is nearly full.** The first full network build (optimized engine + lwIP/WiFi IRAM options)
+  overflowed IRAM by 2,940 B; with `CONFIG_ESP_WIFI_EXTRA_IRAM_OPT` removed it links at 128,343 of
+  131,072 B (97.9 %). Every IRAM byte now competes between our hot path and the network stack's:
+  a Phase 4 measurement.
+
+Raw data: `results/entry3_mc.jsonl`; tables: `python tools/summarize_mc.py entry3_mc.jsonl`.

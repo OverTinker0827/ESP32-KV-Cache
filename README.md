@@ -24,6 +24,16 @@ On-device storage-engine benchmark, ESP32 @ 240 MHz, 16 B keys, 32 B values, seq
 With simulated WiFi load on the other core the optimized engine loses only 4 %; on the same core it
 loses 42 %, which is why the cache is pinned away from the WiFi core.
 
+Multicore (both cores, 90 % GET, vs one core without a lock):
+
+| design | speed-up |
+|---|---:|
+| shared table, FreeRTOS `portMUX` | 0.96× |
+| shared table, readers-writer lock | 1.63× |
+| 2 shards, seqlock | 1.69× |
+| receiver → lock-free ring → 2 shard-owning workers | 1.53× |
+| 2 shards each owned by one core, no lock (ceiling: shared SRAM bus) | 1.78× |
+
 Network benchmarks (throughput, p95/p99 latency, CPU per core) are pending a power fix on the
 test board; see [Hardware notes](#hardware-notes).
 

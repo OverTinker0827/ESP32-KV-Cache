@@ -1,4 +1,4 @@
-set(srcs main.c cmd.c resp.c sysmon.c engine_bench.c wifisim.c)
+set(srcs main.c cmd.c resp.c sysmon.c engine_bench.c wifisim.c mc_bench.c)
 
 if(CONFIG_KV_ENGINE_BASIC)
     list(APPEND srcs kv_basic.c)

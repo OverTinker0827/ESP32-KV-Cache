@@ -33,6 +33,23 @@ int kv_get_evict(void);
 void kv_stats(kv_stats_t *s);
 const char *kv_engine_name(void);
 
+/* ---- multicore harness (CONFIG_KV_MC_BENCH, opt engine): runtime shards + lock discipline ---- */
+enum {
+    KV_LOCK_NONE = 0, /* single owner, no lock */
+    KV_LOCK_MUX,      /* FreeRTOS portMUX spinlock (disables interrupts) */
+    KV_LOCK_CAS,      /* plain compare-and-swap spinlock (S32C1I) */
+    KV_LOCK_RW,       /* readers-writer spinlock: GETs in parallel, writers exclusive */
+    KV_LOCK_SEQ,      /* seqlock: GETs read optimistically without a lock, writers CAS-locked */
+};
+typedef struct {
+    uint32_t acq, contended, retries;
+    uint64_t spin_cycles;
+} kv_lockstat_t;
+void kv_mc_set_mode(int nshards, int lock_mode); /* call before kv_init */
+int kv_shard_index(const uint8_t *k, size_t kl);
+void kv_mc_stats(kv_lockstat_t out[2]); /* per core */
+void kv_mc_reset_stats(void);
+
 /* tick-based clock: 1 ms resolution, wrap-safe comparisons */
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

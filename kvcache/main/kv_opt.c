@@ -25,12 +25,28 @@
 
 static const char *TAG = "kv_opt";
 
-#if CONFIG_KV_CORES_SHARDED
-#define NSHARDS 2
+#if CONFIG_KV_MC_BENCH
+/* Multicore harness build: shard count and lock discipline are chosen at runtime
+ * (kv_mc_set_mode) so every design runs from one firmware under identical conditions. */
+#include "esp_cpu.h"
+#define MAXSHARDS 2
+static int g_nshards = 1;
+static int g_lock = KV_LOCK_NONE;
+#define NSH g_nshards
+#define NEED_LOCK 1
+#define SH_LOCK(sh) mc_wr_lock(sh)
+#define SH_UNLOCK(sh) mc_wr_unlock(sh)
+#define RD_LOCK(sh) mc_rd_lock(sh)
+#define RD_UNLOCK(sh) mc_rd_unlock(sh)
+/* may a reader modify the table (lazy-expiry removal)? not under shared/optimistic reads */
+#define READER_MAY_WRITE (g_lock != KV_LOCK_RW && g_lock != KV_LOCK_SEQ)
 #else
-#define NSHARDS 1
+#if CONFIG_KV_CORES_SHARDED
+#define MAXSHARDS 2
+#else
+#define MAXSHARDS 1
 #endif
-
+#define NSH MAXSHARDS
 #if CONFIG_KV_CORES_SHARED || CONFIG_KV_CORES_SHARDED || CONFIG_KV_SERVER_BASIC || CONFIG_KV_FORCE_LOCK
 #define NEED_LOCK 1
 #define SH_LOCK(sh) portENTER_CRITICAL(&(sh)->mux)
@@ -39,6 +55,10 @@ static const char *TAG = "kv_opt";
 #define NEED_LOCK 0
 #define SH_LOCK(sh) ((void)0)
 #define SH_UNLOCK(sh) ((void)0)
+#endif
+#define RD_LOCK(sh) SH_LOCK(sh)
+#define RD_UNLOCK(sh) SH_UNLOCK(sh)
+#define READER_MAY_WRITE 1
 #endif
 
 #define PAGE_SZ 4096
@@ -91,9 +111,138 @@ typedef struct {
 #if NEED_LOCK
     portMUX_TYPE mux;
 #endif
+#if CONFIG_KV_MC_BENCH
+    volatile uint32_t lk;  /* CAS spinlock word / RW lock word (bit31 = writer, low bits = readers) */
+    volatile uint32_t seq; /* seqlock sequence: odd while a writer is inside */
+#endif
 } shard_t;
 
-static shard_t shards[NSHARDS];
+static shard_t shards[MAXSHARDS];
+
+#if CONFIG_KV_MC_BENCH
+/* ------------------------------------------------ runtime locks + contention stats */
+typedef struct {
+    uint32_t acq, contended, retries;
+    uint64_t spin_cycles;
+    uint32_t pad[3]; /* keep the two cores' counters apart */
+} lkstat_t;
+static lkstat_t lkstat[2];
+#define RW_W 0x80000000u
+
+static inline HOT bool cas(volatile uint32_t *a, uint32_t expect, uint32_t nv)
+{
+    return esp_cpu_compare_and_set(a, expect, nv);
+}
+
+static inline HOT void cas_spin_lock(volatile uint32_t *l, lkstat_t *st)
+{
+    st->acq++;
+    if (likely(cas(l, 0, 1))) return;
+    st->contended++;
+    uint32_t t0 = ccount();
+    do {
+        while (*l) {
+        }
+    } while (!cas(l, 0, 1));
+    st->spin_cycles += ccount() - t0;
+}
+
+static inline HOT void cas_spin_unlock(volatile uint32_t *l)
+{
+    __sync_synchronize(); /* memw: all stores of the critical section visible first */
+    *l = 0;
+}
+
+static HOT void mc_wr_lock(shard_t *sh)
+{
+    lkstat_t *st = &lkstat[xPortGetCoreID()];
+    switch (g_lock) {
+    case KV_LOCK_NONE:
+        return;
+    case KV_LOCK_MUX: {
+        st->acq++;
+        uint32_t t0 = ccount();
+        portENTER_CRITICAL(&sh->mux);
+        uint32_t dt = ccount() - t0;
+        if (dt > 200) { /* uncontended enter is ~100 cycles; more means we spun */
+            st->contended++;
+            st->spin_cycles += dt;
+        }
+        return;
+    }
+    case KV_LOCK_CAS:
+        cas_spin_lock(&sh->lk, st);
+        return;
+    case KV_LOCK_RW: {
+        st->acq++;
+        if (likely(cas(&sh->lk, 0, RW_W))) return;
+        st->contended++;
+        uint32_t t0 = ccount();
+        while (!cas(&sh->lk, 0, RW_W)) {
+        }
+        st->spin_cycles += ccount() - t0;
+        return;
+    }
+    case KV_LOCK_SEQ:
+        cas_spin_lock(&sh->lk, st);
+        sh->seq++; /* odd: readers will retry */
+        __sync_synchronize();
+        return;
+    }
+}
+
+static HOT void mc_wr_unlock(shard_t *sh)
+{
+    switch (g_lock) {
+    case KV_LOCK_NONE:
+        return;
+    case KV_LOCK_MUX:
+        portEXIT_CRITICAL(&sh->mux);
+        return;
+    case KV_LOCK_CAS:
+    case KV_LOCK_RW:
+        cas_spin_unlock(&sh->lk);
+        return;
+    case KV_LOCK_SEQ:
+        __sync_synchronize();
+        sh->seq++; /* even again */
+        cas_spin_unlock(&sh->lk);
+        return;
+    }
+}
+
+static HOT void mc_rd_lock(shard_t *sh)
+{
+    if (g_lock != KV_LOCK_RW) {
+        mc_wr_lock(sh); /* SEQ readers do not come through here (see kv_get_resp) */
+        return;
+    }
+    lkstat_t *st = &lkstat[xPortGetCoreID()];
+    st->acq++;
+    uint32_t v = sh->lk;
+    if (likely(!(v & RW_W) && cas(&sh->lk, v, v + 1))) return;
+    st->contended++;
+    uint32_t t0 = ccount();
+    for (;;) {
+        v = sh->lk;
+        if (!(v & RW_W) && cas(&sh->lk, v, v + 1)) break;
+    }
+    st->spin_cycles += ccount() - t0;
+}
+
+static HOT void mc_rd_unlock(shard_t *sh)
+{
+    if (g_lock != KV_LOCK_RW) {
+        mc_wr_unlock(sh);
+        return;
+    }
+    __sync_synchronize();
+    for (;;) {
+        uint32_t v = sh->lk;
+        if (cas(&sh->lk, v, v - 1)) return;
+    }
+}
+#endif
 static uint8_t *pages[MAX_PAGES]; /* page 0 unused so that ref != 0 */
 static uint16_t npages;
 static void *blocks[16];
@@ -140,7 +289,9 @@ static inline HOT uint32_t home(const shard_t *sh, uint32_t h)
 
 static inline HOT shard_t *shard_of(uint32_t h)
 {
-#if NSHARDS > 1
+#if CONFIG_KV_MC_BENCH
+    return &shards[g_nshards > 1 ? (h >> 11) & 1 : 0];
+#elif MAXSHARDS > 1
     return &shards[(h >> 11) & 1];
 #else
     (void)h;
@@ -373,10 +524,10 @@ static void shard_reset(shard_t *sh)
 static void distribute_pages(void)
 {
     for (uint16_t pg = npages; pg >= 1; pg--) {
-        shard_t *sh = &shards[pg % NSHARDS];
+        shard_t *sh = &shards[pg % NSH];
         phdr_t *ph = page_hdr(pg);
         ph->cls = CLS_NONE;
-        ph->shard = pg % NSHARDS;
+        ph->shard = pg % NSH;
         ph->next = sh->free_pages;
         sh->free_pages = pg;
     }
@@ -391,15 +542,19 @@ int kv_init(size_t reserve)
     uint32_t est_entries = avail / AVG_ENTRY_EST;
     uint32_t slots_total = est_entries * MAX_LOAD_DEN / MAX_LOAD_NUM + 16;
     index_bytes = 0;
-    for (int s = 0; s < NSHARDS; s++) {
+    for (int s = 0; s < NSH; s++) {
         shard_t *sh = &shards[s];
-        sh->nslots = slots_total / NSHARDS;
+        sh->nslots = slots_total / NSH;
         sh->max_count = sh->nslots * MAX_LOAD_NUM / MAX_LOAD_DEN;
         sh->idx = heap_caps_malloc(sh->nslots * sizeof(uint32_t), caps);
         if (!sh->idx) return -1;
         index_bytes += sh->nslots * sizeof(uint32_t);
 #if NEED_LOCK
         portMUX_INITIALIZE(&sh->mux);
+#endif
+#if CONFIG_KV_MC_BENCH
+        sh->lk = 0;
+        sh->seq = 0;
 #endif
     }
     /* carve pages from the largest free blocks until only `reserve` is left */
@@ -419,17 +574,17 @@ int kv_init(size_t reserve)
         blocks[nblocks++] = b;
         for (size_t o = 0; o < take; o += PAGE_SZ) pages[++npages] = b + o;
     }
-    for (int s = 0; s < NSHARDS; s++) shard_reset(&shards[s]);
+    for (int s = 0; s < NSH; s++) shard_reset(&shards[s]);
     distribute_pages();
     ESP_LOGI(TAG, "arena %u pages (%u KiB) in %d blocks, index %u slots (%u B), %d shard(s), heap left %u",
-             npages, npages * 4, nblocks, (unsigned)(slots_total), (unsigned)index_bytes, NSHARDS,
+             npages, npages * 4, nblocks, (unsigned)(slots_total), (unsigned)index_bytes, NSH,
              (unsigned)heap_caps_get_free_size(caps));
     return npages ? 0 : -1;
 }
 
 void kv_deinit(void)
 {
-    for (int s = 0; s < NSHARDS; s++) {
+    for (int s = 0; s < NSH; s++) {
         heap_caps_free(shards[s].idx);
         shards[s].idx = NULL;
     }
@@ -440,7 +595,7 @@ void kv_deinit(void)
 
 void kv_flush(void)
 {
-    for (int s = 0; s < NSHARDS; s++) {
+    for (int s = 0; s < NSH; s++) {
         shard_t *sh = &shards[s];
         SH_LOCK(sh);
         /* free large values first */
@@ -557,42 +712,118 @@ static inline HOT int utoa10(char *out, uint32_t v)
     return n;
 }
 
-HOT int kv_get_resp(const uint8_t *k, size_t kl, obuf_t *o)
+static inline HOT int put_nil(obuf_t *o)
 {
-    uint32_t h = hash32(k, kl), now = kv_now_ms(), pos;
-    shard_t *sh = shard_of(h);
-    int rc;
-    SH_LOCK(sh);
+    if (!ob_room(o, 5)) return KV_ENOROOM;
+    memcpy(o->buf + o->len, "$-1\r\n", 5);
+    o->len += 5;
+    return KV_NOTFOUND;
+}
+
+static inline HOT int put_val(obuf_t *o, const uint8_t *v, uint32_t vl)
+{
+    if (!ob_room(o, 1 + 5 + 2 + vl + 2)) return KV_ENOROOM;
+    uint8_t *w = o->buf + o->len;
+    *w++ = '$';
+    w += utoa10((char *)w, vl);
+    *w++ = '\r';
+    *w++ = '\n';
+    memcpy(w, v, vl);
+    w += vl;
+    *w++ = '\r';
+    *w++ = '\n';
+    o->len = w - o->buf;
+    return KV_OK;
+}
+
+/* GET body, caller holds the read (or write) lock. may_write: allowed to remove expired entries */
+static HOT int get_locked(shard_t *sh, const uint8_t *k, size_t kl, uint32_t h, uint32_t now, obuf_t *o,
+                          int may_write)
+{
+    uint32_t pos;
     ehdr_t *e = lookup(sh, k, kl, h, &pos);
     if (e && kv_expired(e->expire, now)) {
-        entry_remove(sh, sh->idx[pos] & REF_MASK);
-        sh->expired++;
+        if (may_write) {
+            entry_remove(sh, sh->idx[pos] & REF_MASK);
+            sh->expired++;
+        }
         e = NULL;
     }
-    if (!e) {
-        if (!ob_room(o, 5)) rc = KV_ENOROOM;
-        else {
-            memcpy(o->buf + o->len, "$-1\r\n", 5);
-            o->len += 5;
-            rc = KV_NOTFOUND;
+    if (!e) return put_nil(o);
+    int rc = put_val(o, eval(e), e->vlen);
+    if (rc == KV_OK) e->flags |= F_REF; /* concurrent readers only ever set this bit */
+    return rc;
+}
+
+#if CONFIG_KV_MC_BENCH
+#define OPT_RETRY (-100)
+/* Optimistic (seqlock) read: runs concurrently with a writer, so every field read from the
+ * table may be torn. Everything is bounds-checked; the caller validates the sequence number
+ * afterwards and discards the result on any change. Never writes to the table (so no CLOCK
+ * reference bit for optimistic hits: documented limitation). */
+static HOT int get_optimistic(shard_t *sh, const uint8_t *k, size_t kl, uint32_t h, uint32_t now, obuf_t *o)
+{
+    uint32_t i = home(sh, h), tag = TAG_OF(h), n = sh->nslots;
+    for (uint32_t probes = 0; probes < n; probes++) {
+        uint32_t s = sh->idx[i];
+        if (s == 0) return put_nil(o);
+        if ((s >> REF_BITS) == tag) {
+            uint32_t ref = s & REF_MASK, pg = ref >> 9;
+            if (pg == 0 || pg > npages) return OPT_RETRY;
+            ehdr_t *e = ref2e(ref);
+            uint32_t ekl = e->klen, vl = e->vlen, fl = e->flags, c = page_hdr(pg)->cls;
+            if (c >= NCLS || sizeof(ehdr_t) + ekl + vl > cls_size[c]) return OPT_RETRY; /* torn or large */
+            if (ekl == kl && memcmp(ekey(e), k, kl) == 0) {
+                if (!(fl & F_USED)) return OPT_RETRY;
+                if (kv_expired(e->expire, now)) return put_nil(o);
+                return put_val(o, ekey(e) + kl, vl);
+            }
         }
-    } else if (!ob_room(o, 1 + 5 + 2 + e->vlen + 2)) {
-        rc = KV_ENOROOM;
-    } else {
-        uint8_t *w = o->buf + o->len;
-        *w++ = '$';
-        w += utoa10((char *)w, e->vlen);
-        *w++ = '\r';
-        *w++ = '\n';
-        memcpy(w, eval(e), e->vlen);
-        w += e->vlen;
-        *w++ = '\r';
-        *w++ = '\n';
-        o->len = w - o->buf;
-        e->flags |= F_REF;
-        rc = KV_OK;
+        if (++i == n) i = 0;
     }
-    SH_UNLOCK(sh);
+    return OPT_RETRY;
+}
+#endif
+
+HOT int kv_get_resp(const uint8_t *k, size_t kl, obuf_t *o)
+{
+    uint32_t h = hash32(k, kl), now = kv_now_ms();
+    shard_t *sh = shard_of(h);
+    int rc;
+#if CONFIG_KV_MC_BENCH
+    if (g_lock == KV_LOCK_SEQ) {
+        lkstat_t *st = &lkstat[xPortGetCoreID()];
+        size_t len0 = o->len;
+        st->acq++;
+        for (int tries = 0; tries < 16; tries++) {
+            uint32_t s1;
+            if ((s1 = sh->seq) & 1) { /* a writer is inside: wait for it */
+                uint32_t t0 = ccount();
+                while ((s1 = sh->seq) & 1) {
+                }
+                st->spin_cycles += ccount() - t0;
+                st->contended++;
+            }
+            __sync_synchronize();
+            rc = get_optimistic(sh, k, kl, h, now, o);
+            __sync_synchronize();
+            if (sh->seq == s1) {
+                if (rc != OPT_RETRY) return rc;
+                break; /* consistent but not servable optimistically (large value): lock */
+            }
+            o->len = len0; /* a writer interleaved: discard and retry */
+            st->retries++;
+        }
+        o->len = len0;
+        mc_wr_lock(sh);
+        rc = get_locked(sh, k, kl, h, now, o, 1);
+        mc_wr_unlock(sh);
+        return rc;
+    }
+#endif
+    RD_LOCK(sh);
+    rc = get_locked(sh, k, kl, h, now, o, READER_MAY_WRITE);
+    RD_UNLOCK(sh);
     return rc;
 }
 
@@ -661,7 +892,7 @@ int kv_expire(const uint8_t *k, size_t kl, uint32_t ttl_ms)
 void kv_active_expire(int budget)
 {
     uint32_t now = kv_now_ms();
-    for (int s = 0; s < NSHARDS; s++) {
+    for (int s = 0; s < NSH; s++) {
         shard_t *sh = &shards[s];
         SH_LOCK(sh);
         for (int b = 0; b < budget; b++) {
@@ -687,7 +918,7 @@ int kv_get_evict(void) { return evict_on; }
 void kv_stats(kv_stats_t *st)
 {
     memset(st, 0, sizeof *st);
-    for (int s = 0; s < NSHARDS; s++) {
+    for (int s = 0; s < NSH; s++) {
         shard_t *sh = &shards[s];
         SH_LOCK(sh);
         st->keys += sh->count;
@@ -700,5 +931,28 @@ void kv_stats(kv_stats_t *st)
     }
     st->mem_used += index_bytes * st->keys / (st->index_slots ? st->index_slots : 1);
     st->mem_total += (uint32_t)npages * PAGE_SZ + index_bytes;
-    st->shards = NSHARDS;
+    st->shards = NSH;
 }
+
+#if CONFIG_KV_MC_BENCH
+/* ------------------------------------------------------------ harness API */
+void kv_mc_set_mode(int nshards, int lock_mode)
+{
+    g_nshards = nshards < 1 ? 1 : (nshards > MAXSHARDS ? MAXSHARDS : nshards);
+    g_lock = lock_mode;
+}
+
+int kv_shard_index(const uint8_t *k, size_t kl) { return (int)(shard_of(hash32(k, kl)) - shards); }
+
+void kv_mc_stats(kv_lockstat_t out[2])
+{
+    for (int c = 0; c < 2; c++) {
+        out[c].acq = lkstat[c].acq;
+        out[c].contended = lkstat[c].contended;
+        out[c].retries = lkstat[c].retries;
+        out[c].spin_cycles = lkstat[c].spin_cycles;
+    }
+}
+
+void kv_mc_reset_stats(void) { memset(lkstat, 0, sizeof lkstat); }
+#endif
