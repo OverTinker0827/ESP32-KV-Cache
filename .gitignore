@@ -4,9 +4,9 @@ wifi_secrets.json
 # environments and build outputs (reproducible)
 .venv/
 build/
-ccache/sdkconfig
-ccache/sdkconfig.old
-ccache/build/
+kvcache/sdkconfig
+kvcache/sdkconfig.old
+kvcache/build/
 __pycache__/
 *.pyc
 

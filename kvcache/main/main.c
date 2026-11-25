@@ -12,7 +12,7 @@
 #include "sysmon.h"
 #include "wifi_creds.h"
 
-static const char *TAG = "ccache";
+static const char *TAG = "kvcache";
 static EventGroupHandle_t wev;
 #define GOT_IP BIT0
 

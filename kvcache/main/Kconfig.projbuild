@@ -1,4 +1,4 @@
-menu "ccache (ESP32 KV cache)"
+menu "ESP32 KV Cache"
 
     choice KV_ENGINE
         prompt "Storage engine"

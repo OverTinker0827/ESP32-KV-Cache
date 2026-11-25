@@ -6,7 +6,7 @@ Each connection runs in its own process so the Python client is never the bottle
 for a P=1 run; replies are fixed-size so the client just counts bytes.
 
 Per run: requests/s, avg/p50/p95/p99 latency (per request for P=1, per batch for P>1),
-and for ccache, CPU utilisation per core from INFO idle counters.
+and for the C cache, CPU utilisation per core from INFO idle counters.
 
 Usage: python tools/bench.py --host 192.168.1.50 --label microredis --pipeline 1
 """
@@ -133,10 +133,10 @@ def worker(args):
     q.put({"n": n, "lat": lat, "elapsed": duration})
 
 
-def run(host, port, cmd, conns, P, duration, keyspace, is_ccache):
+def run(host, port, cmd, conns, P, duration, keyspace, is_kvcache):
     q = mp.Manager().Queue()
     start_at = time.time() + 1.0
-    if is_ccache:
+    if is_kvcache:
         i0 = info(host, port)
     t0 = time.time()
     with mp.Pool(conns) as pool:
@@ -158,7 +158,7 @@ def run(host, port, cmd, conns, P, duration, keyspace, is_ccache):
         "lat_p99_us": round(lat[int(len(lat) * 0.99)] / 1000, 1),
         "samples": len(lat),
     }
-    if is_ccache:
+    if is_kvcache:
         i1 = info(host, port)
         dt = int(i1["uptime_us"]) - int(i0["uptime_us"])
         out["cpu0_util"] = round(1 - (int(i1["idle0_us"]) - int(i0["idle0_us"])) / dt, 3)
@@ -212,10 +212,10 @@ def main():
 
     is_cc = False
     try:
-        is_cc = info(a.host, a.port).get("impl") == "ccache"
+        is_cc = info(a.host, a.port).get("impl") == "kvcache"
     except Exception:
         pass
-    print(f"[{a.label}] ccache={is_cc}", flush=True)
+    print(f"[{a.label}] kvcache={is_cc}", flush=True)
     preload(a.host, a.port, a.keyspace)
     results = {"label": a.label, "host": a.host, "time": time.strftime("%Y-%m-%d %H:%M:%S"), "runs": []}
     if is_cc:

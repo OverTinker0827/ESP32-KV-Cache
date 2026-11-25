@@ -127,7 +127,7 @@ static int do_info(obuf_t *o)
     uint64_t up, i0, i1;
     sysmon_cpu(&up, &i0, &i1);
     int n = snprintf(tmp, sizeof tmp,
-                     "# Server\r\nimpl:ccache\r\nengine:%s\r\nserver:%s\r\ncores:%s\r\niram_hot:%d\r\n"
+                     "# Server\r\nimpl:kvcache\r\nengine:%s\r\nserver:%s\r\ncores:%s\r\niram_hot:%d\r\n"
                      "# Memory\r\nheap_free:%u\r\nheap_min_free:%u\r\nheap_largest:%u\r\n"
                      "keys:%" PRIu32 "\r\nmem_used:%" PRIu32 "\r\nmem_total:%" PRIu32 "\r\n"
                      "evictions:%" PRIu32 "\r\nexpired:%" PRIu32 "\r\nindex_slots:%" PRIu32

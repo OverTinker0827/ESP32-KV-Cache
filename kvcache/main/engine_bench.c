@@ -98,7 +98,7 @@ void engine_bench_run(size_t reserve)
     }
     tf = esp_timer_get_time() - tf;
     kv_stats(&st);
-    printf("RESULT {\"impl\":\"ccache\",\"engine\":\"%s\",\"key_len\":%d,\"val_len\":%d,"
+    printf("RESULT {\"impl\":\"kvcache\",\"engine\":\"%s\",\"key_len\":%d,\"val_len\":%d,"
            "\"set_ops\":%" PRIu32 ",\"get_ops\":%" PRIu32 ",\"del_ops\":%" PRIu32 ","
            "\"rand_set_ops\":%" PRIu32 ",\"rand_get_ops\":%" PRIu32 ",\"rand_del_ops\":%" PRIu32 ","
            "\"bytes_per_key\":%" PRIu32 ",\"max_keys\":%d,\"fill_ops\":%u,\"store_bytes\":%" PRIu32
