@@ -1,0 +1,32 @@
+set(srcs main.c cmd.c resp.c sysmon.c engine_bench.c)
+
+if(CONFIG_KV_ENGINE_BASIC)
+    list(APPEND srcs kv_basic.c)
+else()
+    list(APPEND srcs kv_opt.c)
+endif()
+
+if(CONFIG_KV_SERVER_BASIC)
+    list(APPEND srcs server_basic.c)
+else()
+    list(APPEND srcs server_opt.c)
+endif()
+
+idf_component_register(SRCS ${srcs}
+                       INCLUDE_DIRS "."
+                       PRIV_REQUIRES esp_wifi esp_netif nvs_flash esp_timer lwip freertos heap)
+
+# WiFi credentials come from the git-ignored ../../wifi_secrets.json (never from sdkconfig)
+set(SECRETS "${CMAKE_CURRENT_LIST_DIR}/../../wifi_secrets.json")
+if(NOT EXISTS ${SECRETS})
+    message(FATAL_ERROR "missing ${SECRETS}")
+endif()
+file(READ ${SECRETS} _sj)
+string(JSON WIFI_SSID GET ${_sj} ssid)
+string(JSON WIFI_PASS GET ${_sj} password)
+set(GEN "${CMAKE_CURRENT_BINARY_DIR}/wifi_creds.h")
+file(WRITE ${GEN}.tmp "#pragma once\n#define WIFI_SSID \"${WIFI_SSID}\"\n#define WIFI_PASS \"${WIFI_PASS}\"\n")
+configure_file(${GEN}.tmp ${GEN} COPYONLY)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${SECRETS})
+target_include_directories(${COMPONENT_LIB} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wall -Wextra -Wno-unused-parameter)

@@ -1,0 +1,15 @@
+{
+  "board": "ESP32-D0WD-V3 rev3.1, 240 MHz, no PSRAM, WiFi off (board supply cannot sustain the radio)",
+  "workload": "16 B keys key:%012d (seq) and 16 B random hex keys (rand), 32 B values, 500 keys, C runs averaged over 20 reps",
+  "microredis": {"set_ops": 922, "get_ops": 1480, "del_ops": 2356, "max_keys": 1223, "heap_total": 187648,
+                 "note": "random-key GET up to ~10x faster (MicroPython hash clustering on sequential keys)"},
+  "c_basic": {"engine": "basic-malloc-chained", "set_ops": 80874, "get_ops": 40306, "del_ops": 99880,
+              "rand_set_ops": 81010, "rand_get_ops": 40286, "rand_del_ops": 99909,
+              "bytes_per_key": 72, "max_keys": 3664, "store_bytes": 265604, "heap_before": 289180,
+              "note": "max_keys stopped by 8 KB free-heap safeguard (no reserve honoured)"},
+  "c_opt": {"engine": "opt-slab-oa", "set_ops": 441423, "get_ops": 361193, "del_ops": 395867,
+            "rand_set_ops": 442497, "rand_get_ops": 361415, "rand_del_ops": 396322,
+            "bytes_per_key": 60, "max_keys": 3942, "store_bytes": 244104, "heap_before": 287828,
+            "arena": "54 pages (216 KiB) in 2 heap blocks + 5730-slot index (22.9 KB); 40 KB heap reserve kept",
+            "note": "fills with 21 KB LESS memory than basic yet stores 7.6% more keys"}
+}

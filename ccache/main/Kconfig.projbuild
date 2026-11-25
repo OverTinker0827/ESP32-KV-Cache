@@ -1,0 +1,62 @@
+menu "ccache (ESP32 KV cache)"
+
+    choice KV_ENGINE
+        prompt "Storage engine"
+        default KV_ENGINE_OPT
+        config KV_ENGINE_BASIC
+            bool "basic: malloc per entry + chained hash table (textbook port)"
+        config KV_ENGINE_OPT
+            bool "opt: preallocated slab arena + compact open-addressing index"
+    endchoice
+
+    choice KV_SERVER
+        prompt "Server model"
+        default KV_SERVER_OPT
+        config KV_SERVER_BASIC
+            bool "basic: task per client, copying parser, one send() per reply"
+        config KV_SERVER_OPT
+            bool "opt: select() event loop, zero-copy parser, batched replies"
+    endchoice
+
+    choice KV_CORES
+        prompt "Multicore model (opt server only)"
+        default KV_CORES_SINGLE
+        config KV_CORES_SINGLE
+            bool "single: one event loop pinned to core 1 (lwIP/WiFi own core 0)"
+        config KV_CORES_SINGLE_CORE0
+            bool "single0: one event loop pinned to core 0 (shares core with lwIP/WiFi)"
+        config KV_CORES_SHARED
+            bool "shared: one loop per core, one table, one global spinlock"
+        config KV_CORES_SHARDED
+            bool "sharded: one loop per core, table split into 2 shards, per-shard lock"
+    endchoice
+
+    config KV_HOT_IRAM
+        bool "Place hot path (hash, lookup, parser, dispatch) in IRAM"
+        default y
+
+    config KV_MAX_CLIENTS
+        int "Max concurrent clients"
+        default 8
+
+    config KV_HEAP_RESERVE_KB
+        int "Heap kept free for WiFi/lwIP after the arena is carved (opt engine)"
+        default 40
+
+    config KV_RX_BUF
+        int "Per-connection receive buffer (opt server)"
+        default 4096
+
+    config KV_TX_BUF
+        int "Per-connection transmit buffer (opt server)"
+        default 4096
+
+    config KV_NO_WIFI
+        bool "Engine-only build: never start WiFi (board power cannot sustain the radio)"
+        default n
+
+    config KV_ENGINE_SELFTEST
+        bool "Run on-device engine benchmark at boot (before WiFi) and print RESULT"
+        default y
+
+endmenu

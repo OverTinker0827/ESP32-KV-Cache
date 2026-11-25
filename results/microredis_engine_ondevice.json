@@ -1,0 +1,15 @@
+{
+  "label": "microredis on-device engine (no network)",
+  "board": "ESP32-D0WD-V3 rev3.1, 4MB flash, no PSRAM, 240 MHz",
+  "firmware": "MicroPython v1.29.0 ESP32_GENERIC, microredis 8bde79f precompiled to .mpy (-O1)",
+  "workload": "16 B keys key:%012d, 32 B values, 500 keys",
+  "result": {"set_ops": 922, "get_ops": 1480, "del_ops": 2356, "max_keys": 1223,
+             "raw_dict_set_ops": 3805, "raw_dict_get_ops": 6812, "heap_total": 187648},
+  "notes": [
+    "MemoryError at <2000 keys during throughput phase (dict resize needs 13 KB contiguous; fragmentation)",
+    "sequential keys hash into only 230/1024 low-bit buckets; GET 6962/s sequential vs 66471/s random hex keys",
+    "bytes_per_key from gc.mem_alloc delta (47) is unreliable on the split heap; use max_keys",
+    "full server import costs 107 KB of heap; 39.5 KB free after MicroRedisServer() before WiFi",
+    "upstream needs 3 patches + bisect from micropython-lib to run on MicroPython at all (see tools/build_mpy.py)"
+  ]
+}

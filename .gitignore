@@ -1,0 +1,17 @@
+# secrets: WiFi credentials (copy wifi_secrets.example.json -> wifi_secrets.json)
+wifi_secrets.json
+
+# environments and build outputs (reproducible)
+.venv/
+build/
+ccache/sdkconfig
+ccache/sdkconfig.old
+ccache/build/
+__pycache__/
+*.pyc
+
+# third-party: upstream microredis is cloned, not vendored (see results.md for the commit)
+ref/
+
+# downloaded MicroPython firmware (URL in results.md)
+firmware/*.bin
