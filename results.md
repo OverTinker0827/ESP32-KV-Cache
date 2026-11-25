@@ -881,3 +881,42 @@ Raw data: `results/entry7_nonet.jsonl`, `results/entry7_microredis_engine.jsonl`
 `results/entry7_microredis_loopback.log`; tables: `python tools/summarize_final.py nonet|net` (saved as
 `results/entry7_nonet_tables.md`, `results/entry7_net_tables.md`). New server modes: `owner`, `dispatch`
 (`kvcache/variants/owner.cfg`, `dispatch.cfg`, `kvcache/main/route.c`).
+
+## Entry 7 summary table — 2026-11-25 — shared vs sharded vs owner vs queue dispatch vs microredis
+
+One table for Entry 7's data (no new runs). Every number is the mean of repeated runs on the same board
+(ESP32-D0WD-V3, 240 MHz, radio off): **no network 5 × 3 s per cell, network 5 × 2 s per cell**, plus the
+correctness runs. Columns use the variant that matches the network build: shared = one table + seqlock,
+sharded = 8 shards + seqlock, queue dispatch = one receiver + one worker. "×" = vs single core (C).
+
+| | microredis | single core (C) | shared cache | sharded cache | owner-based cache | queue dispatch |
+|---|---:|---:|---:|---:|---:|---:|
+| **No network (storage engine only)** | | | | | | |
+| 90 % GET / 10 % SET, ops/s | 6,910 | 299,774 | 447,320 (1.49×) | 477,230 (1.59×) | **543,553 (1.81×)** | 275,761 (0.92×) |
+| 50 % GET / 50 % SET, ops/s | 4,232 | 296,909 | 332,185 (1.12×) | 447,679 (1.51×) | **536,184 (1.81×)** | 273,083 (0.92×) |
+| p99 latency per operation, 90 % / 50 % GET | – | 3.6 / 3.6 µs | 11.0 / 25.2 µs | 8.2 / 9.1 µs | **4.0 / 4.0 µs** | – (timed per request) |
+| run-to-run spread (std dev) | ≤ 1.4 % | ≤ 0.1 % | ≤ 0.3 % | ≤ 0.2 % | ≤ 0.1 % | ≤ 0.1 % |
+| correctness, checked run (both mixes) | PASS (512 keys) | PASS | PASS | PASS | PASS | PASS |
+| **Network (real server, TCP over loopback)** | | | | | | |
+| GET, 1 client, 1 request in flight, ops/s | 26 | **1,218** | 1,144 | 1,144 | 766 | 927 |
+| latency, 1 client (p50 round trip) | ~37,000 µs | **805 µs** | 869 µs | 869 µs | 1,469 µs | 1,077 µs |
+| GET, 4 clients, ops/s | fails (out of memory) | **1,153** | 873 | 876 | 668 | 692 |
+| 90/10 GET/SET, 4 clients, ops/s | fails (out of memory) | **1,136** | 877 | 879 | 668 | 699 |
+| GET, 4 clients × 16 pipelined, ops/s | not supported | **19,544** | 12,718 | 12,728 | 5,137 | 10,354 |
+| SET, 4 clients × 16 pipelined, ops/s | not supported | **18,926** | 12,701 | 12,678 | 5,234 | 10,081 |
+| 90/10, 4 clients × 16 pipelined, ops/s | not supported | **19,440** | 12,723 | 12,758 | 5,150 | 10,158 |
+| run-to-run spread (std dev) | ≤ 1.7 % | ≤ 3.2 % | ≤ 0.8 % (1 client: 16.5 %) | ≤ 0.9 % (1 client: 16.8 %) | ≤ 6.3 % | ≤ 4.1 % |
+| functional suite | 10/11 | 34/34 | 34/34 | 32/34 (10 KB value) | 32/34 (10 KB value) | 34/34 |
+| concurrent consistency test, 4 clients, 3 s | not possible (out of memory) | PASS | PASS | PASS | PASS | PASS |
+| **Best for** | – | **with on-chip network** | – | – | **no network** | – |
+
+Notes:
+- Other no-network variants (Entry 7 tables above): shared + reader-writer lock 1.47× / 1.16×; 8 shards +
+  reader-writer lock 1.57× / 1.56×; queue with 2 owner workers 1.63× / 1.64×; queue with a worker pool 1.26× / 1.02×.
+- Why the order flips with network: the cache work is ~3 µs of a ~800 µs request; the rest is lwIP on core 0.
+  The single loop leaves core 0 to lwIP; every two-core design competes with it.
+- microredis vs single core (C): 43× (90/10) and 70× (50/50) on the engine, 47× over TCP with one client.
+  microredis's latency includes MicroPython's own event loop (~17 ms for a bare echo server on the same
+  loopback); its out-of-memory failures happen because this board has no PSRAM (~40 KB of the MicroPython heap is free
+  for data and connections).
+- The 1-client spread of shared/sharded (~17 %) depends on which core the connection lands on.
