@@ -29,6 +29,26 @@ int64_t kv_pttl(const uint8_t *k, size_t kl); /* -2 missing, -1 no expiry, else 
 int kv_expire(const uint8_t *k, size_t kl, uint32_t ttl_ms); /* 1 if set */
 void kv_active_expire(int budget);
 void kv_set_evict(int on); /* 1 = allkeys-lru (CLOCK), 0 = noeviction */
+/* Phase 3 engine (kv_opt.c v2 only) */
+void kv_set_prefix(int on); /* prefix compression; change only on an empty store */
+int kv_prefix_count(void);
+int kv_pages_live(void);
+/* adaptive reserve: release arena pages when free heap < low, grow when > high; returns delta */
+int kv_mem_adjust(size_t low, size_t high);
+/* streamed SET for values larger than the receive buffer (chained values only) */
+typedef struct {
+    uint8_t key[256];
+    uint32_t h, gen, ref, conts[17];
+    size_t vl, written, first, voff;
+    int nconts, fl, active;
+    uint8_t kl, plen, pid;
+} kv_stream_t;
+int kv_stream_begin(kv_stream_t *st, const uint8_t *k, size_t kl, size_t vl); /* KV_ETOOBIG: use SET */
+size_t kv_stream_write(kv_stream_t *st, const uint8_t *p, size_t n);
+int kv_stream_commit(kv_stream_t *st);
+void kv_stream_abort(kv_stream_t *st);
+/* bytes [off, off+cap) of the full RESP GET reply; *total = reply length (0 = key missing) */
+size_t kv_get_range(const uint8_t *k, size_t kl, size_t off, uint8_t *buf, size_t cap, size_t *total);
 int kv_get_evict(void);
 void kv_stats(kv_stats_t *s);
 const char *kv_engine_name(void);

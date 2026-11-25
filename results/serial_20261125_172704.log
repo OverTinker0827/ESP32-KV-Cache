@@ -1,0 +1,107 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6180
+load:0x40078000,len:15852
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 17:10:14
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 40MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 4MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00177000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=29d18h (171288) map
+I (134) esp_image: segment 1: paddr=00039d40 vaddr=3ffb0000 size=027a8h ( 10152) load
+I (138) esp_image: segment 2: paddr=0003c4f0 vaddr=40080000 size=03b28h ( 15144) load
+I (144) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=16738h ( 91960) map
+I (177) esp_image: segment 4: paddr=00056760 vaddr=40083b28 size=095c8h ( 38344) load
+I (192) esp_image: segment 5: paddr=0005fd30 vaddr=50000000 size=00020h (    32) load
+I (199) boot: Loaded app from partition at offset 0x10000
+I (206) cpu_start: Multicore app
+I (214) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (214) cpu_start: Pro cpu start user code
+I (214) cpu_start: cpu freq: 240000000 Hz
+I (216) app_init: Application information:
+I (220) app_init: Project name:     kvcache
+I (224) app_init: App version:      593933c-dirty
+I (228) app_init: Compile time:     Nov 25 2026 17:09:13
+I (233) app_init: ELF file SHA256:  fd5f60c9b...
+I (238) app_init: ESP-IDF:          v5.5.6
+I (241) efuse_init: Min chip rev:     v0.0
+I (245) efuse_init: Max chip rev:     v3.99
+I (249) efuse_init: Chip rev:         v3.1
+I (253) heap_init: Initializing. RAM available for dynamic allocation:
+I (259) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (264) heap_init: At 3FFB75D8 len 00028A28 (162 KiB): DRAM
+I (270) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (275) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (281) heap_init: At 4008D0F0 len 00012F10 (75 KiB): IRAM
+I (287) spi_flash: detected chip: generic
+I (290) spi_flash: flash io: dio
+I (293) main_task: Started on CPU0
+I (295) main_task: Calling app_main()
+VARIANT engine=opt2-slab-oa-1sh-nolock server=opt-eventloop cores=single-core1 iram=1
+I (308) kv_opt: arena 46 pages (184 KiB), index 5439 slots (21756 B), 1 shard(s), heap left 44592
+RESULT {"impl":"kvcache","engine":"opt2-slab-oa-1sh-nolock","flags":"iram=1,force_lock=0,fast_itoa=0","scenario":"quiet","bench_core":1,"sim_core":-1,"sim_duty_pct":0,"set_ops":353394,"get_ops":324506,"del_ops":345793,"set_p50_ns":2758,"set_p95_ns":2908,"set_p99_ns":3087,"get_p50_ns":3012,"get_p95_ns":3087,"get_p99_ns":3320,"del_p50_ns":2754,"del_p95_ns":3458,"del_p99_ns":4170,"set_p999_ns":7000,"set_max_ns":172620,"get_p999_ns":7058,"get_max_ns":7070,"del_p999_ns":27229,"del_max_ns":54470,"rand_set_ops":355745,"rand_get_ops":324580,"rand_del_ops":347705,"rand_get_p99_ns":3270}
+RESULT {"impl":"kvcache","engine":"opt2-slab-oa-1sh-nolock","flags":"iram=1,force_lock=0,fast_itoa=0","scenario":"quiet_core0","bench_core":0,"sim_core":-1,"sim_duty_pct":0,"set_ops":353020,"get_ops":324107,"del_ops":345411,"set_p50_ns":2758,"set_p95_ns":2908,"set_p99_ns":3116,"get_p50_ns":3012,"get_p95_ns":3087,"get_p99_ns":3370,"del_p50_ns":2754,"del_p95_ns":3458,"del_p99_ns":4170,"set_p999_ns":8116,"set_max_ns":165020,"get_p999_ns":8195,"get_max_ns":8370,"del_p999_ns":27229,"del_max_ns":46566,"rand_set_ops":355416,"rand_get_ops":324275,"rand_del_ops":347487,"rand_get_p99_ns":3445}
+RESULT {"impl":"kvcache","engine":"opt2-slab-oa-1sh-nolock","flags":"iram=1,force_lock=0,fast_itoa=0","scenario":"sim_other_core","bench_core":1,"sim_core":0,"sim_duty_pct":40,"set_ops":349308,"get_ops":317188,"del_ops":340483,"set_p50_ns":2758,"set_p95_ns":3141,"set_p99_ns":3320,"get_p50_ns":3012,"get_p95_ns":3616,"get_p99_ns":3666,"del_p50_ns":2754,"del_p95_ns":3466,"del_p99_ns":4170,"set_p999_ns":8333,"set_max_ns":13641,"get_p999_ns":8375,"get_max_ns":8629,"del_p999_ns":8254,"del_max_ns":9691,"rand_set_ops":349247,"rand_get_ops":317118,"rand_del_ops":341040,"rand_get_p99_ns":3666}
+RESULT {"impl":"kvcache","engine":"opt2-slab-oa-1sh-nolock","flags":"iram=1,force_lock=0,fast_itoa=0","scenario":"sim_same_core","bench_core":0,"sim_core":0,"sim_duty_pct":40,"set_ops":194223,"get_ops":184029,"del_ops":200232,"set_p50_ns":2758,"set_p95_ns":2908,"set_p99_ns":6587,"get_p50_ns":3012,"get_p95_ns":3087,"get_p99_ns":6850,"del_p50_ns":2754,"del_p95_ns":3466,"del_p99_ns":6945,"set_p999_ns":825370,"set_max_ns":825670,"get_p999_ns":841166,"get_max_ns":841275,"del_p999_ns":837245,"del_max_ns":837250,"rand_set_ops":194431,"rand_get_ops":183901,"rand_del_ops":200585,"rand_get_p99_ns":6850}
+I (1467) kv_opt: arena 52 pages (208 KiB), index 5967 slots (23868 B), 1 shard(s), heap left 42312
+RESULT {"impl":"kvcache","engine":"opt2-slab-oa-1sh-nolock","flags":"iram=1,force_lock=0,fast_itoa=0","scenario":"fill","bytes_per_key":56,"max_keys":4056,"store_bytes":236860}
+I (1523) kv_opt: arena 52 pages (208 KiB), index 6053 slots (24212 B), 1 shard(s), heap left 42312
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":8,"prefix":0,"max_keys":5447,"store_bytes":237204,"bytes_per_key":43.5,"payload_eff":0.551}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":8,"prefix":1,"max_keys":5447,"store_bytes":237204,"bytes_per_key":43.5,"payload_eff":0.551}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":16,"prefix":0,"max_keys":5447,"store_bytes":237204,"bytes_per_key":43.5,"payload_eff":0.735}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":16,"prefix":1,"max_keys":5447,"store_bytes":237204,"bytes_per_key":43.5,"payload_eff":0.735}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":32,"prefix":0,"max_keys":4056,"store_bytes":237204,"bytes_per_key":58.5,"payload_eff":0.821}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":32,"prefix":1,"max_keys":4056,"store_bytes":237204,"bytes_per_key":58.5,"payload_eff":0.821}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":64,"prefix":0,"max_keys":2392,"store_bytes":237204,"bytes_per_key":99.2,"payload_eff":0.807}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":64,"prefix":1,"max_keys":2392,"store_bytes":237204,"bytes_per_key":99.2,"payload_eff":0.807}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":128,"prefix":0,"max_keys":1300,"store_bytes":237204,"bytes_per_key":182.5,"payload_eff":0.789}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":128,"prefix":1,"max_keys":1300,"store_bytes":237204,"bytes_per_key":182.5,"payload_eff":0.789}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":256,"prefix":0,"max_keys":728,"store_bytes":237204,"bytes_per_key":325.8,"payload_eff":0.835}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":256,"prefix":1,"max_keys":728,"store_bytes":237204,"bytes_per_key":325.8,"payload_eff":0.835}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":512,"prefix":0,"max_keys":364,"store_bytes":237204,"bytes_per_key":651.7,"payload_eff":0.810}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":512,"prefix":1,"max_keys":364,"store_bytes":237204,"bytes_per_key":651.7,"payload_eff":0.810}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":1024,"prefix":0,"max_keys":156,"store_bytes":237204,"bytes_per_key":1520.5,"payload_eff":0.684}
+RESULT {"part":"sweep","engine":"opt2","keys":"seq","key_len":16,"val_len":1024,"prefix":1,"max_keys":156,"store_bytes":237204,"bytes_per_key":1520.5,"payload_eff":0.684}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":8,"prefix":0,"max_keys":5447,"store_bytes":237204,"bytes_per_key":43.5,"payload_eff":0.735}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":8,"prefix":1,"max_keys":5447,"store_bytes":237204,"bytes_per_key":43.5,"payload_eff":0.735}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":16,"prefix":0,"max_keys":4784,"store_bytes":237204,"bytes_per_key":49.6,"payload_eff":0.807}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":16,"prefix":1,"max_keys":5447,"store_bytes":237204,"bytes_per_key":43.5,"payload_eff":0.919}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":32,"prefix":0,"max_keys":3536,"store_bytes":237204,"bytes_per_key":67.1,"payload_eff":0.835}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":32,"prefix":1,"max_keys":4784,"store_bytes":237204,"bytes_per_key":49.6,"payload_eff":1.129}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":64,"prefix":0,"max_keys":2184,"store_bytes":237204,"bytes_per_key":108.6,"payload_eff":0.810}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":64,"prefix":1,"max_keys":2652,"store_bytes":237204,"bytes_per_key":89.4,"payload_eff":0.984}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":128,"prefix":0,"max_keys":1300,"store_bytes":237204,"bytes_per_key":182.5,"payload_eff":0.833}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":128,"prefix":1,"max_keys":1456,"store_bytes":237204,"bytes_per_key":162.9,"payload_eff":0.933}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":256,"prefix":0,"max_keys":728,"store_bytes":237204,"bytes_per_key":325.8,"payload_eff":0.859}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":256,"prefix":1,"max_keys":780,"store_bytes":237204,"bytes_per_key":304.1,"payload_eff":0.921}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":512,"prefix":0,"max_keys":364,"store_bytes":237204,"bytes_per_key":651.7,"payload_eff":0.823}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":512,"prefix":1,"max_keys":364,"store_bytes":237204,"bytes_per_key":651.7,"payload_eff":0.823}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":1024,"prefix":0,"max_keys":156,"store_bytes":237204,"bytes_per_key":1520.5,"payload_eff":0.689}
+RESULT {"part":"sweep","engine":"opt2","keys":"iot","key_len":24,"val_len":1024,"prefix":1,"max_keys":156,"store_bytes":237204,"bytes_per_key":1520.5,"payload_eff":0.689}
+RESULT {"part":"mixed","engine":"opt2","prefix":0,"max_keys":1189,"rejected":8470,"store_bytes":237204,"payload_bytes":193890,"payload_eff":0.817}
+RESULT {"part":"mixed","engine":"opt2","prefix":1,"max_keys":1645,"rejected":12394,"store_bytes":237204,"payload_bytes":222970,"payload_eff":0.940}
+I (3334) kv_opt: arena 52 pages (208 KiB), index 6046 slots (24184 B), 1 shard(s), heap left 41988
+RESULT {"part":"adaptive","mode":"fixed_40k","init_reserve":40960,"low":0,"high":0,"buf_attempts":1296,"buf_fails":1215,"hit_rate":0.671,"gets":365588,"pages_avg":52.0,"pages_min":52,"pages_max":52,"pages_released":0,"pages_grown":0,"heap_min":4792}
+I (9374) kv_opt: arena 43 pages (172 KiB), index 5011 slots (20044 B), 1 shard(s), heap left 82984
+RESULT {"part":"adaptive","mode":"fixed_80k","init_reserve":81920,"low":0,"high":0,"buf_attempts":176,"buf_fails":0,"hit_rate":0.555,"gets":339870,"pages_avg":43.0,"pages_min":43,"pages_max":43,"pages_released":0,"pages_grown":0,"heap_min":15312}
+I (15414) kv_opt: arena 38 pages (152 KiB), index 4494 slots (17976 B), 1 shard(s), heap left 105532
+RESULT {"part":"adaptive","mode":"fixed_100k","init_reserve":102400,"low":0,"high":0,"buf_attempts":176,"buf_fails":0,"hit_rate":0.492,"gets":329935,"pages_avg":38.0,"pages_min":38,"pages_max":38,"pages_released":0,"pages_grown":0,"heap_min":37860}
+I (21454) kv_opt: arena 52 pages (208 KiB), index 6046 slots (24184 B), 1 shard(s), heap left 41988
+RESULT {"part":"adaptive","mode":"adaptive_20k_48k","init_reserve":40960,"low":20480,"high":49152,"buf_attempts":202,"buf_fails":26,"hit_rate":0.590,"gets":363746,"pages_avg":45.6,"pages_min":40,"pages_max":52,"pages_released":40,"pages_grown":28,"heap_min":10324}
+I (27495) kv_opt: arena 52 pages (208 KiB), index 6046 slots (24184 B), 1 shard(s), heap left 41988
+RESULT {"part":"adaptive","mode":"adaptive_40k_64k","init_reserve":40960,"low":40960,"high":65536,"buf_attempts":197,"buf_fails":21,"hit_rate":0.535,"gets":361071,"pages_avg":41.4,"pages_min":35,"pages_max":51,"pages_released":49,"pages_grown":32,"heap_min":30824}
+I (33537) kv_opt: arena 52 pages (208 KiB), index 6046 slots (24184 B), 1 shard(s), heap left 41988
+RESULT {"part":"adaptive","mode":"adaptive_56k_80k","init_reserve":40960,"low":57344,"high":81920,"buf_attempts":195,"buf_fails":19,"hit_rate":0.485,"gets":358099,"pages_avg":37.4,"pages_min":31,"pages_max":47,"pages_released":53,"pages_grown":32,"heap_min":47224}
+DONE (engine-only build, WiFi disabled)

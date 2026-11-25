@@ -1,7 +1,11 @@
-set(srcs main.c cmd.c resp.c sysmon.c engine_bench.c wifisim.c mc_bench.c loopback.c)
+set(srcs main.c cmd.c resp.c sysmon.c engine_bench.c wifisim.c mc_bench.c loopback.c engine_test.c p3_bench.c)
 
 if(CONFIG_KV_ENGINE_BASIC)
     list(APPEND srcs kv_basic.c)
+elseif(CONFIG_KV_ENGINE_OPT1)
+    list(APPEND srcs kv_opt1.c)
+elseif(CONFIG_KV_ENGINE_OPT0)
+    list(APPEND srcs kv_opt0.c)
 else()
     list(APPEND srcs kv_opt.c)
 endif()

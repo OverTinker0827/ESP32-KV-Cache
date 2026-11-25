@@ -411,6 +411,9 @@ void loopback_run(void)
     done = xSemaphoreCreateCounting(8, 0);
     vTaskPrioritySet(NULL, 20); /* controller preempts the busy client tasks */
     functional();
+#if CONFIG_KV_LOOPBACK_FUNCTIONAL_ONLY
+    return;
+#endif
     echo_baseline(1); /* echo task on core 1: socket calls cross to lwIP's core 0 */
     echo_baseline(0); /* echo task on core 0: same core as lwIP's task */
     preload();

@@ -1,0 +1,119 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:1
+load:0x3fff0030,len:6180
+load:0x40078000,len:15812
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 17:58:31
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 80MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 4MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00177000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=2d910h (186640) map
+I (128) esp_image: segment 1: paddr=0003d938 vaddr=3ffb0000 size=026e0h (  9952) load
+I (131) esp_image: segment 2: paddr=00040020 vaddr=400d0020 size=254c4h (152772) map
+I (175) esp_image: segment 3: paddr=000654ec vaddr=3ffb26e0 size=000c8h (   200) load
+I (175) esp_image: segment 4: paddr=000655bc vaddr=40080000 size=14c18h ( 85016) load
+I (207) esp_image: segment 5: paddr=0007a1dc vaddr=50000000 size=00020h (    32) load
+I (217) boot: Loaded app from partition at offset 0x10000
+I (223) cpu_start: Multicore app
+I (231) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (232) cpu_start: Pro cpu start user code
+I (232) cpu_start: cpu freq: 240000000 Hz
+I (234) app_init: Application information:
+I (237) app_init: Project name:     kvcache
+I (241) app_init: App version:      593933c-dirty
+I (246) app_init: Compile time:     Nov 25 2026 17:57:25
+I (251) app_init: ELF file SHA256:  9103a0755...
+I (255) app_init: ESP-IDF:          v5.5.6
+I (259) efuse_init: Min chip rev:     v0.0
+I (263) efuse_init: Max chip rev:     v3.99
+I (267) efuse_init: Chip rev:         v3.1
+I (271) heap_init: Initializing. RAM available for dynamic allocation:
+I (277) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (282) heap_init: At 3FFC5850 len 0001A7B0 (105 KiB): DRAM
+I (287) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (293) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (298) heap_init: At 40094C18 len 0000B3E8 (44 KiB): IRAM
+I (304) spi_flash: detected chip: generic
+I (307) spi_flash: flash io: dio
+I (310) main_task: Started on CPU0
+I (312) main_task: Calling app_main()
+VARIANT engine=opt2-slab-oa-1sh-nolock server=opt-eventloop cores=single-core1 iram=1
+I (324) kv_opt: arena 20 pages (80 KiB), index 2409 slots (9636 B), 1 shard(s), heap left 125948
+I (332) srv_opt: listening on 6379 with 1 loop(s)
+I (332) srv_opt: loop 0 running on core 1
+VARIANT engine=opt2-slab-oa-1sh-nolock server=opt-eventloop cores=single-core1
+TEST SUMMARY pass=34 fail=0 server=opt-eventloop cores=single-core1 engine=opt2-slab-oa-1sh-nolock
+RESULT {"part":"echo_baseline","echo_core":1,"core_locking":1,"rtt_p50_us":650,"rtt_p99_us":922,"rtt_min_us":612}
+RESULT {"part":"echo_baseline","echo_core":0,"core_locking":1,"rtt_p50_us":585,"rtt_p99_us":789,"rtt_min_us":579}
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":1,"ops_per_s":1247,"batch_p50_us":783,"batch_p99_us":885,"batch_p999_us":1033,"cpu0_pct":79.8,"cpu1_pct":99.6,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":5.440,"errors":0,"heap_free":96716}
+SRVCYC select_us=2804362 recv_us=219507 send_us=204118 (totals since boot, wall time inside the call)
+SRVDIAG iter=2350 sel_pos=2290 sel_zero=60 sel_neg=0 errno=0 accept_fail=0
+TASKSTATS
+main           	572708		17%
+lbc            	366087		10%
+IDLE1          	1204880		36%
+IDLE0          	1177602		35%
+tiT            	1085820		32%
+kvloop0        	1929300		57%
+ipc1           	12097		<1%
+ipc0           	7160		<1%
+
+TASKSTATS END
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":1,"ops_per_s":1184,"batch_p50_us":3631,"batch_p99_us":6143,"batch_p999_us":7729,"cpu0_pct":93.2,"cpu1_pct":87.7,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":4.893,"errors":0,"heap_free":33128}
+SRVCYC select_us=3366199 recv_us=572530 send_us=459093 (totals since boot, wall time inside the call)
+SRVDIAG iter=2843 sel_pos=2777 sel_zero=66 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":16,"ops_per_s":16016,"batch_p50_us":1000,"batch_p99_us":1007,"batch_p999_us":1205,"cpu0_pct":63.8,"cpu1_pct":94.8,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.487,"errors":0,"heap_free":83112}
+SRVCYC select_us=4209273 recv_us=645937 send_us=564216 (totals since boot, wall time inside the call)
+SRVDIAG iter=3851 sel_pos=3780 sel_zero=71 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":16,"ops_per_s":18733,"batch_p50_us":3328,"batch_p99_us":6046,"batch_p999_us":6155,"cpu0_pct":85.5,"cpu1_pct":82.7,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.849,"errors":0,"heap_free":32476}
+SRVCYC select_us=4631233 recv_us=950072 send_us=880480 (totals since boot, wall time inside the call)
+SRVDIAG iter=4190 sel_pos=4114 sel_zero=76 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":1,"ops_per_s":1158,"batch_p50_us":889,"batch_p99_us":987,"batch_p999_us":1064,"cpu0_pct":72.9,"cpu1_pct":97.2,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":6.012,"errors":0,"heap_free":82472}
+SRVCYC select_us=5531423 recv_us=1042246 send_us=984844 (totals since boot, wall time inside the call)
+SRVDIAG iter=5355 sel_pos=5274 sel_zero=81 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":1,"ops_per_s":1161,"batch_p50_us":3489,"batch_p99_us":5667,"batch_p999_us":6130,"cpu0_pct":94.0,"cpu1_pct":87.1,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":5.617,"errors":0,"heap_free":32480}
+SRVCYC select_us=6109851 recv_us=1410766 send_us=1181901 (totals since boot, wall time inside the call)
+SRVDIAG iter=5883 sel_pos=5797 sel_zero=86 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":16,"ops_per_s":15951,"batch_p50_us":1011,"batch_p99_us":1110,"batch_p999_us":1233,"cpu0_pct":64.2,"cpu1_pct":95.4,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":4.050,"errors":0,"heap_free":82352}
+SRVCYC select_us=6966111 recv_us=1485953 send_us=1274984 (totals since boot, wall time inside the call)
+SRVDIAG iter=6887 sel_pos=6796 sel_zero=91 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":16,"ops_per_s":19456,"batch_p50_us":3275,"batch_p99_us":5916,"batch_p999_us":5985,"cpu0_pct":87.2,"cpu1_pct":86.9,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":4.414,"errors":0,"heap_free":32364}
+SRVCYC select_us=7326079 recv_us=1829336 send_us=1544890 (totals since boot, wall time inside the call)
+SRVDIAG iter=7214 sel_pos=7118 sel_zero=96 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":1,"ops_per_s":970,"batch_p50_us":1188,"batch_p99_us":1753,"batch_p999_us":1861,"cpu0_pct":90.8,"cpu1_pct":78.6,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":5.881,"errors":0,"heap_free":78564}
+SRVCYC select_us=8360375 recv_us=1902291 send_us=1632561 (totals since boot, wall time inside the call)
+SRVDIAG iter=8194 sel_pos=8090 sel_zero=104 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":1,"ops_per_s":812,"batch_p50_us":4430,"batch_p99_us":10849,"batch_p999_us":12146,"cpu0_pct":98.8,"cpu1_pct":72.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":5.394,"errors":0,"heap_free":28572}
+SRVCYC select_us=9024623 recv_us=2229408 send_us=1771299 (totals since boot, wall time inside the call)
+SRVDIAG iter=8753 sel_pos=8644 sel_zero=109 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":16,"ops_per_s":11743,"batch_p50_us":1470,"batch_p99_us":1906,"batch_p999_us":2031,"cpu0_pct":85.8,"cpu1_pct":71.3,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.527,"errors":0,"heap_free":78576}
+SRVCYC select_us=9959546 recv_us=2284590 send_us=1851107 (totals since boot, wall time inside the call)
+SRVDIAG iter=9494 sel_pos=9380 sel_zero=114 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":16,"ops_per_s":14096,"batch_p50_us":4121,"batch_p99_us":9970,"batch_p999_us":11889,"cpu0_pct":98.7,"cpu1_pct":74.2,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.905,"errors":0,"heap_free":28592}
+SRVCYC select_us=10496617 recv_us=2563324 send_us=2086220 (totals since boot, wall time inside the call)
+SRVDIAG iter=9988 sel_pos=9870 sel_zero=118 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":1,"ops_per_s":935,"batch_p50_us":1218,"batch_p99_us":1769,"batch_p999_us":1789,"cpu0_pct":90.5,"cpu1_pct":78.1,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":6.811,"errors":0,"heap_free":78560}
+SRVCYC select_us=11464585 recv_us=2632267 send_us=2172180 (totals since boot, wall time inside the call)
+SRVDIAG iter=10930 sel_pos=10807 sel_zero=123 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":1,"ops_per_s":815,"batch_p50_us":4577,"batch_p99_us":10275,"batch_p999_us":13522,"cpu0_pct":99.2,"cpu1_pct":74.2,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":6.228,"errors":0,"heap_free":28588}
+SRVCYC select_us=12174872 recv_us=2925801 send_us=2300293 (totals since boot, wall time inside the call)
+SRVDIAG iter=11514 sel_pos=11386 sel_zero=128 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":16,"ops_per_s":11854,"batch_p50_us":1480,"batch_p99_us":1856,"batch_p999_us":2032,"cpu0_pct":86.5,"cpu1_pct":73.4,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":4.105,"errors":0,"heap_free":78564}
+SRVCYC select_us=13100347 recv_us=2982822 send_us=2373903 (totals since boot, wall time inside the call)
+SRVDIAG iter=12262 sel_pos=12129 sel_zero=133 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt2-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":16,"ops_per_s":14048,"batch_p50_us":4162,"batch_p99_us":10018,"batch_p999_us":14151,"cpu0_pct":98.9,"cpu1_pct":75.9,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":4.518,"errors":0,"heap_free":28572}
+SRVCYC select_us=13633097 recv_us=3251681 send_us=2604783 (totals since boot, wall time inside the call)
+SRVDIAG iter=12755 sel_pos=12617 sel_zero=138 sel_neg=0 errno=0 accept_fail=0
+DONE (loopback build, WiFi disabled)

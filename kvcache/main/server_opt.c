@@ -30,6 +30,11 @@ typedef struct {
     int fd;
     uint8_t *rx, *tx;
     size_t rlen, rcap, tcap;
+#if CONFIG_KV_ENGINE_OPT
+    kv_stream_t *st;  /* streamed SET in progress (value larger than the receive buffer) */
+    size_t st_left;   /* value bytes still to come */
+    uint8_t streaming;
+#endif
 } conn_t;
 
 typedef struct {
@@ -67,6 +72,12 @@ static int send_all(int fd, const uint8_t *p, size_t n)
 
 static void conn_close(int loop, conn_t *c)
 {
+#if CONFIG_KV_ENGINE_OPT
+    if (c->st) {
+        if (c->streaming) kv_stream_abort(c->st);
+        free(c->st);
+    }
+#endif
     if (c->fd >= 0) srv_active[loop]--;
     if (c->fd >= 0) close(c->fd);
     free(c->rx);
@@ -112,6 +123,58 @@ static int regrow(uint8_t **b, size_t *cap, size_t want)
     return 0;
 }
 
+#if CONFIG_KV_ENGINE_OPT
+/* "*3\r\n$3\r\nSET\r\n$<kl>\r\n<key>\r\n$<vl>\r\n" complete at p? -> header length, else 0 */
+static int set_stream_header(const uint8_t *p, size_t n, const uint8_t **key, size_t *kl, size_t *vl)
+{
+    if (n < 16 || memcmp(p, "*3\r\n$3\r\n", 8) != 0) return 0;
+    if ((p[8] | 0x20) != 's' || (p[9] | 0x20) != 'e' || (p[10] | 0x20) != 't' || p[11] != '\r' || p[12] != '\n' ||
+        p[13] != '$')
+        return 0;
+    size_t i = 14, v = 0;
+    while (i < n && p[i] >= '0' && p[i] <= '9') v = v * 10 + (p[i++] - '0');
+    if (i + 2 > n || p[i] != '\r' || p[i + 1] != '\n' || v == 0 || v > 255) return 0;
+    i += 2;
+    *key = p + i;
+    *kl = v;
+    i += v;
+    if (i + 3 > n || p[i] != '\r' || p[i + 1] != '\n' || p[i + 2] != '$') return 0;
+    i += 3;
+    v = 0;
+    while (i < n && p[i] >= '0' && p[i] <= '9') v = v * 10 + (p[i++] - '0');
+    if (i + 2 > n || p[i] != '\r' || p[i + 1] != '\n') return 0;
+    *vl = v;
+    return i + 2;
+}
+
+/* consume value bytes (then the trailing CRLF) from the start of rx; on completion commit and
+   reply. Returns -1 on a send error. A failed begin() leaves the stream inactive: its bytes are
+   swallowed and the client gets -OOM, like a normal SET. */
+static int stream_feed(conn_t *c)
+{
+    size_t used = 0;
+    if (c->st_left) {
+        size_t take = c->rlen < c->st_left ? c->rlen : c->st_left;
+        kv_stream_write(c->st, c->rx, take);
+        c->st_left -= take;
+        used = take;
+    }
+    if (!c->st_left && c->rlen - used >= 2) {
+        used += 2; /* trailing CRLF of the bulk string */
+        c->streaming = 0;
+        int rc = kv_stream_commit(c->st);
+        static const char ok[] = "+OK\r\n";
+        static const char oom[] = "-OOM command not allowed when used memory > 'maxmemory'.\r\n";
+        if (send_all(c->fd, (const uint8_t *)(rc == KV_OK ? ok : oom), rc == KV_OK ? sizeof ok - 1 : sizeof oom - 1) <
+            0)
+            return -1;
+    }
+    memmove(c->rx, c->rx + used, c->rlen - used);
+    c->rlen -= used;
+    return 0;
+}
+#endif
+
 /* returns -1 when the connection must be closed */
 static HOT int conn_readable(conn_t *c, srv_stats_t *st)
 {
@@ -125,6 +188,12 @@ static HOT int conn_readable(conn_t *c, srv_stats_t *st)
     if (n <= 0) return -1;
     int64_t t0 = esp_timer_get_time();
     c->rlen += n;
+#if CONFIG_KV_ENGINE_OPT
+    if (c->streaming) {
+        if (stream_feed(c) < 0) return -1;
+        if (c->streaming) return 0; /* more value bytes to come */
+    }
+#endif
 
     obuf_t o = {.buf = c->tx, .len = 0, .cap = c->tcap};
     arg_t argv[RESP_MAX_ARGS];
@@ -137,6 +206,27 @@ static HOT int conn_readable(conn_t *c, srv_stats_t *st)
         size_t need;
         int r = resp_parse(c->rx + off, c->rlen - off, argv, &argc, &need);
         if (r == 0) {
+#if CONFIG_KV_ENGINE_OPT
+            /* a SET whose value cannot fit the receive buffer: stream the value into the store */
+            const uint8_t *key;
+            size_t kl, vl;
+            int hl;
+            if (need > c->rcap && (hl = set_stream_header(c->rx + off, c->rlen - off, &key, &kl, &vl)) &&
+                (c->st || (c->st = malloc(sizeof(kv_stream_t))))) {
+                if (o.len && send_all(c->fd, o.buf, o.len) < 0) return -1; /* keep reply order */
+                o.len = 0;
+                kv_stream_begin(c->st, key, kl, vl); /* on failure: inactive stream -> -OOM */
+                c->streaming = 1;
+                c->st_left = vl;
+                off += hl;
+                memmove(c->rx, c->rx + off, c->rlen - off);
+                c->rlen -= off;
+                off = 0;
+                if (stream_feed(c) < 0) return -1;
+                if (c->streaming) break;
+                continue; /* value complete within this read: go on with what follows */
+            }
+#endif
             if (need > c->rcap - 0 && off == 0) { /* single command larger than buffer */
                 if (need > BIG_BUF || regrow(&c->rx, &c->rcap, need + 64) < 0) {
                     static const char e[] = "-ERR request too large\r\n";
@@ -162,8 +252,25 @@ static HOT int conn_readable(conn_t *c, srv_stats_t *st)
             if (send_all(c->fd, o.buf, o.len) < 0) return -1;
             o.len = 0;
             rc = cmd_exec(argc, argv, &o);
-            /* still too big: grow step by step (doubling) instead of jumping to BIG_BUF (71 KB
-               is more than the heap reserve, so the old single jump failed and dropped the client) */
+#if CONFIG_KV_ENGINE_OPT
+            /* a GET reply larger than the transmit buffer: stream it through the same buffer
+               (no extra memory), instead of growing the buffer from the heap reserve */
+            if (rc == KV_ENOROOM && argc == 2 && argv[0].n == 3 && (argv[0].p[0] | 0x20) == 'g' &&
+                (argv[0].p[1] | 0x20) == 'e' && (argv[0].p[2] | 0x20) == 't') {
+                size_t off = 0, total = 0;
+                do {
+                    size_t n = kv_get_range(argv[1].p, argv[1].n, off, c->tx, c->tcap, &total);
+                    if (!total) { /* vanished meanwhile: plain miss */
+                        if (send_all(c->fd, (const uint8_t *)"$-1\r\n", 5) < 0) return -1;
+                        break;
+                    }
+                    if (send_all(c->fd, c->tx, n) < 0) return -1;
+                    off += n;
+                } while (off < total);
+                rc = 0;
+            }
+#endif
+            /* other oversized replies: grow step by step (doubling) */
             while (rc == KV_ENOROOM && c->tcap < BIG_BUF) {
                 size_t want = c->tcap * 2 > BIG_BUF ? BIG_BUF : c->tcap * 2;
                 if (regrow(&c->tx, &c->tcap, want) < 0) return -1;
@@ -231,6 +338,9 @@ static void loop_task(void *arg)
         if (n < 0) srv_diag[5] = errno;
         if (n <= 0) {
             kv_active_expire(64); /* idle: incremental TTL sweep */
+#if CONFIG_KV_ADAPTIVE_RESERVE
+            if (L->id == 0) kv_mem_adjust(CONFIG_KV_ADAPTIVE_LOW_KB * 1024, CONFIG_KV_ADAPTIVE_HIGH_KB * 1024);
+#endif
             continue;
         }
         if (L->lfd >= 0 && FD_ISSET(L->lfd, &rs)) {

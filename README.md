@@ -39,6 +39,10 @@ load, spill-over balancing recovers **1.59×** over static hashing and hot-key r
 shard migration (with hysteresis) is best for spread-out skew (1.18×). With WiFi-like load on core 0,
 only the lock-free shared-nothing design keeps a solid dual-core gain (1.46× over one core).
 
+Memory (engine v2, Entry 6): with mixed value sizes the same RAM holds **+41 % more keys** than the previous
+engine and **+95 % with prefix compression**; values up to 64 KB are stored and streamed inside the arena,
+so they need no spare heap.
+
 End to end (real server over lwIP loopback, no WiFi): the server adds ~50 µs to a ~680 µs TCP round
 trip, so the network stack is ~93 % of a request. One event loop on core 1 with lwIP core locking is the
 fastest configuration (19.4k ops/s pipelined; +33 % over default lwIP under WiFi-like load); two-loop

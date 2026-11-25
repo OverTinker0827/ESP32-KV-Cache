@@ -7,6 +7,10 @@ menu "ESP32 KV Cache"
             bool "basic: malloc per entry + chained hash table (textbook port)"
         config KV_ENGINE_OPT
             bool "opt: preallocated slab arena + compact open-addressing index"
+        config KV_ENGINE_OPT1
+            bool "opt1: the Entry 5 optimized engine, frozen for Phase 3 comparisons"
+        config KV_ENGINE_OPT0
+            bool "opt0: the Entry 2 optimized engine (git e82bda2), frozen"
     endchoice
 
     choice KV_SERVER
@@ -43,6 +47,32 @@ menu "ESP32 KV Cache"
         bool "Ablation: basic engine formats GET reply headers with a hand-written itoa, not snprintf"
         default n
 
+    config KV_PREFIX_COMPRESS
+        bool "Prefix-compressed keys ('a:b:' prefixes stored once, 1-byte id per entry; opt engine)"
+        default n
+
+    config KV_ADAPTIVE_RESERVE
+        bool "Adaptive heap reserve: give arena pages back when free heap < LOW, retake when > HIGH (opt engine)"
+        default n
+        help
+            Entry 6: a reactive controller cannot absorb sudden buffer bursts, so LOW must be at least
+            the largest expected burst; this then only helps with slowly changing memory demand.
+
+    config KV_ADAPTIVE_LOW_KB
+        int "Adaptive reserve: release pages below this much free heap (KB)"
+        depends on KV_ADAPTIVE_RESERVE
+        default 80
+
+    config KV_ADAPTIVE_HIGH_KB
+        int "Adaptive reserve: take pages back above this much free heap (KB)"
+        depends on KV_ADAPTIVE_RESERVE
+        default 104
+
+    config KV_LOOPBACK_FUNCTIONAL_ONLY
+        bool "Loopback test: run only the functional suite (fits the deployment heap reserve)"
+        depends on KV_LOOPBACK_TEST
+        default n
+
     config KV_MAX_CLIENTS
         int "Max concurrent clients"
         default 8
@@ -65,7 +95,7 @@ menu "ESP32 KV Cache"
 
     config KV_MC_BENCH
         bool "Phase 1 multicore harness: runtime lock modes/shards, run designs at boot (opt engine)"
-        depends on KV_ENGINE_OPT
+        depends on KV_ENGINE_OPT || KV_ENGINE_OPT1
         default n
 
     config KV_MC_PHASE
@@ -75,6 +105,14 @@ menu "ESP32 KV Cache"
 
     config KV_LOOPBACK_TEST
         bool "Test the real server end-to-end over lwIP loopback (127.0.0.1), no WiFi needed"
+        default n
+
+    config KV_ENGINE_TEST
+        bool "Run on-board engine correctness tests at boot (WiFi off)"
+        default n
+
+    config KV_P3_BENCH
+        bool "Run the Phase 3 memory benchmark at boot (WiFi off)"
         default n
 
     config KV_ENGINE_SELFTEST

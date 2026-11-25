@@ -556,3 +556,128 @@ Full tables: `results/entry5_tables.md`.
 
 Raw data: `results/entry5_lb_*.jsonl`; tables: `python tools/summarize_lb.py entry5` (saved as
 `results/entry5_tables.md`).
+
+---
+
+## Entry 6 — 2026-11-25 — Phase 3: memory (engine v2), integrated into the server
+
+**What changed (engine v2, `kvcache/main/kv_opt.c`).** The Entry 5 engine is frozen as `kv_opt1.c` and
+the exact Entry 2 engine (git `e82bda2`) as `kv_opt0.c`, so all three run through the same benchmarks.
+
+| change | why |
+|---|---|
+| arena pages allocated one by one (4 KiB each) | lets the store shrink/grow at runtime (adaptive reserve) |
+| **chained values inside the arena** (4 KiB chunks) | values > ~4 KB used the heap reserve and failed with `-OOM` (Entry 5) |
+| **4-byte entry header**; the 4-byte expiry is stored only for keys with a TTL | v1 spent 8 B of header per entry |
+| **"page-fit" size classes** above 256 B (4088/n: 272, 292 … 584, 680, 816, 1020, 1360, 2044) | v1's 640/768 classes fit 6 × 532 B entries per page instead of 7 |
+| 4-byte-granular classes up to 64 B; O(1) class lookup table | less rounding waste; no per-SET scan |
+| **prefix compression**: `a:b:` prefixes (≤ 24 B, up to 63) stored once, 1-byte id per entry | IoT key names repeat long prefixes |
+| reclaim fully empty pages of other classes before evicting | empty pages stayed stuck in their old class (slab calcification) |
+| adaptive reserve controller `kv_mem_adjust(low, high)` (option, off by default) | research question: cache vs network memory |
+| **streamed SET and GET** for values larger than the 4 KB connection buffers | no buffer growth from the heap reserve |
+| clock read only for entries with a TTL; GET/SET bodies and fast paths inlined; compile-time lock mode in single-loop server builds | speed regression found in this entry (below) |
+
+**Correctness.** A new on-board engine test suite (`engine_test.c`, 72 checks: small/large/empty values,
+in-place and class-changing overwrites, TTL/EXPIRE/KEEPTTL/NX/XX, 4,089 B – 64 KB chained values byte-exact,
+prefix learning, and two 6,000-operation stress runs with eviction, page stealing and chains mixed, verifying
+every surviving value against its expected content) passes **72/72** on the final engine. It found two engine
+bugs, both fixed: TTL deadlines up to 1 ms long (`| 1` to avoid a zero deadline; also present in v1) and
+empty pages stuck in their old slab class (64 KB values failed with free memory available).
+
+### Capacity: max keys before the store refuses (noeviction), store bytes per key in brackets
+
+16 B keys `key:%012d`:
+
+| engine | 8 B | 16 B | 32 B | 64 B | 128 B | 256 B | 512 B | 1024 B |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| basic C | 5,145 (54) | 4,406 (56) | 3,416 (72) | 2,367 (104) | 1,431 (173) | 798 (309) | 425 (581) | 225 (1100) |
+| opt0 (Entry 2) | 5,131 (48) | 5,131 (48) | 3,942 (62) | 2,268 (108) | 1,350 (181) | 648 (376) | 324 (753) | 162 (1506) |
+| opt1 (Entry 5) | 5,075 (47) | 5,075 (47) | 3,869 (62) | 2,226 (108) | 1,325 (181) | 636 (377) | 318 (754) | 159 (1507) |
+| **opt2 (v2)** | **5,447** (44) | **5,447** (44) | **4,056** (58) | **2,392** (99) | 1,300 (182) | 728 (326) | 364 (652) | 156 (1520) |
+
+24 B IoT keys `sensor:temp:roomNN:NNNNN` (20 distinct prefixes):
+
+| engine | 8 B | 16 B | 32 B | 64 B | 128 B | 256 B | 512 B | 1024 B |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| basic C | 4,406 (56) | 3,856 (64) | 3,076 (80) | 2,199 (112) | 1,371 (180) | 798 (309) | 425 (581) | 225 (1100) |
+| opt1 (Entry 5) | 5,075 (47) | 4,505 (53) | 3,339 (72) | 2,226 (108) | 1,325 (181) | 636 (377) | 318 (754) | 159 (1507) |
+| opt2 | 5,447 (44) | 4,784 (50) | 3,536 (67) | 2,184 (109) | 1,300 (182) | 728 (326) | 364 (652) | 156 (1520) |
+| **opt2 + prefix** | **5,447** (44) | **5,447** (44) | **4,784** (50) | **2,652** (89) | **1,456** (163) | **780** (304) | 364 (652) | 156 (1520) |
+
+Mixed value sizes (16–512 B, IoT keys; insert until 200 rejections in a row):
+
+| engine | keys stored | payload / store bytes |
+|---|---:|---:|
+| basic C | 766 | 0.90 |
+| opt1 (Entry 5) | 844 | 0.75 |
+| opt2 | 1,189 (+41 %) | 0.82 |
+| **opt2 + prefix** | **1,645 (+95 %)** | **0.94** |
+
+### Speed (Entry 2 engine benchmark, same firmware, sequential 16 B keys, 32 B values)
+
+| engine | SET/s | GET/s | DEL/s | GET p50 / p99 µs |
+|---|---:|---:|---:|---:|
+| opt0 (Entry 2 code) | 434,272 | 357,283 | 389,468 | 2.73 / 3.11 |
+| opt1 (Entry 5 code) | 380,474 | 324,991 | 366,743 | 3.01 / 3.33 |
+| opt2, first version | 304,460 | 297,380 | 331,081 | 3.29 / 3.88 |
+| **opt2, final** (prefix off) | **404,350** | **338,329** | 359,544 | 2.89 / 3.33 |
+| opt2, final, prefix on | 245,585 | 260,321 | 266,261 | 3.77 / – |
+
+### End to end (real server over loopback; v2 engine + prefix + streaming + lwIP core locking)
+
+| | GET 1×1 | SET 1×1 | GET 1×16 | GET 4×16 | SET 4×16 | GET 4×16 under WiFi-like load |
+|---|---:|---:|---:|---:|---:|---:|
+| Entry 5 server (opt1 + core locking) | 1,279 | 1,324 | 16,272 | 19,392 | 19,356 | 14,222 |
+| **Entry 6 server** | **1,365** | **1,374** | **18,303** | **19,837** | **19,644** | **14,560** |
+| v2 without prefix (same run day) | 1,247 | 1,158 | 16,016 | 18,733 | 19,456 | 14,096 |
+| v2 with prefix (same run day) | 1,186 | 1,208 | 16,077 | 19,134 | 19,072 | 14,463 |
+
+Functional suite at the **real 40 KB deployment reserve**: Entry 5 engine 30/34 (10 KB SET `-OOM`),
+**Entry 6 server 34/34** (10 KB SET and GET streamed through the 4 KB buffers).
+
+### Adaptive reserve (v2) under a simulated packet-buffer load (baseline ~10 KB, bursts to ~64 KB in ~5 ms every 1.5 s)
+
+| reserve | buffer allocations failed | cache hit rate | avg arena pages |
+|---|---:|---:|---:|
+| fixed 40 KB (current default) | 1,215 of 1,296 | 0.671 | 52.0 |
+| **fixed 80 KB** | **0 of 176** | 0.555 | 43.0 |
+| fixed 100 KB | 0 of 176 | 0.492 | 38.0 |
+| adaptive, low 20 / high 48 KB | 26 of 202 | 0.590 | 45.6 |
+| adaptive, low 40 / high 64 KB | 21 of 197 | 0.535 | 41.4 |
+| adaptive, low 56 / high 80 KB | 19 of 195 | 0.485 | 37.4 |
+
+### Findings
+
+1. **Engine v2 stores more in the same memory** (vs the Entry 5 engine, 16 B keys): +7.3 % (8 B values),
+   +4.8 % (32 B), +7.5 % (64 B), +14.5 % (256 B and 512 B, page-fit classes), but −1.9 % at 128 B and 1 KB;
+   **+41 % for mixed sizes, +95 % with prefix compression**.
+2. **Prefix compression** adds +14 % / +35 % / +21 % / +12 % / +7 % keys for IoT-style names with 16 / 32 /
+   64 / 128 / 256 B values, and nothing for short prefixes (`key:`) or ≥ 512 B values. It costs 23–39 % in the engine benchmark but **nothing measurable end
+   to end** (the engine is ~7 % of a request, Entry 5). Enabled by default.
+3. **Where malloc still wins:** basic C stores more 512 B–1 KB values (425 vs 364; 225 vs 156). A 4 KiB page
+   holds only three ~1 KB entries; exact-size `malloc` has no page rounding. Fixing this needs larger pages or
+   chaining medium values (future work).
+4. **Small values hit the index limit**, not the arena: 5,447 keys, because the index is sized for an average
+   44 B entry (`AVG_ENTRY_EST`). A bigger index costs memory when values are large; a trade-off to tune.
+5. **Streaming makes large values independent of the heap reserve**: values up to 64 KB are written into and read
+   out of arena chunks through the normal 4 KB connection buffers (pages pinned while a value streams in).
+6. **Adaptive reserve: negative result for sudden bursts.** No adaptive setting reaches zero failed buffer
+   allocations: the burst (64 KB in ~5 ms) outruns a reactive controller (2 ms tick, up to 16 pages per tick).
+   A fixed reserve sized for the burst (80 KB) has none. Adaptive only wins hit rate by accepting 10–13 % failed
+   allocations. **For bursty demand the headroom must be fixed; adaptation can only help with slowly changing
+   demand** (not tested). Kept as an option (`CONFIG_KV_ADAPTIVE_RESERVE`, low ≥ largest burst), off by default.
+   The synthetic load says the 40 KB default reserve may be too small for real WiFi bursts: to calibrate once
+   the radio works.
+7. **IRAM** cannot hold the index (Phase 3 plan item dropped): the deployment build has 793 B of IRAM left (Entry 5).
+
+### Corrections
+
+- **The Entry 5 integration cost engine speed and I did not measure it then.** The exact Entry 2 engine, built
+  into today's firmware, runs at 434k SET/s; the Entry 5 engine at 380k (−12 %). In this entry I first blamed the
+  runtime lock switch; making it compile-time did not recover the speed, which disproved that. The cause was
+  code structure (hot functions no longer inlined, an extra function call and a clock read per operation). The
+  final v2 engine recovers most of it (404k SET/s, −7 % vs Entry 2, +6 % vs Entry 5) while storing more.
+- End to end the loss was never visible (the engine is ~7 % of a request), which is exactly why it went unnoticed.
+
+Raw data: `results/entry6_p3_*.jsonl`, `results/entry6_lb_*.jsonl`; tables: `python tools/summarize_p3.py entry6`
+(saved as `results/entry6_tables.md`).
