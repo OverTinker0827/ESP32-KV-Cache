@@ -36,7 +36,11 @@ typedef struct {
 
 static inline int ob_room(obuf_t *o, size_t n) { return o->len + n <= o->cap; }
 
-/* ---------- server statistics (shared by all variants) ---------- */
+/* ---------- server statistics (shared by all variants) ----------
+ * One block per event loop (single writer each, no atomics); INFO sums them. Phase 1 measured
+ * a shared plain counter losing 316 of 205k updates in 0.4 s with two writers. The basic
+ * server (task per client, tasks migrate between cores) updates block 0 inside STATS_LOCK. */
+#define NSTATS 2
 typedef struct {
     volatile uint32_t cmds;
     volatile uint32_t conns;
@@ -44,7 +48,7 @@ typedef struct {
     volatile uint64_t exec_cycles;  /* CPU cycles spent inside command execution */
     volatile uint32_t svc_hist[24]; /* log2 histogram, server residence per batch in us */
 } srv_stats_t;
-extern srv_stats_t g_stats;
+extern srv_stats_t g_stats[NSTATS];
 
 static inline void hist_add(volatile uint32_t *h, uint32_t us)
 {

@@ -1,0 +1,132 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:1
+load:0x3fff0030,len:6180
+load:0x40078000,len:15812
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 15:16:45
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 80MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 4MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00177000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=2d9e0h (186848) map
+I (128) esp_image: segment 1: paddr=0003da08 vaddr=3ffb0000 size=02610h (  9744) load
+I (131) esp_image: segment 2: paddr=00040020 vaddr=400d0020 size=24d94h (150932) map
+I (175) esp_image: segment 3: paddr=00064dbc vaddr=3ffb2610 size=00198h (   408) load
+I (175) esp_image: segment 4: paddr=00064f5c vaddr=40080000 size=14d5ch ( 85340) load
+I (207) esp_image: segment 5: paddr=00079cc0 vaddr=50000000 size=00020h (    32) load
+I (217) boot: Loaded app from partition at offset 0x10000
+I (223) cpu_start: Multicore app
+I (231) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (231) cpu_start: Pro cpu start user code
+I (231) cpu_start: cpu freq: 240000000 Hz
+I (233) app_init: Application information:
+I (237) app_init: Project name:     kvcache
+I (241) app_init: App version:      8b68673-dirty
+I (245) app_init: Compile time:     Nov 25 2026 15:24:39
+I (250) app_init: ELF file SHA256:  9334c0465...
+I (255) app_init: ESP-IDF:          v5.5.6
+I (259) efuse_init: Min chip rev:     v0.0
+I (262) efuse_init: Max chip rev:     v3.99
+I (266) efuse_init: Chip rev:         v3.1
+I (270) heap_init: Initializing. RAM available for dynamic allocation:
+I (277) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (282) heap_init: At 3FFC4A88 len 0001B578 (109 KiB): DRAM
+I (287) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (292) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (298) heap_init: At 40094D5C len 0000B2A4 (44 KiB): IRAM
+I (304) spi_flash: detected chip: generic
+I (307) spi_flash: flash io: dio
+I (310) main_task: Started on CPU0
+I (312) main_task: Calling app_main()
+VARIANT engine=opt-slab-oa-1sh-nolock server=opt-eventloop cores=single-core1 iram=1
+I (324) kv_opt: arena 30 pages (120 KiB) in 2 blocks, index 3237 slots (12948 B), 1 shard(s), heap left 84908
+I (333) srv_opt: listening on 6379 with 1 loop(s)
+I (333) srv_opt: loop 0 running on core 1
+VARIANT engine=opt-slab-oa-1sh-nolock server=opt-eventloop cores=single-core1
+TEST SUMMARY pass=34 fail=0 server=opt-eventloop cores=single-core1 engine=opt-slab-oa-1sh-nolock
+RESULT {"part":"echo_baseline","echo_core":1,"core_locking":0,"rtt_p50_us":682,"rtt_p99_us":1025,"rtt_min_us":634}
+RESULT {"part":"echo_baseline","echo_core":0,"core_locking":0,"rtt_p50_us":544,"rtt_p99_us":755,"rtt_min_us":537}
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":1,"ops_per_s":1352,"batch_p50_us":734,"batch_p99_us":847,"batch_p999_us":970,"cpu0_pct":86.9,"cpu1_pct":91.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":3.694,"errors":0,"heap_free":55696}
+SRVCYC select_us=2905532 recv_us=350389 send_us=251605 (totals since boot, wall time inside the call)
+SRVDIAG iter=2455 sel_pos=2395 sel_zero=60 sel_neg=0 errno=0 accept_fail=0
+TASKSTATS
+main           	418603		11%
+lbc            	291524		8%
+IDLE1          	1372429		38%
+IDLE0          	861834		23%
+tiT            	1938151		53%
+kvloop0        	2055507		56%
+ipc1           	12067		<1%
+ipc0           	7149		<1%
+
+TASKSTATS END
+W (3941) srv_opt: conn_open: no memory for buffers (free heap 6656)
+LBDIAG client 1 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":1,"ops_per_s":1334,"batch_p50_us":750,"batch_p99_us":848,"batch_p999_us":1175,"cpu0_pct":84.6,"cpu1_pct":91.1,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":3.632,"errors":3,"heap_free":34128}
+SRVCYC select_us=3780257 recv_us=481301 send_us=390882 (totals since boot, wall time inside the call)
+SRVDIAG iter=3802 sel_pos=3736 sel_zero=66 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":16,"ops_per_s":16062,"batch_p50_us":896,"batch_p99_us":1297,"batch_p999_us":1304,"cpu0_pct":84.4,"cpu1_pct":91.9,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.482,"errors":0,"heap_free":42328}
+SRVCYC select_us=4594819 recv_us=621283 send_us=505360 (totals since boot, wall time inside the call)
+SRVDIAG iter=4813 sel_pos=4742 sel_zero=71 sel_neg=0 errno=0 accept_fail=0
+W (6216) srv_opt: conn_open: no memory for buffers (free heap 6028)
+LBDIAG client 2 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":16,"ops_per_s":18351,"batch_p50_us":838,"batch_p99_us":992,"batch_p999_us":994,"cpu0_pct":79.8,"cpu1_pct":91.0,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.503,"errors":3,"heap_free":33484}
+SRVCYC select_us=5324092 recv_us=773384 send_us=635327 (totals since boot, wall time inside the call)
+SRVDIAG iter=5972 sel_pos=5896 sel_zero=76 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":1,"ops_per_s":1317,"batch_p50_us":751,"batch_p99_us":885,"batch_p999_us":1030,"cpu0_pct":88.4,"cpu1_pct":91.1,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":4.049,"errors":0,"heap_free":41692}
+SRVCYC select_us=6145044 recv_us=938275 send_us=773097 (totals since boot, wall time inside the call)
+SRVDIAG iter=7297 sel_pos=7216 sel_zero=81 sel_neg=0 errno=0 accept_fail=0
+W (8492) srv_opt: conn_open: no memory for buffers (free heap 5964)
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":1,"ops_per_s":1228,"batch_p50_us":1334,"batch_p99_us":2742,"batch_p999_us":3181,"cpu0_pct":95.6,"cpu1_pct":87.3,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":4.383,"errors":1,"heap_free":24936}
+SRVCYC select_us=6830798 recv_us=1226918 send_us=942564 (totals since boot, wall time inside the call)
+SRVDIAG iter=8133 sel_pos=8047 sel_zero=86 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":16,"ops_per_s":15856,"batch_p50_us":904,"batch_p99_us":1283,"batch_p999_us":1349,"cpu0_pct":81.9,"cpu1_pct":92.5,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.903,"errors":0,"heap_free":41472}
+SRVCYC select_us=7629781 recv_us=1357219 send_us=1047100 (totals since boot, wall time inside the call)
+SRVDIAG iter=9131 sel_pos=9040 sel_zero=91 sel_neg=0 errno=0 accept_fail=0
+W (10771) srv_opt: conn_open: no memory for buffers (free heap 6004)
+LBDIAG client 3 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":16,"ops_per_s":15960,"batch_p50_us":914,"batch_p99_us":1284,"batch_p999_us":1546,"cpu0_pct":82.2,"cpu1_pct":92.6,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.874,"errors":3,"heap_free":33448}
+SRVCYC select_us=8425977 recv_us=1485654 send_us=1153111 (totals since boot, wall time inside the call)
+SRVDIAG iter=10140 sel_pos=10044 sel_zero=96 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":1,"ops_per_s":918,"batch_p50_us":1131,"batch_p99_us":1838,"batch_p999_us":2030,"cpu0_pct":97.0,"cpu1_pct":69.6,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":3.674,"errors":0,"heap_free":37852}
+SRVCYC select_us=9375827 recv_us=1618172 send_us=1251428 (totals since boot, wall time inside the call)
+SRVDIAG iter=11069 sel_pos=10965 sel_zero=104 sel_neg=0 errno=0 accept_fail=0
+W (13106) srv_opt: conn_open: no memory for buffers (free heap 8356)
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":1,"ops_per_s":795,"batch_p50_us":2328,"batch_p99_us":4246,"batch_p999_us":5605,"cpu0_pct":100.0,"cpu1_pct":76.7,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":4.076,"errors":1,"heap_free":21156}
+SRVCYC select_us=10246824 recv_us=1776263 send_us=1355630 (totals since boot, wall time inside the call)
+SRVDIAG iter=11853 sel_pos=11744 sel_zero=109 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":16,"ops_per_s":11757,"batch_p50_us":1307,"batch_p99_us":2012,"batch_p999_us":2121,"cpu0_pct":94.0,"cpu1_pct":68.7,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.506,"errors":0,"heap_free":37664}
+SRVCYC select_us=11118077 recv_us=1893896 send_us=1442412 (totals since boot, wall time inside the call)
+SRVDIAG iter=12595 sel_pos=12481 sel_zero=114 sel_neg=0 errno=0 accept_fail=0
+W (15392) srv_opt: conn_open: no memory for buffers (free heap 6772)
+LBDIAG client 0 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":16,"ops_per_s":12350,"batch_p50_us":2416,"batch_p99_us":4273,"batch_p999_us":5665,"cpu0_pct":99.9,"cpu1_pct":80.9,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.972,"errors":3,"heap_free":12956}
+SRVCYC select_us=11916097 recv_us=2052167 send_us=1547789 (totals since boot, wall time inside the call)
+SRVDIAG iter=13370 sel_pos=13251 sel_zero=119 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":1,"ops_per_s":874,"batch_p50_us":1147,"batch_p99_us":1829,"batch_p999_us":1997,"cpu0_pct":97.0,"cpu1_pct":67.5,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":4.060,"errors":0,"heap_free":37864}
+SRVCYC select_us=12824156 recv_us=2182581 send_us=1641528 (totals since boot, wall time inside the call)
+SRVDIAG iter=14252 sel_pos=14128 sel_zero=124 sel_neg=0 errno=0 accept_fail=0
+W (17678) srv_opt: conn_open: no memory for buffers (free heap 8312)
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":1,"ops_per_s":790,"batch_p50_us":2310,"batch_p99_us":4505,"batch_p999_us":5232,"cpu0_pct":100.0,"cpu1_pct":75.8,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":4.503,"errors":1,"heap_free":21128}
+SRVCYC select_us=13690980 recv_us=2339197 send_us=1750425 (totals since boot, wall time inside the call)
+SRVDIAG iter=15042 sel_pos=14913 sel_zero=129 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":16,"ops_per_s":11312,"batch_p50_us":1396,"batch_p99_us":1945,"batch_p999_us":2856,"cpu0_pct":93.3,"cpu1_pct":68.2,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.896,"errors":0,"heap_free":37664}
+SRVCYC select_us=14560945 recv_us=2456956 send_us=1829415 (totals since boot, wall time inside the call)
+SRVDIAG iter=15756 sel_pos=15622 sel_zero=134 sel_neg=0 errno=0 accept_fail=0
+W (19964) srv_opt: conn_open: no memory for buffers (free heap 8336)
+LBDIAG client 0 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core1","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":16,"ops_per_s":11310,"batch_p50_us":1413,"batch_p99_us":2002,"batch_p999_us":2965,"cpu0_pct":93.8,"cpu1_pct":69.4,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.929,"errors":3,"heap_free":29648}
+SRVCYC select_us=15427699 recv_us=2575184 send_us=1908630 (totals since boot, wall time inside the call)
+SRVDIAG iter=16475 sel_pos=16336 sel_zero=139 sel_neg=0 errno=0 accept_fail=0
+DONE (loopback build, WiFi disabled)

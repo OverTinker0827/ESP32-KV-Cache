@@ -18,6 +18,7 @@ static EventGroupHandle_t wev;
 
 void engine_bench_run(size_t reserve);
 void mc_bench_run(size_t reserve);
+void loopback_run(void);
 
 static void on_event(void *arg, esp_event_base_t base, int32_t id, void *data)
 {
@@ -68,7 +69,17 @@ void app_main(void)
 #elif CONFIG_KV_ENGINE_SELFTEST
     engine_bench_run(reserve);
 #endif
-#if CONFIG_KV_NO_WIFI
+#if CONFIG_KV_NO_WIFI && CONFIG_KV_LOOPBACK_TEST
+    /* real server, no radio: lwIP + loopback interface, clients on the board */
+    ESP_ERROR_CHECK(esp_netif_init());
+    if (kv_init(reserve) != 0) ESP_LOGE(TAG, "kv_init failed");
+    server_start();
+    vTaskDelay(pdMS_TO_TICKS(200));
+    printf("VARIANT engine=%s server=%s cores=%s\n", kv_engine_name(), variant_server_name(), variant_cores_name());
+    loopback_run();
+    printf("DONE (loopback build, WiFi disabled)\n");
+    return;
+#elif CONFIG_KV_NO_WIFI
     printf("DONE (engine-only build, WiFi disabled)\n");
     return;
 #endif

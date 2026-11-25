@@ -5,7 +5,7 @@
 #include "sysmon.h"
 #include "esp_heap_caps.h"
 
-srv_stats_t g_stats;
+srv_stats_t g_stats[NSTATS];
 
 /* ----------------------------------------------------------- reply helpers */
 static inline HOT void put(obuf_t *o, const char *s, size_t n)
@@ -122,6 +122,14 @@ static HOT void do_set(int argc, const arg_t *argv, obuf_t *o)
 static int do_info(obuf_t *o)
 {
     static char tmp[1400];
+    srv_stats_t g = {0}; /* sum of the per-loop blocks */
+    for (int i = 0; i < NSTATS; i++) {
+        g.cmds += g_stats[i].cmds;
+        g.conns += g_stats[i].conns;
+        g.batches += g_stats[i].batches;
+        g.exec_cycles += g_stats[i].exec_cycles;
+        for (int b = 0; b < 24; b++) g.svc_hist[b] += g_stats[i].svc_hist[b];
+    }
     kv_stats_t st;
     kv_stats(&st);
     uint64_t up, i0, i1;
@@ -140,10 +148,10 @@ static int do_info(obuf_t *o)
                      (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL),
                      (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL), st.keys,
                      st.mem_used, st.mem_total, st.evictions, st.expired, st.index_slots,
-                     kv_get_evict() ? "allkeys-lru" : "noeviction", up, i0, i1, g_stats.cmds, g_stats.conns,
-                     g_stats.batches, g_stats.exec_cycles);
+                     kv_get_evict() ? "allkeys-lru" : "noeviction", up, i0, i1, g.cmds, g.conns,
+                     g.batches, g.exec_cycles);
     for (int b = 0; b < 24 && n < (int)sizeof tmp - 16; b++)
-        n += snprintf(tmp + n, sizeof tmp - n, "%s%" PRIu32, b ? "," : "", g_stats.svc_hist[b]);
+        n += snprintf(tmp + n, sizeof tmp - n, "%s%" PRIu32, b ? "," : "", g.svc_hist[b]);
     n += snprintf(tmp + n, sizeof tmp - n, "\r\n");
     return put_bulk(o, (const uint8_t *)tmp, n);
 }
@@ -181,7 +189,7 @@ HOT int cmd_exec(int argc, const arg_t *argv, obuf_t *o)
             return 0;
         }
         if (EQ(c, "STATS.RESET")) {
-            memset((void *)&g_stats, 0, sizeof g_stats);
+            memset((void *)g_stats, 0, sizeof g_stats);
             PUTS(o, "+OK\r\n");
             return 0;
         }

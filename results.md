@@ -430,3 +430,129 @@ Designs:
 - 2 workers only; with more shards per worker the migration granularity problem shrinks.
 
 Raw data: `results/entry4_p2.jsonl`; tables: `python tools/summarize_p2.py` (saved as `results/entry4_tables.md`).
+
+---
+
+## Entry 5 — 2026-11-25 — Phase 1–2 results integrated into the real server; end-to-end test over loopback
+
+**Why this entry.** Phases 1–2 were measured in a separate harness; the real server still used designs the
+harness had ruled out (portMUX in its two-core modes, shared non-atomic statistics counters). This entry
+moves the decisions into the server and tests the server itself, end to end.
+
+**What was integrated**
+
+| change | evidence |
+|---|---|
+| One lock implementation for server and harness: shard count and lock discipline are runtime settings (server takes them from Kconfig) | prevents the two drifting apart again |
+| Two-core modes: `shared` = 1 table + seqlock, `sharded` = 8 shards + seqlock (CAS-locked writers); portMUX removed | Entry 3: portMUX 0.96×, sharded seqlock 1.69× (engine-level) |
+| Per-loop statistics blocks summed in `INFO`; basic server updates under a critical section | Entry 3: shared plain counter lost 316 updates in 0.4 s |
+| lwIP core locking in `netopt.cfg` | this entry: +5 % quiet, +33 % under WiFi-like load |
+
+**Method.** Without WiFi, the board tests itself: lwIP's loopback interface carries real TCP connections
+from client tasks on core 0 (where the network stack runs) to the server on `127.0.0.1:6379`, so every
+request goes through sockets, TCP, the RESP parser, the event loop(s) and the engine. Each build runs
+(1) a 34-case functional suite with exact expected replies (PING, SET/GET, NX/XX, DEL, EXISTS, TTL/PTTL,
+expiry, SETEX, pipelining, inline commands, 3 KB and 10 KB values, FLUSHALL, errors), (2) a raw TCP echo
+baseline (no parser, no engine), (3) 1 s runs of GET/SET at 1 or 4 connections × 1 or 16 pipelined
+requests, quiet and with the WiFi-load simulator on core 0. Loopback runs TCP twice on one chip and the
+clients share core 0 with lwIP, so absolute numbers are a pessimistic stand-in for WiFi; they compare
+server designs under identical conditions. Test builds use a 120 KB heap reserve for the on-board clients
+and a 32-packet loopback queue (default 8).
+
+### Functional suite
+
+| build | result |
+|---|---|
+| basic C (basic engine + task per client) | 33/33 (no inline commands, by design) |
+| optimized, all five configurations | **34/34** |
+
+### Raw TCP echo over loopback (no parser, no engine): RTT p50 / p99 µs
+
+| echo task on | default lwIP | lwIP core locking |
+|---|---:|---:|
+| core 1 (socket calls cross to lwIP's core 0) | 682 / 1,061 | 627 / 814 |
+| core 0 (same core as lwIP) | **545** / 762 | 551 / 763 |
+| (stock lwIP config of the basic build, core 1) | 1,334 / 1,719 | – |
+
+### Real server over loopback: ops/s (batch p50 / p99 µs)
+
+Quiet:
+
+| design | GET 1×1 | GET 4×1 | GET 1×16 | GET 4×16 | SET 1×1 | SET 4×16 |
+|---|---:|---:|---:|---:|---:|---:|
+| basic C | 509 (1,959 / 2,308) | 935 | 16 (1.38 s) | 48 ⚠ | 564 | 64 |
+| opt, 1 loop core 1 | 1,348 (735 / 859) | 1,135 | 15,999 (897 / 1,303) | 18,528 | 1,318 | 17,976 |
+| opt, 1 loop core 0 | 912 (1,095 / 1,103) | 758 | 13,294 | 11,152 | 911 | 11,021 |
+| opt, 2 loops, shared seqlock | 925 | 871 | 16,272 | 13,072 | 924 | 12,912 |
+| opt, 2 loops, 8 shards seqlock | 923 | 874 | 17,584 | 12,944 | 923 | 12,944 |
+| **opt, 1 loop core 1 + core locking** | 1,279 | **1,206** | 16,272 (1,006 / 1,013) | **19,392** | 1,324 | **19,356** |
+
+With the WiFi-load simulator on core 0 (40 % duty):
+
+| design | GET 1×1 | GET 4×1 | GET 1×16 | GET 4×16 | SET 1×1 | SET 4×16 |
+|---|---:|---:|---:|---:|---:|---:|
+| basic C | 278 | 420 | 208 | 64 | 314 | 1,087 |
+| opt, 1 loop core 1 | 883 | 726 | 11,389 | 10,715 | 883 | 11,087 |
+| opt, 1 loop core 0 | 494 | 407 | 7,184 | 6,032 | 493 | 5,952 |
+| opt, 2 loops, shared seqlock | 499 | 570 | 11,563 | 8,496 | 499 | 8,559 |
+| opt, 2 loops, 8 shards seqlock | 498 | 553 | 11,676 | 8,560 | 497 | 8,400 |
+| **opt, 1 loop core 1 + core locking** | **990** | **821** | **12,640** | **14,222** | **985** | **13,984** |
+
+Server-side time per command (from the server's own counters) is 3.7–4.4 µs for every optimized design
+when quiet. ⚠ = a client connection failed in that run (basic C: one 3 s receive timeout, see findings).
+Full tables: `results/entry5_tables.md`.
+
+### Findings
+
+1. **The network stack, not the cache, dominates end to end.** A bare TCP echo over loopback costs
+   545–682 µs per round trip; the full server costs 735 µs, i.e. **the server adds ~50 µs (≈ 7 %)**:
+   ~93 % of a request is lwIP's socket/TCP path (~150 µs per `recv()`, ~107 µs per `send()` measured
+   inside the server). This is the measurement that justifies attacking the socket layer next.
+2. **Engine-level dual-core gains do not carry over end to end.** The two-loop designs (1.69× in the
+   Entry 3 harness) are **30 % slower** than one loop on core 1 here (12.9–13.1k vs 18.5k ops/s at 4×16),
+   and 20 % slower under WiFi-like load: their second loop runs on core 0, where lwIP (and here the test
+   clients) are already the bottleneck. Amdahl's law with the serial stage on core 0. **Decision: the
+   server's default stays one loop on core 1**; the seqlock-sharded two-loop mode is kept for when core 0
+   has spare capacity (an adaptive switch is a follow-up).
+3. **Same-core socket calls are 20 % cheaper** (echo RTT 545 vs 682 µs), and **lwIP core locking**
+   recovers part of the cross-core cost: +5 % at 4×16 quiet and **+33 % under WiFi-like load**
+   (14.2k vs 10.7k ops/s), +12 % at 1×1 under load. Adopted.
+4. **Optimized vs basic C, end to end:** 2.6× at one request in flight (1,348 vs 509 ops/s) and
+   280–1,000× with 16 pipelined requests. The basic server sends one TCP segment per reply; 16 pipelined
+   replies per client overflow the loopback queue and trigger ~1 s TCP retransmissions (and one 3 s client
+   timeout). The size of that gap is loopback-specific; the per-reply segment cost is not.
+5. **A one-loop server placed on core 0 is the worst optimized choice** (912 vs 1,348 ops/s at 1×1; 494 vs
+   883 under load), confirming from the real server path what Entry 2 showed for the engine.
+6. **IRAM is now 99.4 % full** in the full WiFi build (793 B free) after adding core locking: every further
+   IRAM placement now has to be traded against the network stack's.
+
+### Bugs found by the end-to-end test (fixed)
+
+- **Replies larger than the 4 KB transmit buffer dropped the connection** (optimized server): it grew the
+  buffer straight to 71 KB, more than the heap reserve. Now grows by doubling.
+- **Same bug in the basic server** (single 70 KB `malloc`, client left without a reply). Now doubles.
+- Test harness: an unchecked `malloc` in the client (crash), the next run starting before the server had
+  closed the previous run's connections, client buffers exhausting the reserve, lwIP's 8-packet loopback
+  queue; basic server timing used per-core cycle counters from unpinned tasks (now `esp_timer`).
+
+### Corrections
+
+- **Build-system issue:** ESP-IDF applies `SDKCONFIG_DEFAULTS` only when a build directory's `sdkconfig` is
+  first created; later edits to a fragment are silently ignored. The first rerun of this entry therefore ran
+  with a stale 80 KB reserve and an 8-packet loopback queue (connection resets in every 4-connection run).
+  `tools/build_variant.ps1` now always regenerates `sdkconfig`. Checked every build directory: Entries 1–4
+  were not affected (their fragments existed before the first build; the one later change, removing
+  `ESP_WIFI_EXTRA_IRAM_OPT`, was applied by deleting that `sdkconfig` by hand).
+- In chat I recommended "two-core mode = 8 shards + seqlock" as the server's way to use both cores. That
+  holds for the engine, but end to end the second loop costs more than it gains (finding 2); the default
+  is one loop on core 1.
+
+### Open
+
+- **Values above ~4 KB are stored outside the arena in the heap reserve** and get `-OOM` when the reserve
+  is fragmented (the 10 KB test fails with the deployment-size reserve). To fix in Phase 3 (chained arena
+  chunks).
+- Everything here is loopback; real-WiFi numbers still need the board's power fixed.
+
+Raw data: `results/entry5_lb_*.jsonl`; tables: `python tools/summarize_lb.py entry5` (saved as
+`results/entry5_tables.md`).

@@ -1,0 +1,128 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:1
+load:0x3fff0030,len:6180
+load:0x40078000,len:15812
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 15:52:15
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 80MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 4MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00177000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=2d990h (186768) map
+I (128) esp_image: segment 1: paddr=0003d9b8 vaddr=3ffb0000 size=02660h (  9824) load
+I (131) esp_image: segment 2: paddr=00040020 vaddr=400d0020 size=24d60h (150880) map
+I (175) esp_image: segment 3: paddr=00064d88 vaddr=3ffb2660 size=00148h (   328) load
+I (175) esp_image: segment 4: paddr=00064ed8 vaddr=40080000 size=14d5ch ( 85340) load
+I (207) esp_image: segment 5: paddr=00079c3c vaddr=50000000 size=00020h (    32) load
+I (217) boot: Loaded app from partition at offset 0x10000
+I (223) cpu_start: Multicore app
+I (231) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (231) cpu_start: Pro cpu start user code
+I (231) cpu_start: cpu freq: 240000000 Hz
+I (233) app_init: Application information:
+I (237) app_init: Project name:     kvcache
+I (241) app_init: App version:      8b68673-dirty
+I (245) app_init: Compile time:     Nov 25 2026 15:51:10
+I (250) app_init: ELF file SHA256:  b4aab3389...
+I (255) app_init: ESP-IDF:          v5.5.6
+I (259) efuse_init: Min chip rev:     v0.0
+I (262) efuse_init: Max chip rev:     v3.99
+I (266) efuse_init: Chip rev:         v3.1
+I (270) heap_init: Initializing. RAM available for dynamic allocation:
+I (276) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (282) heap_init: At 3FFC4A88 len 0001B578 (109 KiB): DRAM
+I (287) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (292) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (298) heap_init: At 40094D5C len 0000B2A4 (44 KiB): IRAM
+I (304) spi_flash: detected chip: generic
+I (307) spi_flash: flash io: dio
+I (310) main_task: Started on CPU0
+I (312) main_task: Calling app_main()
+VARIANT engine=opt-slab-oa-1sh-nolock server=opt-eventloop cores=single-core0 iram=1
+I (324) kv_opt: arena 30 pages (120 KiB) in 2 blocks, index 3237 slots (12948 B), 1 shard(s), heap left 84908
+I (333) srv_opt: loop 0 running on core 0
+I (337) srv_opt: listening on 6379 with 1 loop(s)
+VARIANT engine=opt-slab-oa-1sh-nolock server=opt-eventloop cores=single-core0
+TEST SUMMARY pass=34 fail=0 server=opt-eventloop cores=single-core0 engine=opt-slab-oa-1sh-nolock
+RESULT {"part":"echo_baseline","echo_core":1,"core_locking":0,"rtt_p50_us":683,"rtt_p99_us":812,"rtt_min_us":624}
+RESULT {"part":"echo_baseline","echo_core":0,"core_locking":0,"rtt_p50_us":545,"rtt_p99_us":958,"rtt_min_us":539}
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":1,"ops_per_s":924,"batch_p50_us":1081,"batch_p99_us":1088,"batch_p999_us":1279,"cpu0_pct":100.0,"cpu1_pct":0.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":3.520,"errors":0}
+SRVCYC select_us=2395390 recv_us=207624 send_us=765819 (totals since boot, wall time inside the call)
+SRVDIAG iter=2022 sel_pos=1967 sel_zero=55 sel_neg=0 errno=0 accept_fail=0
+TASKSTATS
+main           	387777		11%
+kvloop0        	1131771		32%
+lbc            	85651		2%
+IDLE1          	3309329		94%
+IDLE0          	645817		18%
+tiT            	1174638		33%
+ipc1           	12112		<1%
+ipc0           	7173		<1%
+
+TASKSTATS END
+LBDIAG client 3 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":1,"ops_per_s":924,"batch_p50_us":1080,"batch_p99_us":1096,"batch_p999_us":1856,"cpu0_pct":100.0,"cpu1_pct":-0.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":3.540,"errors":3}
+SRVCYC select_us=3263659 recv_us=299199 send_us=939086 (totals since boot, wall time inside the call)
+SRVDIAG iter=2957 sel_pos=2897 sel_zero=60 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":16,"ops_per_s":13456,"batch_p50_us":1188,"batch_p99_us":1212,"batch_p999_us":1552,"cpu0_pct":100.0,"cpu1_pct":-0.0,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.496,"errors":0}
+SRVCYC select_us=4057045 recv_us=385801 send_us=1106319 (totals since boot, wall time inside the call)
+SRVDIAG iter=3805 sel_pos=3740 sel_zero=65 sel_neg=0 errno=0 accept_fail=0
+LBDIAG client 2 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":16,"ops_per_s":13439,"batch_p50_us":1188,"batch_p99_us":1208,"batch_p999_us":1579,"cpu0_pct":100.0,"cpu1_pct":0.0,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.489,"errors":3}
+SRVCYC select_us=4849677 recv_us=470183 send_us=1275371 (totals since boot, wall time inside the call)
+SRVDIAG iter=4656 sel_pos=4586 sel_zero=70 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":1,"ops_per_s":924,"batch_p50_us":1080,"batch_p99_us":1088,"batch_p999_us":1283,"cpu0_pct":100.0,"cpu1_pct":0.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":3.890,"errors":0}
+SRVCYC select_us=5696726 recv_us=563600 send_us=1445936 (totals since boot, wall time inside the call)
+SRVDIAG iter=5588 sel_pos=5513 sel_zero=75 sel_neg=0 errno=0 accept_fail=0
+LBDIAG client 2 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":1,"ops_per_s":923,"batch_p50_us":1081,"batch_p99_us":1103,"batch_p999_us":1499,"cpu0_pct":100.0,"cpu1_pct":-0.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":3.901,"errors":3}
+SRVCYC select_us=6541410 recv_us=655226 send_us=1618417 (totals since boot, wall time inside the call)
+SRVDIAG iter=6522 sel_pos=6442 sel_zero=80 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":16,"ops_per_s":13246,"batch_p50_us":1206,"batch_p99_us":1219,"batch_p999_us":1417,"cpu0_pct":100.0,"cpu1_pct":0.0,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.891,"errors":0}
+SRVCYC select_us=7334830 recv_us=741782 send_us=1773521 (totals since boot, wall time inside the call)
+SRVDIAG iter=7357 sel_pos=7272 sel_zero=85 sel_neg=0 errno=0 accept_fail=0
+LBDIAG client 3 io failed after 0 ops errno=104
+LBDIAG client 2 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"quiet","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":16,"ops_per_s":13230,"batch_p50_us":1207,"batch_p99_us":1250,"batch_p999_us":2331,"cpu0_pct":100.0,"cpu1_pct":0.0,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":3.887,"errors":3}
+SRVCYC select_us=8128218 recv_us=826586 send_us=1929869 (totals since boot, wall time inside the call)
+SRVDIAG iter=8195 sel_pos=8105 sel_zero=90 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":1,"ops_per_s":500,"batch_p50_us":2004,"batch_p99_us":2868,"batch_p999_us":2868,"cpu0_pct":100.0,"cpu1_pct":-0.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":5.093,"errors":0}
+SRVCYC select_us=9075468 recv_us=899515 send_us=2064309 (totals since boot, wall time inside the call)
+SRVDIAG iter=8704 sel_pos=8607 sel_zero=97 sel_neg=0 errno=0 accept_fail=0
+LBDIAG client 2 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":1,"ops_per_s":0,"batch_p50_us":0,"batch_p99_us":0,"batch_p999_us":0,"cpu0_pct":43.6,"cpu1_pct":-0.0,"server_cmds_per_batch":0.00,"server_exec_us_per_cmd":0.000,"errors":3}
+SRVCYC select_us=10201761 recv_us=899811 send_us=2064309 (totals since boot, wall time inside the call)
+SRVDIAG iter=8760 sel_pos=8613 sel_zero=147 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":1,"P":16,"ops_per_s":7264,"batch_p50_us":2121,"batch_p99_us":2967,"batch_p999_us":3128,"cpu0_pct":100.0,"cpu1_pct":-0.0,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":6.339,"errors":0}
+SRVCYC select_us=10992584 recv_us=984614 send_us=2225060 (totals since boot, wall time inside the call)
+SRVDIAG iter=9221 sel_pos=9069 sel_zero=152 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"GET","conns":4,"P":16,"ops_per_s":0,"batch_p50_us":0,"batch_p99_us":0,"batch_p999_us":0,"cpu0_pct":43.5,"cpu1_pct":-0.0,"server_cmds_per_batch":0.00,"server_exec_us_per_cmd":0.000,"errors":1}
+SRVCYC select_us=12120693 recv_us=984906 send_us=2225060 (totals since boot, wall time inside the call)
+SRVDIAG iter=9277 sel_pos=9075 sel_zero=202 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":1,"ops_per_s":499,"batch_p50_us":2001,"batch_p99_us":2250,"batch_p999_us":2846,"cpu0_pct":100.0,"cpu1_pct":-0.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":9.260,"errors":0}
+SRVCYC select_us=12909216 recv_us=1055775 send_us=2465100 (totals since boot, wall time inside the call)
+SRVDIAG iter=9783 sel_pos=9576 sel_zero=207 sel_neg=0 errno=0 accept_fail=0
+LBDIAG client 1 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":1,"ops_per_s":498,"batch_p50_us":1996,"batch_p99_us":2892,"batch_p999_us":3982,"cpu0_pct":100.0,"cpu1_pct":-0.0,"server_cmds_per_batch":1.00,"server_exec_us_per_cmd":10.970,"errors":3}
+SRVCYC select_us=13719526 recv_us=1145004 send_us=2653740 (totals since boot, wall time inside the call)
+SRVDIAG iter=10290 sel_pos=10079 sel_zero=211 sel_neg=0 errno=0 accept_fail=0
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":1,"P":16,"ops_per_s":7151,"batch_p50_us":2146,"batch_p99_us":3004,"batch_p999_us":3049,"cpu0_pct":100.0,"cpu1_pct":0.0,"server_cmds_per_batch":16.00,"server_exec_us_per_cmd":7.388,"errors":0}
+SRVCYC select_us=14515156 recv_us=1226952 send_us=2808467 (totals since boot, wall time inside the call)
+SRVDIAG iter=10744 sel_pos=10528 sel_zero=216 sel_neg=0 errno=0 accept_fail=0
+LBDIAG client 1 io failed after 0 ops errno=104
+LBDIAG client 3 io failed after 0 ops errno=104
+RESULT {"part":"loopback","scenario":"wifisim_core0","server":"opt-eventloop","cores":"single-core0","engine":"opt-slab-oa-1sh-nolock","cmd":"SET","conns":4,"P":16,"ops_per_s":0,"batch_p50_us":0,"batch_p99_us":0,"batch_p999_us":0,"cpu0_pct":43.7,"cpu1_pct":-0.0,"server_cmds_per_batch":0.00,"server_exec_us_per_cmd":0.000,"errors":3}
+SRVCYC select_us=15641778 recv_us=1227240 send_us=2808467 (totals since boot, wall time inside the call)
+SRVDIAG iter=10800 sel_pos=10534 sel_zero=266 sel_neg=0 errno=0 accept_fail=0
+DONE (loopback build, WiFi disabled)

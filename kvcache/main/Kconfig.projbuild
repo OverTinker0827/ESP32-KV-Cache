@@ -73,6 +73,10 @@ menu "ESP32 KV Cache"
         depends on KV_MC_BENCH
         default 1
 
+    config KV_LOOPBACK_TEST
+        bool "Test the real server end-to-end over lwIP loopback (127.0.0.1), no WiFi needed"
+        default n
+
     config KV_ENGINE_SELFTEST
         bool "Run on-device engine benchmark at boot (before WiFi) and print RESULT"
         default y

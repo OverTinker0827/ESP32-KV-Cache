@@ -39,6 +39,11 @@ load, spill-over balancing recovers **1.59×** over static hashing and hot-key r
 shard migration (with hysteresis) is best for spread-out skew (1.18×). With WiFi-like load on core 0,
 only the lock-free shared-nothing design keeps a solid dual-core gain (1.46× over one core).
 
+End to end (real server over lwIP loopback, no WiFi): the server adds ~50 µs to a ~680 µs TCP round
+trip, so the network stack is ~93 % of a request. One event loop on core 1 with lwIP core locking is the
+fastest configuration (19.4k ops/s pipelined; +33 % over default lwIP under WiFi-like load); two-loop
+designs lose end to end because their second loop shares core 0 with the network stack.
+
 Network benchmarks (throughput, p95/p99 latency, CPU per core) are pending a power fix on the
 test board; see [Hardware notes](#hardware-notes).
 

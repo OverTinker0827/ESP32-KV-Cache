@@ -9,6 +9,7 @@
 #include "lwip/sockets.h"
 #include "esp_log.h"
 #include "esp_timer.h"
+#include "esp_heap_caps.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "server.h"
@@ -41,10 +42,16 @@ typedef struct {
 } loop_t;
 
 static loop_t loops[NLOOPS];
+/* diagnostics: what the event loop spends its iterations on */
+volatile uint32_t srv_diag[6];
+volatile int srv_active[2]; /* open connections per loop (benchmarks wait for 0 between runs) */
+volatile uint64_t srv_cyc[3]; /* CPU cycles (wall, this task) inside select, recv, send */ /* iterations, select>0, select==0, select<0 (last errno in [5]), accept failures */
 static int rr;
 
+extern volatile uint64_t srv_cyc[3];
 static int send_all(int fd, const uint8_t *p, size_t n)
 {
+    uint32_t c0 = ccount();
     while (n) {
         int w = send(fd, p, n, 0);
         if (w < 0) {
@@ -54,11 +61,13 @@ static int send_all(int fd, const uint8_t *p, size_t n)
         p += w;
         n -= w;
     }
+    srv_cyc[2] += ccount() - c0;
     return 0;
 }
 
-static void conn_close(conn_t *c)
+static void conn_close(int loop, conn_t *c)
 {
+    if (c->fd >= 0) srv_active[loop]--;
     if (c->fd >= 0) close(c->fd);
     free(c->rx);
     free(c->tx);
@@ -74,16 +83,19 @@ static int conn_open(loop_t *L, int fd)
             c->rx = malloc(CONFIG_KV_RX_BUF);
             c->tx = malloc(CONFIG_KV_TX_BUF);
             if (!c->rx || !c->tx) {
+                ESP_LOGW(TAG, "conn_open: no memory for buffers (free heap %u)",
+                         (unsigned)heap_caps_get_free_size(MALLOC_CAP_8BIT));
                 free(c->rx);
                 free(c->tx);
                 c->rx = c->tx = NULL;
                 return -1;
             }
             c->fd = fd;
+            srv_active[L->id]++;
             c->rcap = CONFIG_KV_RX_BUF;
             c->tcap = CONFIG_KV_TX_BUF;
             c->rlen = 0;
-            g_stats.conns++;
+            g_stats[L->id].conns++;
             return 0;
         }
     }
@@ -101,13 +113,15 @@ static int regrow(uint8_t **b, size_t *cap, size_t want)
 }
 
 /* returns -1 when the connection must be closed */
-static HOT int conn_readable(conn_t *c)
+static HOT int conn_readable(conn_t *c, srv_stats_t *st)
 {
     if (unlikely(c->rlen == c->rcap)) { /* partial command fills the buffer: grow */
         size_t want = c->rcap * 2 > BIG_BUF ? BIG_BUF : c->rcap * 2;
         if (want <= c->rcap || regrow(&c->rx, &c->rcap, want) < 0) return -1;
     }
+    uint32_t cr0 = ccount();
     int n = recv(c->fd, c->rx + c->rlen, c->rcap - c->rlen, 0);
+    srv_cyc[1] += ccount() - cr0;
     if (n <= 0) return -1;
     int64_t t0 = esp_timer_get_time();
     c->rlen += n;
@@ -148,12 +162,16 @@ static HOT int conn_readable(conn_t *c)
             if (send_all(c->fd, o.buf, o.len) < 0) return -1;
             o.len = 0;
             rc = cmd_exec(argc, argv, &o);
-            if (rc == KV_ENOROOM) {
-                if (regrow(&c->tx, &c->tcap, BIG_BUF) < 0) return -1;
+            /* still too big: grow step by step (doubling) instead of jumping to BIG_BUF (71 KB
+               is more than the heap reserve, so the old single jump failed and dropped the client) */
+            while (rc == KV_ENOROOM && c->tcap < BIG_BUF) {
+                size_t want = c->tcap * 2 > BIG_BUF ? BIG_BUF : c->tcap * 2;
+                if (regrow(&c->tx, &c->tcap, want) < 0) return -1;
                 o.buf = c->tx;
                 o.cap = c->tcap;
                 rc = cmd_exec(argc, argv, &o);
             }
+            if (rc == KV_ENOROOM) return -1;
         }
         cyc += ccount() - c0;
         if (rc == 1) quit = 1;
@@ -168,10 +186,10 @@ static HOT int conn_readable(conn_t *c)
     if (c->rcap > CONFIG_KV_RX_BUF && c->rlen <= CONFIG_KV_RX_BUF) regrow(&c->rx, &c->rcap, CONFIG_KV_RX_BUF);
 
     if (ncmd) {
-        g_stats.cmds += ncmd; /* benign race between loops: stats only */
-        g_stats.batches++;
-        g_stats.exec_cycles += cyc;
-        hist_add(g_stats.svc_hist, (uint32_t)(esp_timer_get_time() - t0));
+        st->cmds += ncmd; /* per-loop block: single writer */
+        st->batches++;
+        st->exec_cycles += cyc;
+        hist_add(st->svc_hist, (uint32_t)(esp_timer_get_time() - t0));
     }
     return quit ? -1 : 0;
 }
@@ -205,13 +223,19 @@ static void loop_task(void *arg)
                 if (L->c[i].fd > maxfd) maxfd = L->c[i].fd;
             }
         struct timeval tv = {.tv_sec = 0, .tv_usec = 20000};
+        uint32_t cs0 = ccount();
         int n = maxfd >= 0 ? select(maxfd + 1, &rs, NULL, NULL, &tv) : (vTaskDelay(pdMS_TO_TICKS(20)), 0);
+        srv_cyc[0] += ccount() - cs0;
+        srv_diag[0]++;
+        srv_diag[n > 0 ? 1 : n == 0 ? 2 : 3]++;
+        if (n < 0) srv_diag[5] = errno;
         if (n <= 0) {
             kv_active_expire(64); /* idle: incremental TTL sweep */
             continue;
         }
         if (L->lfd >= 0 && FD_ISSET(L->lfd, &rs)) {
             int fd = accept(L->lfd, NULL, NULL);
+            if (fd < 0) srv_diag[4]++;
             if (fd >= 0) {
                 int one = 1;
                 setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof one);
@@ -230,7 +254,7 @@ static void loop_task(void *arg)
         for (int i = 0; i < MAXC; i++) {
             conn_t *c = &L->c[i];
             if (c->fd >= 0 && FD_ISSET(c->fd, &rs))
-                if (conn_readable(c) < 0) conn_close(c);
+                if (conn_readable(c, &g_stats[L->id]) < 0) conn_close(L->id, c);
         }
     }
 }

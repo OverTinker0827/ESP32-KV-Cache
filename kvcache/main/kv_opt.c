@@ -25,41 +25,24 @@
 
 static const char *TAG = "kv_opt";
 
-#if CONFIG_KV_MC_BENCH
-/* Multicore harness build: shard count and lock discipline are chosen at runtime
- * (kv_mc_set_mode) so every design runs from one firmware under identical conditions. */
+/* One lock implementation for the server AND the multicore harness (they used to differ,
+ * and the server kept designs the harness had ruled out). Shard count and lock discipline are
+ * runtime settings: the server takes them from Kconfig at kv_init(); the harness sets them with
+ * kv_mc_set_mode() before kv_init(). Single-owner mode (KV_LOCK_NONE) costs one predictable
+ * branch per operation and takes no lock. */
 #include "esp_cpu.h"
 #define MAXSHARDS 8 /* power of two; shard = bits 11.. of the hash (independent of tag and home slot) */
 static int g_nshards = 1;
 static int g_lock = KV_LOCK_NONE;
+static int g_mode_set; /* 1 once kv_mc_set_mode() chose explicitly (harness) */
 #define NSH g_nshards
 #define NEED_LOCK 1
-#define SH_LOCK(sh) mc_wr_lock(sh)
-#define SH_UNLOCK(sh) mc_wr_unlock(sh)
-#define RD_LOCK(sh) mc_rd_lock(sh)
-#define RD_UNLOCK(sh) mc_rd_unlock(sh)
+#define SH_LOCK(sh) do { if (g_lock) mc_wr_lock(sh); } while (0)
+#define SH_UNLOCK(sh) do { if (g_lock) mc_wr_unlock(sh); } while (0)
+#define RD_LOCK(sh) do { if (g_lock) mc_rd_lock(sh); } while (0)
+#define RD_UNLOCK(sh) do { if (g_lock) mc_rd_unlock(sh); } while (0)
 /* may a reader modify the table (lazy-expiry removal)? not under shared/optimistic reads */
 #define READER_MAY_WRITE (g_lock != KV_LOCK_RW && g_lock != KV_LOCK_SEQ)
-#else
-#if CONFIG_KV_CORES_SHARDED
-#define MAXSHARDS 2
-#else
-#define MAXSHARDS 1
-#endif
-#define NSH MAXSHARDS
-#if CONFIG_KV_CORES_SHARED || CONFIG_KV_CORES_SHARDED || CONFIG_KV_SERVER_BASIC || CONFIG_KV_FORCE_LOCK
-#define NEED_LOCK 1
-#define SH_LOCK(sh) portENTER_CRITICAL(&(sh)->mux)
-#define SH_UNLOCK(sh) portEXIT_CRITICAL(&(sh)->mux)
-#else
-#define NEED_LOCK 0
-#define SH_LOCK(sh) ((void)0)
-#define SH_UNLOCK(sh) ((void)0)
-#endif
-#define RD_LOCK(sh) SH_LOCK(sh)
-#define RD_UNLOCK(sh) SH_UNLOCK(sh)
-#define READER_MAY_WRITE 1
-#endif
 
 #define PAGE_SZ 4096
 #define PAGE_HDR 8
@@ -111,15 +94,12 @@ typedef struct {
 #if NEED_LOCK
     portMUX_TYPE mux;
 #endif
-#if CONFIG_KV_MC_BENCH
     volatile uint32_t lk;  /* CAS spinlock word / RW lock word (bit31 = writer, low bits = readers) */
     volatile uint32_t seq; /* seqlock sequence: odd while a writer is inside */
-#endif
 } shard_t;
 
 static shard_t shards[MAXSHARDS];
 
-#if CONFIG_KV_MC_BENCH
 /* ------------------------------------------------ runtime locks + contention stats */
 typedef struct {
     uint32_t acq, contended, retries;
@@ -242,7 +222,6 @@ static HOT void mc_rd_unlock(shard_t *sh)
         if (cas(&sh->lk, v, v - 1)) return;
     }
 }
-#endif
 static uint8_t *pages[MAX_PAGES]; /* page 0 unused so that ref != 0 */
 static uint16_t npages;
 static void *blocks[16];
@@ -250,14 +229,33 @@ static int nblocks;
 static int evict_on = 1;
 static uint32_t index_bytes;
 
+static void default_mode(void);
+
 const char *kv_engine_name(void)
 {
-#if CONFIG_KV_CORES_SHARDED
-    return "opt-slab-oa-sharded2";
-#elif NEED_LOCK
-    return "opt-slab-oa-locked";
+    static char name[40];
+    static const char *ln[] = {"nolock", "mux", "cas", "rw", "seqlock"};
+    default_mode();
+    snprintf(name, sizeof name, "opt-slab-oa-%dsh-%s", g_nshards, ln[g_lock]);
+    return name;
+}
+
+/* Server defaults (Phases 1-2): one core owns the table -> no lock; two cores -> 8 shards with
+ * a seqlock (lock-free GETs, CAS-locked writers), which beat portMUX 0.96x -> 1.69x quiet and
+ * kept 1.40x of one core under WiFi-like load. */
+static void default_mode(void)
+{
+    if (g_mode_set) return;
+#if CONFIG_KV_FORCE_LOCK
+    g_nshards = 1, g_lock = KV_LOCK_MUX; /* Entry 2 ablation: cost of a portMUX lock */
+#elif CONFIG_KV_SERVER_BASIC
+    g_nshards = 1, g_lock = KV_LOCK_CAS; /* task per client: many tasks on both cores */
+#elif CONFIG_KV_CORES_SHARED
+    g_nshards = 1, g_lock = KV_LOCK_SEQ;
+#elif CONFIG_KV_CORES_SHARDED
+    g_nshards = 8, g_lock = KV_LOCK_SEQ;
 #else
-    return "opt-slab-oa";
+    g_nshards = 1, g_lock = KV_LOCK_NONE;
 #endif
 }
 
@@ -289,14 +287,7 @@ static inline HOT uint32_t home(const shard_t *sh, uint32_t h)
 
 static inline HOT shard_t *shard_of(uint32_t h)
 {
-#if CONFIG_KV_MC_BENCH
     return &shards[(h >> 11) & (uint32_t)(g_nshards - 1)];
-#elif MAXSHARDS > 1
-    return &shards[(h >> 11) & 1];
-#else
-    (void)h;
-    return &shards[0];
-#endif
 }
 
 /* --------------------------------------------------------------- pages/refs */
@@ -535,6 +526,7 @@ static void distribute_pages(void)
 
 int kv_init(size_t reserve)
 {
+    default_mode();
     const uint32_t caps = MALLOC_CAP_8BIT | MALLOC_CAP_INTERNAL;
     size_t free0 = heap_caps_get_free_size(caps);
     if (free0 < reserve + 2 * PAGE_SZ) return -1;
@@ -552,10 +544,8 @@ int kv_init(size_t reserve)
 #if NEED_LOCK
         portMUX_INITIALIZE(&sh->mux);
 #endif
-#if CONFIG_KV_MC_BENCH
         sh->lk = 0;
         sh->seq = 0;
-#endif
     }
     /* carve pages from the largest free blocks until only `reserve` is left */
     npages = 0;
@@ -755,7 +745,6 @@ static HOT int get_locked(shard_t *sh, const uint8_t *k, size_t kl, uint32_t h, 
     return rc;
 }
 
-#if CONFIG_KV_MC_BENCH
 #define OPT_RETRY (-100)
 /* Optimistic (seqlock) read: runs concurrently with a writer, so every field read from the
  * table may be torn. Everything is bounds-checked; the caller validates the sequence number
@@ -783,14 +772,12 @@ static HOT int get_optimistic(shard_t *sh, const uint8_t *k, size_t kl, uint32_t
     }
     return OPT_RETRY;
 }
-#endif
 
 HOT int kv_get_resp(const uint8_t *k, size_t kl, obuf_t *o)
 {
     uint32_t h = hash32(k, kl), now = kv_now_ms();
     shard_t *sh = shard_of(h);
     int rc;
-#if CONFIG_KV_MC_BENCH
     if (g_lock == KV_LOCK_SEQ) {
         lkstat_t *st = &lkstat[xPortGetCoreID()];
         size_t len0 = o->len;
@@ -820,7 +807,6 @@ HOT int kv_get_resp(const uint8_t *k, size_t kl, obuf_t *o)
         mc_wr_unlock(sh);
         return rc;
     }
-#endif
     RD_LOCK(sh);
     rc = get_locked(sh, k, kl, h, now, o, READER_MAY_WRITE);
     RD_UNLOCK(sh);
@@ -934,7 +920,6 @@ void kv_stats(kv_stats_t *st)
     st->shards = NSH;
 }
 
-#if CONFIG_KV_MC_BENCH
 /* ------------------------------------------------------------ harness API */
 void kv_mc_set_mode(int nshards, int lock_mode)
 {
@@ -942,6 +927,7 @@ void kv_mc_set_mode(int nshards, int lock_mode)
     while (n < nshards && n < MAXSHARDS) n <<= 1; /* round up to a power of two */
     g_nshards = n;
     g_lock = lock_mode;
+    g_mode_set = 1;
 }
 
 int kv_shard_index(const uint8_t *k, size_t kl) { return (int)(shard_of(hash32(k, kl)) - shards); }
@@ -957,4 +943,3 @@ void kv_mc_stats(kv_lockstat_t out[2])
 }
 
 void kv_mc_reset_stats(void) { memset(lkstat, 0, sizeof lkstat); }
-#endif

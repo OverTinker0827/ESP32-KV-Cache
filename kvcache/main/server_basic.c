@@ -16,6 +16,14 @@
 
 static const char *TAG = "srv_basic";
 static volatile int nclients;
+/* same diagnostics symbols as server_opt.c (read by the loopback test) */
+volatile int srv_active[2];
+volatile uint32_t srv_diag[6];
+volatile uint64_t srv_cyc[3];
+/* tasks migrate between cores and preempt each other: update the shared block atomically */
+static portMUX_TYPE stats_mux = portMUX_INITIALIZER_UNLOCKED;
+#define STATS_LOCK() portENTER_CRITICAL(&stats_mux)
+#define STATS_UNLOCK() portEXIT_CRITICAL(&stats_mux)
 
 typedef struct {
     int fd;
@@ -74,7 +82,9 @@ static void client_task(void *arg)
     char line[32];
     r->fd = fd;
     r->pos = r->len = 0;
-    g_stats.conns++;
+    STATS_LOCK();
+    g_stats[0].conns++;
+    STATS_UNLOCK();
     for (;;) {
         int argc = 0;
         if (rd_line(r, line, sizeof line) < 0) break;
@@ -96,21 +106,30 @@ static void client_task(void *arg)
         if (ok) {
             int64_t t0 = esp_timer_get_time();
             obuf_t o = {.buf = out, .len = 0, .cap = 1024};
-            uint32_t c0 = ccount();
+            int64_t e0 = esp_timer_get_time(); /* tasks are unpinned: CCOUNT differs per core */
             int rc = cmd_exec(argc, argv, &o);
-            if (rc == KV_ENOROOM) { /* large value: one-off big buffer */
-                o.buf = malloc(RESP_MAX_BULK + 64);
-                o.cap = RESP_MAX_BULK + 64;
+            /* large value: one-off bigger buffer, doubled until the reply fits (a single 70 KB
+               malloc exceeds the free heap and left the client without a reply) */
+            for (size_t cap = 2048; rc == KV_ENOROOM && cap <= RESP_MAX_BULK + 64 * 2; cap *= 2) {
+                if (o.buf != out) free(o.buf);
+                o.buf = malloc(cap);
+                o.cap = cap;
                 o.len = 0;
-                rc = o.buf ? cmd_exec(argc, argv, &o) : 0;
+                rc = o.buf ? cmd_exec(argc, argv, &o) : KV_ENOROOM;
+                if (!o.buf) break;
             }
-            g_stats.exec_cycles += ccount() - c0;
+            if (rc == KV_ENOROOM) quit = 1;
+            uint32_t cyc = (uint32_t)(esp_timer_get_time() - e0) * 240; /* in cycles @240 MHz */
             if (o.buf && send(fd, o.buf, o.len, 0) < 0) quit = 1; /* one send per reply */
             if (o.buf != out) free(o.buf);
             if (rc == 1) quit = 1;
-            g_stats.cmds++;
-            g_stats.batches++;
-            hist_add(g_stats.svc_hist, (uint32_t)(esp_timer_get_time() - t0));
+            uint32_t us = (uint32_t)(esp_timer_get_time() - t0);
+            STATS_LOCK();
+            g_stats[0].exec_cycles += cyc;
+            g_stats[0].cmds++;
+            g_stats[0].batches++;
+            hist_add(g_stats[0].svc_hist, us);
+            STATS_UNLOCK();
         }
         for (int i = 0; i < argc; i++) free((void *)argv[i].p);
         if (quit) break;
@@ -119,6 +138,7 @@ static void client_task(void *arg)
     free(r);
     free(out);
     nclients--;
+    srv_active[0] = nclients;
     vTaskDelete(NULL);
 }
 
@@ -142,9 +162,11 @@ static void listen_task(void *arg)
         }
         setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof one);
         nclients++;
+        srv_active[0] = nclients;
         if (xTaskCreate(client_task, "kvcli", 4096, (void *)(intptr_t)fd, 10, NULL) != pdPASS) {
             close(fd);
             nclients--;
+            srv_active[0] = nclients;
         }
     }
 }
