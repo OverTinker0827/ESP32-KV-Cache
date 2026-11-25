@@ -14,10 +14,10 @@ On-device storage-engine benchmark, ESP32 @ 240 MHz, 16 B keys, 32 B values, seq
 
 | | microredis | basic C | optimized C |
 |---|---:|---:|---:|
-| SET ops/s | 891 | 80,792 | **434,046** (487× microredis) |
-| GET ops/s | 1,585 | 76,995 | **357,079** (225×) |
-| DEL ops/s | 2,188 | 99,698 | **390,579** (179×) |
-| GET p50 / p99 latency | 200 µs / 4,027 µs | 12.8 µs / 17.1 µs | **2.7 µs / 3.2 µs** |
+| SET ops/s | 891 | 80,792 | **434,046** (487Ã— microredis) |
+| GET ops/s | 1,585 | 76,995 | **357,079** (225Ã—) |
+| DEL ops/s | 2,188 | 99,698 | **390,579** (179Ã—) |
+| GET p50 / p99 latency | 200 Âµs / 4,027 Âµs | 12.8 Âµs / 17.1 Âµs | **2.7 Âµs / 3.2 Âµs** |
 | Max keys | 1,223 | 3,659 | **3,869** |
 | Bytes per key | 77 | 68 | **60** |
 
@@ -28,22 +28,22 @@ Multicore (both cores, 90 % GET, vs one core without a lock):
 
 | design | speed-up |
 |---|---:|
-| shared table, FreeRTOS `portMUX` | 0.96× |
-| shared table, readers-writer lock | 1.63× |
-| 2 shards, seqlock | 1.69× |
-| receiver → lock-free ring → 2 shard-owning workers | 1.53× |
-| 2 shards each owned by one core, no lock (ceiling: shared SRAM bus) | 1.78× |
+| shared table, FreeRTOS `portMUX` | 0.96Ã— |
+| shared table, readers-writer lock | 1.63Ã— |
+| 2 shards, seqlock | 1.69Ã— |
+| receiver â†’ lock-free ring â†’ 2 shard-owning workers | 1.53Ã— |
+| 2 shards each owned by one core, no lock (ceiling: shared SRAM bus) | 1.78Ã— |
 
 Load imbalance (one skewed request stream, 8 shards over 2 workers): when one shard holds 91 % of the
-load, spill-over balancing recovers **1.59×** over static hashing and hot-key replication 1.53×, while
-shard migration (with hysteresis) is best for spread-out skew (1.18×). With WiFi-like load on core 0,
-only the lock-free shared-nothing design keeps a solid dual-core gain (1.46× over one core).
+load, spill-over balancing recovers **1.59Ã—** over static hashing and hot-key replication 1.53Ã—, while
+shard migration (with hysteresis) is best for spread-out skew (1.18Ã—). With WiFi-like load on core 0,
+only the lock-free shared-nothing design keeps a solid dual-core gain (1.46Ã— over one core).
 
 Memory (engine v2, Entry 6): with mixed value sizes the same RAM holds **+41 % more keys** than the previous
 engine and **+95 % with prefix compression**; values up to 64 KB are stored and streamed inside the arena,
 so they need no spare heap.
 
-End to end (real server over lwIP loopback, no WiFi): the server adds ~50 µs to a ~680 µs TCP round
+End to end (real server over lwIP loopback, no WiFi): the server adds ~50 Âµs to a ~680 Âµs TCP round
 trip, so the network stack is ~93 % of a request. One event loop on core 1 with lwIP core locking is the
 fastest configuration (19.4k ops/s pipelined; +33 % over default lwIP under WiFi-like load); two-loop
 designs lose end to end because their second loop shares core 0 with the network stack.
@@ -72,6 +72,9 @@ each one can be turned off on its own to measure what it contributes.
 | Server | one FreeRTOS task per client, copies every argument, one `send()` per reply | `select()` event loop, zero-copy RESP parser, all replies of a packet sent with one `send()` |
 | Placement | default | hot path (hash, lookup, parser, dispatch) in IRAM; lwIP/WiFi IRAM options; lwIP pinned to core 0 |
 | Multicore | unpinned tasks | single loop on core 1 or core 0, two loops sharing one locked table, or two loops with the table split into two shards |
+
+A plain-language explanation of the whole design (flow, architecture, every technique, what is ESP32-specific,
+how each step compares with the baseline) is in [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md).
 
 ## Repository layout
 
@@ -140,7 +143,7 @@ the C cache also CPU utilization per core (from `INFO`) and server-side executio
 
 - The test board is a classic **ESP32-D0WD-V3** (no PSRAM). The code targets ESP32 and should port
   to ESP32-S3; PSRAM tiering needs a board with PSRAM.
-- The test board's 3.3 V supply collapses when the radio starts (brownout reset). A 100–470 µF
+- The test board's 3.3 V supply collapses when the radio starts (brownout reset). A 100â€“470 ÂµF
   capacitor across 3V3 and GND, a better cable or a better board fixes this. Until then only
   on-device benchmarks with WiFi off are possible.
 - `wifi_secrets.json` is git-ignored; the build reads it to embed the credentials.
