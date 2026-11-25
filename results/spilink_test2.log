@@ -1,0 +1,84 @@
+﻿ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6180
+load:0x40078000,len:15852
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 21:38:46
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 40MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 2MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00100000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=0ab84h ( 43908) map
+I (91) esp_image: segment 1: paddr=0001abac vaddr=3ffb0000 size=02c04h ( 11268) load
+I (95) esp_image: segment 2: paddr=0001d7b8 vaddr=40080000 size=02860h ( 10336) load
+I (99) esp_image: segment 3: paddr=00020020 vaddr=400d0020 size=11e44h ( 73284) map
+I (127) esp_image: segment 4: paddr=00031e6c vaddr=40082860 size=0cbd0h ( 52176) load
+I (148) esp_image: segment 5: paddr=0003ea44 vaddr=50000000 size=00020h (    32) load
+I (155) boot: Loaded app from partition at offset 0x10000
+I (163) cpu_start: Multicore app
+I (171) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (172) cpu_start: Pro cpu start user code
+I (172) cpu_start: cpu freq: 160000000 Hz
+I (174) app_init: Application information:
+I (177) app_init: Project name:     spilink_master
+I (182) app_init: App version:      296364f
+I (186) app_init: Compile time:     Nov 25 2026 21:37:44
+I (191) app_init: ELF file SHA256:  542a782eb...
+I (195) app_init: ESP-IDF:          v5.5.6
+I (199) efuse_init: Min chip rev:     v0.0
+I (203) efuse_init: Max chip rev:     v3.99
+I (207) efuse_init: Chip rev:         v3.1
+I (211) heap_init: Initializing. RAM available for dynamic allocation:
+I (217) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (222) heap_init: At 3FFB34F0 len 0002CB10 (178 KiB): DRAM
+I (227) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (233) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (238) heap_init: At 4008F430 len 00010BD0 (66 KiB): IRAM
+I (245) spi_flash: detected chip: generic
+I (247) spi_flash: flash io: dio
+W (250) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
+I (263) main_task: Started on CPU0
+I (263) main_task: Calling app_main()
+LINK no ready marker (status 0x00000000)
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":5,"clock_hz":4000000,"frames":2000,"ok":6,"slave_crc_fail":233,"reply_bad":229,"timeouts":1757,"frames_per_s":56,"us_per_frame":17758.3,"polls_per_frame":411.27,"payload_kB_per_s_each_way":1.3}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":5,"clock_hz":10000000,"frames":2000,"ok":1841,"slave_crc_fail":8,"reply_bad":23,"timeouts":135,"frames_per_s":628,"us_per_frame":1593.2,"polls_per_frame":39.67,"payload_kB_per_s_each_way":14.7}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":5,"clock_hz":16000000,"frames":2000,"ok":1853,"slave_crc_fail":5,"reply_bad":23,"timeouts":124,"frames_per_s":685,"us_per_frame":1460.6,"polls_per_frame":38.20,"payload_kB_per_s_each_way":16.0}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":5,"clock_hz":20000000,"frames":2000,"ok":1622,"slave_crc_fail":21,"reply_bad":162,"timeouts":211,"frames_per_s":401,"us_per_frame":2492.8,"polls_per_frame":69.80,"payload_kB_per_s_each_way":9.4}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":5,"clock_hz":26666667,"frames":2000,"ok":0,"slave_crc_fail":0,"reply_bad":0,"timeouts":2000,"frames_per_s":50,"us_per_frame":20098.5,"polls_per_frame":610.00,"payload_kB_per_s_each_way":1.2}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":20,"clock_hz":4000000,"frames":2000,"ok":1713,"slave_crc_fail":94,"reply_bad":106,"timeouts":166,"frames_per_s":500,"us_per_frame":1998.5,"polls_per_frame":29.67,"payload_kB_per_s_each_way":11.7}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":20,"clock_hz":10000000,"frames":2000,"ok":1830,"slave_crc_fail":15,"reply_bad":38,"timeouts":131,"frames_per_s":639,"us_per_frame":1564.7,"polls_per_frame":26.80,"payload_kB_per_s_each_way":15.0}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":20,"clock_hz":16000000,"frames":2000,"ok":1862,"slave_crc_fail":7,"reply_bad":23,"timeouts":115,"frames_per_s":723,"us_per_frame":1382.7,"polls_per_frame":24.36,"payload_kB_per_s_each_way":17.0}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":20,"clock_hz":20000000,"frames":2000,"ok":1551,"slave_crc_fail":66,"reply_bad":242,"timeouts":206,"frames_per_s":407,"us_per_frame":2455.7,"polls_per_frame":46.94,"payload_kB_per_s_each_way":9.5}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":20,"clock_hz":26666667,"frames":2000,"ok":0,"slave_crc_fail":0,"reply_bad":0,"timeouts":2000,"frames_per_s":50,"us_per_frame":20131.6,"polls_per_frame":418.97,"payload_kB_per_s_each_way":1.2}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":50,"clock_hz":4000000,"frames":2000,"ok":1658,"slave_crc_fail":99,"reply_bad":127,"timeouts":210,"frames_per_s":397,"us_per_frame":2518.0,"polls_per_frame":24.84,"payload_kB_per_s_each_way":9.3}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":50,"clock_hz":10000000,"frames":2000,"ok":1785,"slave_crc_fail":12,"reply_bad":43,"timeouts":170,"frames_per_s":491,"us_per_frame":2036.1,"polls_per_frame":22.00,"payload_kB_per_s_each_way":11.5}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":50,"clock_hz":16000000,"frames":2000,"ok":1773,"slave_crc_fail":76,"reply_bad":106,"timeouts":116,"frames_per_s":676,"us_per_frame":1479.4,"polls_per_frame":15.62,"payload_kB_per_s_each_way":15.8}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":50,"clock_hz":20000000,"frames":2000,"ok":1635,"slave_crc_fail":7,"reply_bad":118,"timeouts":246,"frames_per_s":336,"us_per_frame":2974.0,"polls_per_frame":34.91,"payload_kB_per_s_each_way":7.9}
+RESULT {"part":"spilink","handshake":"status_poll","gap_us":50,"clock_hz":26666667,"frames":2000,"ok":0,"slave_crc_fail":0,"reply_bad":0,"timeouts":2000,"frames_per_s":50,"us_per_frame":20193.2,"polls_per_frame":257.98,"payload_kB_per_s_each_way":1.2}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":5,"clock_hz":4000000,"frames":2000,"ok":1675,"slave_crc_fail":0,"reply_bad":163,"timeouts":162,"frames_per_s":504,"us_per_frame":1982.5,"polls_per_frame":17.07,"payload_kB_per_s_each_way":11.8}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":5,"clock_hz":10000000,"frames":2000,"ok":1864,"slave_crc_fail":0,"reply_bad":91,"timeouts":45,"frames_per_s":1435,"us_per_frame":696.7,"polls_per_frame":8.89,"payload_kB_per_s_each_way":33.6}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":5,"clock_hz":16000000,"frames":2000,"ok":1683,"slave_crc_fail":0,"reply_bad":241,"timeouts":76,"frames_per_s":1035,"us_per_frame":966.5,"polls_per_frame":15.74,"payload_kB_per_s_each_way":24.3}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":5,"clock_hz":20000000,"frames":2000,"ok":65,"slave_crc_fail":0,"reply_bad":1805,"timeouts":130,"frames_per_s":637,"us_per_frame":1570.6,"polls_per_frame":28.71,"payload_kB_per_s_each_way":14.9}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":5,"clock_hz":26666667,"frames":2000,"ok":0,"slave_crc_fail":0,"reply_bad":0,"timeouts":2000,"frames_per_s":50,"us_per_frame":20111.1,"polls_per_frame":421.00,"payload_kB_per_s_each_way":1.2}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":20,"clock_hz":4000000,"frames":2000,"ok":1728,"slave_crc_fail":0,"reply_bad":138,"timeouts":134,"frames_per_s":611,"us_per_frame":1637.3,"polls_per_frame":12.01,"payload_kB_per_s_each_way":14.3}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":20,"clock_hz":10000000,"frames":2000,"ok":1881,"slave_crc_fail":0,"reply_bad":47,"timeouts":72,"frames_per_s":1072,"us_per_frame":932.6,"polls_per_frame":9.98,"payload_kB_per_s_each_way":25.1}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":20,"clock_hz":16000000,"frames":2000,"ok":1875,"slave_crc_fail":0,"reply_bad":47,"timeouts":78,"frames_per_s":1029,"us_per_frame":971.8,"polls_per_frame":12.20,"payload_kB_per_s_each_way":24.1}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":20,"clock_hz":20000000,"frames":2000,"ok":1705,"slave_crc_fail":0,"reply_bad":137,"timeouts":158,"frames_per_s":526,"us_per_frame":1900.0,"polls_per_frame":26.91,"payload_kB_per_s_each_way":12.3}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":20,"clock_hz":26666667,"frames":2000,"ok":0,"slave_crc_fail":0,"reply_bad":0,"timeouts":2000,"frames_per_s":50,"us_per_frame":20125.0,"polls_per_frame":320.00,"payload_kB_per_s_each_way":1.2}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":50,"clock_hz":4000000,"frames":2000,"ok":1696,"slave_crc_fail":0,"reply_bad":147,"timeouts":157,"frames_per_s":519,"us_per_frame":1925.0,"polls_per_frame":11.34,"payload_kB_per_s_each_way":12.2}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":50,"clock_hz":10000000,"frames":2000,"ok":1851,"slave_crc_fail":0,"reply_bad":46,"timeouts":103,"frames_per_s":769,"us_per_frame":1300.5,"polls_per_frame":10.34,"payload_kB_per_s_each_way":18.0}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":50,"clock_hz":16000000,"frames":2000,"ok":1840,"slave_crc_fail":0,"reply_bad":71,"timeouts":89,"frames_per_s":876,"us_per_frame":1141.1,"polls_per_frame":9.93,"payload_kB_per_s_each_way":20.5}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":50,"clock_hz":20000000,"frames":2000,"ok":1497,"slave_crc_fail":0,"reply_bad":270,"timeouts":233,"frames_per_s":359,"us_per_frame":2783.7,"polls_per_frame":27.41,"payload_kB_per_s_each_way":8.4}
+RESULT {"part":"spilink","handshake":"read_until_seq","gap_us":50,"clock_hz":26666667,"frames":2000,"ok":0,"slave_crc_fail":0,"reply_bad":0,"timeouts":2000,"frames_per_s":50,"us_per_frame":20185.1,"polls_per_frame":216.75,"payload_kB_per_s_each_way":1.2}
+SPITEST DONE

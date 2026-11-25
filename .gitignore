@@ -15,3 +15,8 @@ ref/
 
 # downloaded MicroPython firmware (URL in results.md)
 firmware/*.bin
+
+# SPI bridge: generated WiFi credentials header and ESP-IDF configs
+spilink/**/wifi_creds.h
+spilink/**/sdkconfig
+spilink/**/sdkconfig.old

@@ -1,0 +1,61 @@
+﻿ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6180
+load:0x40078000,len:15852
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 21:38:46
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 40MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 2MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00100000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=0ab74h ( 43892) map
+I (91) esp_image: segment 1: paddr=0001ab9c vaddr=3ffb0000 size=02c04h ( 11268) load
+I (95) esp_image: segment 2: paddr=0001d7a8 vaddr=40080000 size=02870h ( 10352) load
+I (99) esp_image: segment 3: paddr=00020020 vaddr=400d0020 size=11de0h ( 73184) map
+I (127) esp_image: segment 4: paddr=00031e08 vaddr=40082870 size=0cbc0h ( 52160) load
+I (147) esp_image: segment 5: paddr=0003e9d0 vaddr=50000000 size=00020h (    32) load
+I (155) boot: Loaded app from partition at offset 0x10000
+I (163) cpu_start: Multicore app
+I (172) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (172) cpu_start: Pro cpu start user code
+I (172) cpu_start: cpu freq: 160000000 Hz
+I (174) app_init: Application information:
+I (177) app_init: Project name:     spilink_master
+I (182) app_init: App version:      296364f
+I (186) app_init: Compile time:     Nov 25 2026 21:37:44
+I (191) app_init: ELF file SHA256:  61d82664e...
+I (195) app_init: ESP-IDF:          v5.5.6
+I (199) efuse_init: Min chip rev:     v0.0
+I (203) efuse_init: Max chip rev:     v3.99
+I (207) efuse_init: Chip rev:         v3.1
+I (211) heap_init: Initializing. RAM available for dynamic allocation:
+I (217) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (222) heap_init: At 3FFB34F0 len 0002CB10 (178 KiB): DRAM
+I (227) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (233) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (238) heap_init: At 4008F430 len 00010BD0 (66 KiB): IRAM
+I (245) spi_flash: detected chip: generic
+I (247) spi_flash: flash io: dio
+W (250) spi_flash: Detected size(4096k) larger than the size in the binary image header(2048k). Using the size in the binary image header.
+I (263) main_task: Started on CPU0
+I (263) main_task: Calling app_main()
+LINK status read 0: 0x5a5a5a5a
+LINK slave ready marker seen (status 0x5a5a5a5a)
+RESULT {"part":"spilink","clock_hz":1000000,"frames":5000,"ok":11,"slave_crc_fail":223,"reply_bad":209,"timeouts":4758,"frames_per_s":51,"us_per_frame":19419.7,"status_polls_per_frame":263.03,"payload_kB_per_s_each_way":1.2}
+RESULT {"part":"spilink","clock_hz":4000000,"frames":5000,"ok":4383,"slave_crc_fail":155,"reply_bad":205,"timeouts":403,"frames_per_s":519,"us_per_frame":1927.5,"status_polls_per_frame":44.78,"payload_kB_per_s_each_way":12.2}
+RESULT {"part":"spilink","clock_hz":8000000,"frames":5000,"ok":4502,"slave_crc_fail":134,"reply_bad":158,"timeouts":330,"frames_per_s":641,"us_per_frame":1559.3,"status_polls_per_frame":43.41,"payload_kB_per_s_each_way":15.0}
+RESULT {"part":"spilink","clock_hz":10000000,"frames":5000,"ok":4651,"slave_crc_fail":18,"reply_bad":57,"timeouts":292,"frames_per_s":718,"us_per_frame":1393.5,"status_polls_per_frame":40.25,"payload_kB_per_s_each_way":16.8}
+RESULT {"part":"spilink","clock_hz":13333333,"frames":5000,"ok":4705,"slave_crc_fail":17,"reply_bad":25,"timeouts":270,"frames_per_s":775,"us_per_frame":1289.6,"status_polls_per_frame":38.61,"payload_kB_per_s_each_way":18.2}
+RESULT {"part":"spilink","clock_hz":16000000,"frames":5000,"ok":4712,"slave_crc_fail":11,"reply_bad":32,"timeouts":255,"frames_per_s":818,"us_per_frame":1222.3,"status_polls_per_frame":37.20,"payload_kB_per_s_each_way":19.2}
+RESULT {"part":"spilink","clock_hz":20000000,"frames":5000,"ok":4244,"slave_crc_fail":17,"reply_bad":311,"timeouts":439,"frames_per_s":478,"us_per_frame":2091.8,"status_polls_per_frame":68.89,"payload_kB_per_s_each_way":11.2}
