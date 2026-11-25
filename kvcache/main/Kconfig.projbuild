@@ -35,6 +35,14 @@ menu "ESP32 KV Cache"
         bool "Place hot path (hash, lookup, parser, dispatch) in IRAM"
         default y
 
+    config KV_FORCE_LOCK
+        bool "Ablation: take the shard spinlock on every op even in single-core mode"
+        default n
+
+    config KV_BASIC_FAST_ITOA
+        bool "Ablation: basic engine formats GET reply headers with a hand-written itoa, not snprintf"
+        default n
+
     config KV_MAX_CLIENTS
         int "Max concurrent clients"
         default 8

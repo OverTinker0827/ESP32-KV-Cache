@@ -1,0 +1,59 @@
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0030,len:6180
+load:0x40078000,len:15852
+load:0x40080400,len:3876
+entry 0x4008063c
+I (27) boot: ESP-IDF v5.5.6 2nd stage bootloader
+I (27) boot: compile time Nov 25 2026 14:03:54
+I (28) boot: chip revision: v3.1
+I (29) boot.esp32: SPI Speed      : 40MHz
+I (32) boot.esp32: SPI Mode       : DIO
+I (36) boot.esp32: SPI Flash Size : 4MB
+I (39) boot: Partition Table:
+I (42) boot: ## Label            Usage          Type ST Offset   Length
+I (48) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (55) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (61) boot:  2 factory          factory app      00 00 00010000 00177000
+I (68) esp_image: segment 0: paddr=00010020 vaddr=3f400020 size=298f8h (170232) map
+I (134) esp_image: segment 1: paddr=00039920 vaddr=3ffb0000 size=027a8h ( 10152) load
+I (138) esp_image: segment 2: paddr=0003c0d0 vaddr=40080000 size=03f48h ( 16200) load
+I (144) esp_image: segment 3: paddr=00040020 vaddr=400d0020 size=15d64h ( 89444) map
+I (176) esp_image: segment 4: paddr=00055d8c vaddr=40083f48 size=08b00h ( 35584) load
+I (190) esp_image: segment 5: paddr=0005e894 vaddr=50000000 size=00020h (    32) load
+I (197) boot: Loaded app from partition at offset 0x10000
+I (203) cpu_start: Multicore app
+I (212) cpu_start: GPIO 3 and 1 are used as console UART I/O pins
+I (212) cpu_start: Pro cpu start user code
+I (212) cpu_start: cpu freq: 240000000 Hz
+I (214) app_init: Application information:
+I (218) app_init: Project name:     kvcache
+I (221) app_init: App version:      1c9e092-dirty
+I (226) app_init: Compile time:     Nov 25 2026 14:02:53
+I (231) app_init: ELF file SHA256:  578ea1d06...
+I (235) app_init: ESP-IDF:          v5.5.6
+I (239) efuse_init: Min chip rev:     v0.0
+I (243) efuse_init: Max chip rev:     v3.99
+I (247) efuse_init: Chip rev:         v3.1
+I (251) heap_init: Initializing. RAM available for dynamic allocation:
+I (257) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (262) heap_init: At 3FFB5850 len 0002A7B0 (169 KiB): DRAM
+I (267) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (273) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (278) heap_init: At 4008CA48 len 000135B8 (77 KiB): IRAM
+I (285) spi_flash: detected chip: generic
+I (287) spi_flash: flash io: dio
+I (291) main_task: Started on CPU0
+I (293) main_task: Calling app_main()
+VARIANT engine=opt-slab-oa server=opt-eventloop cores=single-core1 iram=0
+I (306) kv_opt: arena 48 pages (192 KiB) in 2 blocks, index 5157 slots (20628 B), 1 shard(s), heap left 44964
+RESULT {"impl":"kvcache","engine":"opt-slab-oa","flags":"iram=0,force_lock=0,fast_itoa=0","scenario":"quiet","bench_core":1,"sim_core":-1,"sim_duty_pct":0,"set_ops":430607,"get_ops":356849,"del_ops":390411,"set_p50_ns":2258,"set_p95_ns":2320,"set_p99_ns":2525,"get_p50_ns":2733,"get_p95_ns":2800,"get_p99_ns":2800,"del_p50_ns":2429,"del_p95_ns":3054,"del_p99_ns":3670,"rand_set_ops":433688,"rand_get_ops":357756,"rand_del_ops":392110,"rand_get_p99_ns":2800}
+RESULT {"impl":"kvcache","engine":"opt-slab-oa","flags":"iram=0,force_lock=0,fast_itoa=0","scenario":"sim_other_core","bench_core":1,"sim_core":0,"sim_duty_pct":40,"set_ops":431984,"get_ops":356633,"del_ops":390930,"set_p50_ns":2258,"set_p95_ns":2320,"set_p99_ns":2525,"get_p50_ns":2733,"get_p95_ns":2800,"get_p99_ns":2833,"del_p50_ns":2429,"del_p95_ns":3054,"del_p99_ns":3670,"rand_set_ops":433407,"rand_get_ops":357130,"rand_del_ops":393840,"rand_get_p99_ns":2808}
+RESULT {"impl":"kvcache","engine":"opt-slab-oa","flags":"iram=0,force_lock=0,fast_itoa=0","scenario":"sim_same_core","bench_core":0,"sim_core":0,"sim_duty_pct":40,"set_ops":233094,"get_ops":208785,"del_ops":218207,"set_p50_ns":2275,"set_p95_ns":2408,"set_p99_ns":5937,"get_p50_ns":2733,"get_p95_ns":2800,"get_p99_ns":6566,"del_p50_ns":2429,"del_p95_ns":3054,"del_p99_ns":6100,"rand_set_ops":229026,"rand_get_ops":208698,"rand_del_ops":218564,"rand_get_p99_ns":6729}
+I (1121) kv_opt: arena 53 pages (212 KiB) in 2 blocks, index 5641 slots (22564 B), 1 shard(s), heap left 43356
+RESULT {"impl":"kvcache","engine":"opt-slab-oa","flags":"iram=0,force_lock=0,fast_itoa=0","scenario":"fill","bytes_per_key":60,"max_keys":3869,"store_bytes":239652}
+DONE (engine-only build, WiFi disabled)

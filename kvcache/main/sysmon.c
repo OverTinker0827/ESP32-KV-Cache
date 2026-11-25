@@ -11,6 +11,29 @@ void sysmon_cpu(uint64_t *uptime_us, uint64_t *idle0_us, uint64_t *idle1_us)
     *idle1_us = ulTaskGetIdleRunTimeCounterForCore(1);
 }
 
+const char *variant_flags(void)
+{
+    return "iram="
+#if CONFIG_KV_HOT_IRAM
+           "1"
+#else
+           "0"
+#endif
+           ",force_lock="
+#if CONFIG_KV_FORCE_LOCK
+           "1"
+#else
+           "0"
+#endif
+           ",fast_itoa="
+#if CONFIG_KV_BASIC_FAST_ITOA
+           "1"
+#else
+           "0"
+#endif
+        ;
+}
+
 const char *variant_server_name(void)
 {
 #if CONFIG_KV_SERVER_BASIC

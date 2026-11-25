@@ -166,7 +166,21 @@ out:
 static int put_bulk_hdr(obuf_t *o, size_t vl)
 {
     char tmp[16];
+#if CONFIG_KV_BASIC_FAST_ITOA
+    char d[10];
+    int nd = 0, n = 0;
+    unsigned v = vl;
+    do {
+        d[nd++] = '0' + v % 10;
+        v /= 10;
+    } while (v);
+    tmp[n++] = '$';
+    while (nd) tmp[n++] = d[--nd];
+    tmp[n++] = '\r';
+    tmp[n++] = '\n';
+#else
     int n = snprintf(tmp, sizeof tmp, "$%u\r\n", (unsigned)vl);
+#endif
     if (!ob_room(o, n + vl + 2)) return -1;
     memcpy(o->buf + o->len, tmp, n);
     o->len += n;

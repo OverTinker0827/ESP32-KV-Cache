@@ -9,16 +9,20 @@ port and a progressively hardware-optimized C version, measuring each step on th
 
 ## Results so far
 
-On-device storage-engine benchmark, ESP32 @ 240 MHz, 16 B keys, 32 B values
-(full tables, method and raw data in [results.md](results.md)):
+On-device storage-engine benchmark, ESP32 @ 240 MHz, 16 B keys, 32 B values, sequential keys
+(latest entry; full tables, method and raw data in [results.md](results.md)):
 
 | | microredis | basic C | optimized C |
 |---|---:|---:|---:|
-| SET ops/s | 922 | 80,874 | **441,423** (479× microredis) |
-| GET ops/s | 1,480 | 40,306 | **361,193** (244×) |
-| DEL ops/s | 2,356 | 99,880 | **395,867** (168×) |
-| Max keys | 1,223 | 3,664 | **3,942** |
-| Bytes per key | ~153 | 72 | **62** |
+| SET ops/s | 891 | 80,792 | **434,046** (487× microredis) |
+| GET ops/s | 1,585 | 76,995 | **357,079** (225×) |
+| DEL ops/s | 2,188 | 99,698 | **390,579** (179×) |
+| GET p50 / p99 latency | 200 µs / 4,027 µs | 12.8 µs / 17.1 µs | **2.7 µs / 3.2 µs** |
+| Max keys | 1,223 | 3,659 | **3,869** |
+| Bytes per key | 77 | 68 | **60** |
+
+With simulated WiFi load on the other core the optimized engine loses only 4 %; on the same core it
+loses 42 %, which is why the cache is pinned away from the WiFi core.
 
 Network benchmarks (throughput, p95/p99 latency, CPU per core) are pending a power fix on the
 test board; see [Hardware notes](#hardware-notes).
