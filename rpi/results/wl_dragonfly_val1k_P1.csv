@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+dragonfly,val1k_P1,1,172226,286.8,527.8,624.8,110,0,200,11.61,111904
+dragonfly,val1k_P1,2,171789,281.5,522.9,596.6,116,0,200,11.62,111904
+dragonfly,val1k_P1,3,172508,282.2,522.9,603.5,113,0,200,11.59,111904

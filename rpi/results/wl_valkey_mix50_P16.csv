@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+valkey,mix50_P16,1,1253785,635.0,677.4,774.5,66,0,200,1.59,17200
+valkey,mix50_P16,2,1249848,636.4,677.4,771.0,66,0,200,1.60,17200
+valkey,mix50_P16,3,1250192,636.4,680.5,772.7,66,0,200,1.60,17200

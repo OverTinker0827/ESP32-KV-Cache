@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+keydb,zipf90_P1,1,171297,162.8,5558.7,11066.1,99,0,185,10.82,29040
+keydb,zipf90_P1,2,162581,162.8,7385.7,11298.6,93,0,186,11.46,29040
+keydb,zipf90_P1,3,171820,162.1,5444.3,11482.8,99,0,187,10.90,29040

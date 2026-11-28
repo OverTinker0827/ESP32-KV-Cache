@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+keydb,conn1000_P1,1,140289,6534.5,16928.8,30233.4,116,0,195,13.88,29216
+keydb,conn1000_P1,2,140742,6656.4,14908.6,24900.0,116,0,195,13.85,29216
+keydb,conn1000_P1,3,141827,6414.8,15292.4,21676.7,116,0,197,13.87,29216

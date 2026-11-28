@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+valkey,zipf90_P16,1,1461704,543.9,587.0,674.3,73,0,200,1.37,17152
+valkey,zipf90_P16,2,1452297,545.2,636.4,1821.0,70,0,200,1.38,17152
+valkey,zipf90_P16,3,1460175,543.9,584.3,675.8,73,0,200,1.37,17152

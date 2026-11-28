@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+garnet,keys10M_P1,1,83627,760.4,1031.5,1223.8,74,0,200,23.94,869696
+garnet,keys10M_P1,2,83684,765.6,1072.8,1269.9,74,0,200,23.85,869696
+garnet,keys10M_P1,3,81767,772.7,1243.8,1472.3,72,0,200,24.41,869696

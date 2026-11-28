@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+garnet,ttl50_P1,1,83508,666.5,1284.7,1581.6,77,0,200,23.89,234608
+garnet,ttl50_P1,2,86734,652.8,1229.5,1730.8,79,0,200,23.04,234608
+garnet,ttl50_P1,3,86696,669.6,1144.5,1333.1,79,0,200,23.06,234608

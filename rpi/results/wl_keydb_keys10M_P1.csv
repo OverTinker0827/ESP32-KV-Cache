@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+keydb,keys10M_P1,1,147234,172.9,8044.9,11778.4,85,0,185,12.58,1319376
+keydb,keys10M_P1,2,136853,172.1,8602.4,15577.6,79,0,184,13.42,1319376
+keydb,keys10M_P1,3,156665,172.9,5662.4,11324.7,90,0,186,11.90,1319376

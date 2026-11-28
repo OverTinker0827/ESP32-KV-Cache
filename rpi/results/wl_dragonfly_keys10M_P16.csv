@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+dragonfly,keys10M_P16,1,759044,1022.0,1916.0,2348.0,37,0,200,2.63,858352
+dragonfly,keys10M_P16,2,761184,982.6,1951.7,2145.6,35,0,200,2.62,858352
+dragonfly,keys10M_P16,3,759433,987.2,1956.2,2140.7,35,0,200,2.63,858352

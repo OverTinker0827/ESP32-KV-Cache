@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+dragonfly,mix50_P16,1,711013,1105.5,1920.4,2453.3,40,0,200,2.81,26208
+dragonfly,mix50_P16,2,705482,1085.3,2101.5,3055.5,39,0,199,2.83,26208
+dragonfly,mix50_P16,3,715357,1045.9,1988.1,2180.6,37,0,200,2.79,26208

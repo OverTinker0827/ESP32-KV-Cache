@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+dragonfly,ttl50_P1,1,188776,253.2,486.8,1455.4,121,0,199,10.55,26336
+dragonfly,ttl50_P1,2,193903,252.6,463.7,527.8,122,0,200,10.32,26336
+dragonfly,ttl50_P1,3,194859,262.7,500.5,573.6,113,0,200,10.25,26336

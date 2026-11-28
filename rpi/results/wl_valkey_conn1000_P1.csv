@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+valkey,conn1000_P1,1,102248,9768.1,9950.3,9996.4,91,0,198,19.40,17200
+valkey,conn1000_P1,2,102361,9745.5,9927.3,10019.5,89,0,198,19.39,17200
+valkey,conn1000_P1,3,103701,9589.2,10019.5,12364.0,83,0,199,19.16,17200

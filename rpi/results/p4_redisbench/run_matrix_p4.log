@@ -1,0 +1,190 @@
+## kvpi_1c  00:46:23  temp=48.8'C  : ./kvpi/build/v1/kvpi-server-mt -p 7777 -c 3
+p4_kvpi_1c       SET c= 1 P= 1       45251 rps  p50 0.023  p99 0.023 ms  srvCPU  45%  9.84 cpu-us/req
+p4_kvpi_1c       GET c= 1 P= 1       45255 rps  p50 0.023  p99 0.023 ms  srvCPU  46%  10.08 cpu-us/req
+p4_kvpi_1c       SET c=50 P= 1      166410 rps  p50 0.271  p99 0.559 ms  srvCPU  97%  5.82 cpu-us/req
+p4_kvpi_1c       GET c=50 P= 1      159784 rps  p50 0.287  p99 0.583 ms  srvCPU  97%  6.07 cpu-us/req
+p4_kvpi_1c       SET c= 1 P=16      396850 rps  p50 0.031  p99 0.031 ms  srvCPU  41%  1.04 cpu-us/req
+p4_kvpi_1c       GET c= 1 P=16      396513 rps  p50 0.031  p99 0.031 ms  srvCPU  48%  1.22 cpu-us/req
+p4_kvpi_1c       SET c=50 P=16     1328714 rps  p50 0.583  p99 1.167 ms  srvCPU  99%  0.75 cpu-us/req
+p4_kvpi_1c       GET c=50 P=16     1139846 rps  p50 0.655  p99 1.319 ms  srvCPU  97%  0.85 cpu-us/req
+## kvpi_2c  00:47:46  temp=57.6'C  : ./kvpi/build/v1/kvpi-server-mt -p 7777 -c 2,3
+p4_kvpi_2c       SET c= 1 P= 1       45256 rps  p50 0.023  p99 0.023 ms  srvCPU  45%  9.84 cpu-us/req
+p4_kvpi_2c       GET c= 1 P= 1       45250 rps  p50 0.023  p99 0.023 ms  srvCPU  46%  10.16 cpu-us/req
+p4_kvpi_2c       SET c=50 P= 1      199602 rps  p50 0.127  p99 0.159 ms  srvCPU 145%  7.28 cpu-us/req
+p4_kvpi_2c       GET c=50 P= 1      199613 rps  p50 0.135  p99 0.159 ms  srvCPU 149%  7.47 cpu-us/req
+p4_kvpi_2c       SET c= 1 P=16      494929 rps  p50 0.031  p99 0.031 ms  srvCPU  51%  1.04 cpu-us/req
+p4_kvpi_2c       GET c= 1 P=16      396708 rps  p50 0.031  p99 0.031 ms  srvCPU  48%  1.22 cpu-us/req
+p4_kvpi_2c       SET c=50 P=16     2272796 rps  p50 0.183  p99 0.271 ms  srvCPU 188%  0.82 cpu-us/req
+p4_kvpi_2c       GET c=50 P=16     2274061 rps  p50 0.255  p99 0.447 ms  srvCPU 192%  0.85 cpu-us/req
+## kvpi_3c  00:48:52  temp=61.5'C  : ./kvpi/build/v1/kvpi-server-mt -p 7777 -c 1,2,3
+p4_kvpi_3c       SET c= 1 P= 1       47338 rps  p50 0.023  p99 0.023 ms  srvCPU  46%  9.76 cpu-us/req
+p4_kvpi_3c       GET c= 1 P= 1       46335 rps  p50 0.023  p99 0.023 ms  srvCPU  47%  10.16 cpu-us/req
+p4_kvpi_3c       SET c=50 P= 1      103028 rps  p50 0.255  p99 0.279 ms  srvCPU  84%  8.16 cpu-us/req
+p4_kvpi_3c       GET c=50 P= 1      101405 rps  p50 0.255  p99 0.279 ms  srvCPU  84%  8.33 cpu-us/req
+p4_kvpi_3c       SET c= 1 P=16      501994 rps  p50 0.031  p99 0.031 ms  srvCPU  52%  1.04 cpu-us/req
+p4_kvpi_3c       GET c= 1 P=16      453660 rps  p50 0.031  p99 0.031 ms  srvCPU  54%  1.20 cpu-us/req
+p4_kvpi_3c       SET c=50 P=16     1267192 rps  p50 0.327  p99 0.367 ms  srvCPU 113%  0.90 cpu-us/req
+p4_kvpi_3c       GET c=50 P=16     1266551 rps  p50 0.327  p99 0.367 ms  srvCPU 124%  0.98 cpu-us/req
+## kvpiu_1c  00:50:34  temp=58.2'C  : ./kvpi/build/v2/kvpi-server-uring -p 7777 -c 3
+p4_kvpiu_1c      SET c= 1 P= 1       45251 rps  p50 0.023  p99 0.023 ms  srvCPU  46%  10.16 cpu-us/req
+p4_kvpiu_1c      GET c= 1 P= 1       45254 rps  p50 0.023  p99 0.023 ms  srvCPU  47%  10.48 cpu-us/req
+p4_kvpiu_1c      SET c=50 P= 1      173613 rps  p50 0.263  p99 0.303 ms  srvCPU  96%  5.51 cpu-us/req
+p4_kvpiu_1c      GET c=50 P= 1      173642 rps  p50 0.271  p99 0.311 ms  srvCPU  98%  5.64 cpu-us/req
+p4_kvpiu_1c      SET c= 1 P=16      494871 rps  p50 0.031  p99 0.031 ms  srvCPU  53%  1.06 cpu-us/req
+p4_kvpiu_1c      GET c= 1 P=16      396654 rps  p50 0.031  p99 0.031 ms  srvCPU  48%  1.22 cpu-us/req
+p4_kvpiu_1c      SET c=50 P=16     1329121 rps  p50 0.503  p99 0.663 ms  srvCPU  96%  0.72 cpu-us/req
+p4_kvpiu_1c      GET c=50 P=16     1227089 rps  p50 0.559  p99 0.783 ms  srvCPU 100%  0.81 cpu-us/req
+## kvpiu_2c  00:51:54  temp=57.1'C  : ./kvpi/build/v2/kvpi-server-uring -p 7777 -c 2,3
+p4_kvpiu_2c      SET c= 1 P= 1       45259 rps  p50 0.023  p99 0.023 ms  srvCPU  46%  10.08 cpu-us/req
+p4_kvpiu_2c      GET c= 1 P= 1       45250 rps  p50 0.023  p99 0.023 ms  srvCPU  47%  10.48 cpu-us/req
+p4_kvpiu_2c      SET c=50 P= 1      210087 rps  p50 0.127  p99 0.159 ms  srvCPU 153%  7.28 cpu-us/req
+p4_kvpiu_2c      GET c=50 P= 1      199600 rps  p50 0.135  p99 0.159 ms  srvCPU 150%  7.49 cpu-us/req
+p4_kvpiu_2c      SET c= 1 P=16      494988 rps  p50 0.031  p99 0.031 ms  srvCPU  52%  1.06 cpu-us/req
+p4_kvpiu_2c      GET c= 1 P=16      396826 rps  p50 0.031  p99 0.039 ms  srvCPU  49%  1.24 cpu-us/req
+p4_kvpiu_2c      SET c=50 P=16     2273655 rps  p50 0.183  p99 0.287 ms  srvCPU 186%  0.82 cpu-us/req
+p4_kvpiu_2c      GET c=50 P=16     2274067 rps  p50 0.231  p99 0.359 ms  srvCPU 192%  0.84 cpu-us/req
+## kvpiu_3c  00:53:00  temp=61.5'C  : ./kvpi/build/v2/kvpi-server-uring -p 7777 -c 1,2,3
+p4_kvpiu_3c      SET c= 1 P= 1       47561 rps  p50 0.023  p99 0.023 ms  srvCPU  48%  10.16 cpu-us/req
+p4_kvpiu_3c      GET c= 1 P= 1       47369 rps  p50 0.023  p99 0.023 ms  srvCPU  49%  10.32 cpu-us/req
+p4_kvpiu_3c      SET c=50 P= 1      103562 rps  p50 0.255  p99 0.287 ms  srvCPU  86%  8.34 cpu-us/req
+p4_kvpiu_3c      GET c=50 P= 1      101776 rps  p50 0.255  p99 0.287 ms  srvCPU  87%  8.49 cpu-us/req
+p4_kvpiu_3c      SET c= 1 P=16      502500 rps  p50 0.031  p99 0.031 ms  srvCPU  53%  1.06 cpu-us/req
+p4_kvpiu_3c      GET c= 1 P=16      454153 rps  p50 0.031  p99 0.031 ms  srvCPU  56%  1.22 cpu-us/req
+p4_kvpiu_3c      SET c=50 P=16     1257486 rps  p50 0.327  p99 0.367 ms  srvCPU 116%  0.92 cpu-us/req
+p4_kvpiu_3c      GET c=50 P=16     1267072 rps  p50 0.327  p99 0.367 ms  srvCPU 128%  1.01 cpu-us/req
+## redis_1c  00:54:42  temp=59.8'C  : /home/deadname/kvpi/src/redis-8.12.0/src/redis-server --port 7777 --save '' --appendonly no --protected-mode no --io-threads 1
+p4_redis_1c      SET c= 1 P= 1       35585 rps  p50 0.023  p99 0.031 ms  srvCPU  59%  16.48 cpu-us/req
+p4_redis_1c      GET c= 1 P= 1       35579 rps  p50 0.023  p99 0.031 ms  srvCPU  57%  15.92 cpu-us/req
+p4_redis_1c      SET c=50 P= 1      142659 rps  p50 0.311  p99 0.575 ms  srvCPU  97%  6.83 cpu-us/req
+p4_redis_1c      GET c=50 P= 1      153633 rps  p50 0.295  p99 0.543 ms  srvCPU  99%  6.50 cpu-us/req
+p4_redis_1c      SET c= 1 P=16      330966 rps  p50 0.039  p99 0.047 ms  srvCPU  66%  2.00 cpu-us/req
+p4_redis_1c      GET c= 1 P=16      330853 rps  p50 0.039  p99 0.047 ms  srvCPU  60%  1.80 cpu-us/req
+p4_redis_1c      SET c=50 P=16      760120 rps  p50 1.103  p99 1.375 ms  srvCPU  98%  1.29 cpu-us/req
+p4_redis_1c      GET c=50 P=16      886646 rps  p50 0.887  p99 1.175 ms  srvCPU  96%  1.08 cpu-us/req
+## redis_2c  00:56:25  temp=58.7'C  : /home/deadname/kvpi/src/redis-8.12.0/src/redis-server --port 7777 --save '' --appendonly no --protected-mode no --io-threads 2
+p4_redis_2c      SET c= 1 P= 1       26236 rps  p50 0.039  p99 0.047 ms  srvCPU  70%  26.72 cpu-us/req
+p4_redis_2c      GET c= 1 P= 1       26236 rps  p50 0.039  p99 0.039 ms  srvCPU  68%  25.84 cpu-us/req
+p4_redis_2c      SET c=50 P= 1      153613 rps  p50 0.303  p99 0.423 ms  srvCPU 120%  7.90 cpu-us/req
+p4_redis_2c      GET c=50 P= 1      159762 rps  p50 0.287  p99 0.399 ms  srvCPU 117%  7.31 cpu-us/req
+p4_redis_2c      SET c= 1 P=16      221070 rps  p50 0.063  p99 0.087 ms  srvCPU  73%  3.30 cpu-us/req
+p4_redis_2c      GET c= 1 P=16      248570 rps  p50 0.055  p99 0.055 ms  srvCPU  66%  2.66 cpu-us/req
+p4_redis_2c      SET c=50 P=16      997387 rps  p50 0.735  p99 0.999 ms  srvCPU 187%  1.87 cpu-us/req
+p4_redis_2c      GET c=50 P=16     1329288 rps  p50 0.519  p99 0.695 ms  srvCPU 173%  1.30 cpu-us/req
+## redis_3c  00:58:08  temp=59.3'C  : /home/deadname/kvpi/src/redis-8.12.0/src/redis-server --port 7777 --save '' --appendonly no --protected-mode no --io-threads 3
+p4_redis_3c      SET c= 1 P= 1       26868 rps  p50 0.039  p99 0.047 ms  srvCPU  72%  26.80 cpu-us/req
+p4_redis_3c      GET c= 1 P= 1       27580 rps  p50 0.039  p99 0.039 ms  srvCPU  72%  26.00 cpu-us/req
+p4_redis_3c      SET c=50 P= 1      106688 rps  p50 0.247  p99 0.295 ms  srvCPU 192%  17.97 cpu-us/req
+p4_redis_3c      GET c=50 P= 1      106499 rps  p50 0.247  p99 0.295 ms  srvCPU 188%  17.70 cpu-us/req
+p4_redis_3c      SET c= 1 P=16      238818 rps  p50 0.063  p99 0.087 ms  srvCPU  78%  3.28 cpu-us/req
+p4_redis_3c      GET c= 1 P=16      280721 rps  p50 0.055  p99 0.055 ms  srvCPU  74%  2.66 cpu-us/req
+p4_redis_3c      SET c=50 P=16     1074197 rps  p50 0.687  p99 0.951 ms  srvCPU 203%  1.89 cpu-us/req
+p4_redis_3c      GET c=50 P=16     1250337 rps  p50 0.343  p99 0.407 ms  srvCPU 216%  1.73 cpu-us/req
+## valkey_1c  01:00:07  temp=63.1'C  : /home/deadname/kvpi/src/valkey-9.2.1/src/valkey-server --port 7777 --save '' --appendonly no --protected-mode no --io-threads 1
+p4_valkey_1c     SET c= 1 P= 1       35583 rps  p50 0.023  p99 0.031 ms  srvCPU  56%  15.84 cpu-us/req
+p4_valkey_1c     GET c= 1 P= 1       35588 rps  p50 0.023  p99 0.031 ms  srvCPU  53%  14.80 cpu-us/req
+p4_valkey_1c     SET c=50 P= 1      142579 rps  p50 0.319  p99 0.583 ms  srvCPU 100%  6.99 cpu-us/req
+p4_valkey_1c     GET c=50 P= 1      147948 rps  p50 0.303  p99 0.551 ms  srvCPU  98%  6.60 cpu-us/req
+p4_valkey_1c     SET c= 1 P=16      330941 rps  p50 0.039  p99 0.047 ms  srvCPU  67%  2.02 cpu-us/req
+p4_valkey_1c     GET c= 1 P=16      330965 rps  p50 0.039  p99 0.039 ms  srvCPU  58%  1.74 cpu-us/req
+p4_valkey_1c     SET c=50 P=16      694074 rps  p50 1.207  p99 1.471 ms  srvCPU  96%  1.39 cpu-us/req
+p4_valkey_1c     GET c=50 P=16      886693 rps  p50 0.919  p99 1.191 ms  srvCPU  98%  1.11 cpu-us/req
+## valkey_2c  01:01:52  temp=58.2'C  : /home/deadname/kvpi/src/valkey-9.2.1/src/valkey-server --port 7777 --save '' --appendonly no --protected-mode no --io-threads 2
+p4_valkey_2c     SET c= 1 P= 1       41520 rps  p50 0.023  p99 0.023 ms  srvCPU 156%  37.52 cpu-us/req
+p4_valkey_2c     GET c= 1 P= 1       45281 rps  p50 0.023  p99 0.023 ms  srvCPU 157%  34.72 cpu-us/req
+p4_valkey_2c     SET c=50 P= 1      159726 rps  p50 0.295  p99 0.359 ms  srvCPU 197%  12.39 cpu-us/req
+p4_valkey_2c     GET c=50 P= 1      166377 rps  p50 0.287  p99 0.359 ms  srvCPU 200%  12.01 cpu-us/req
+p4_valkey_2c     SET c= 1 P=16      331314 rps  p50 0.039  p99 0.039 ms  srvCPU 163%  4.92 cpu-us/req
+p4_valkey_2c     GET c= 1 P=16      397186 rps  p50 0.031  p99 0.039 ms  srvCPU 163%  4.10 cpu-us/req
+p4_valkey_2c     SET c=50 P=16     1064030 rps  p50 0.703  p99 0.783 ms  srvCPU 196%  1.85 cpu-us/req
+p4_valkey_2c     GET c=50 P=16     1329299 rps  p50 0.527  p99 0.615 ms  srvCPU 192%  1.44 cpu-us/req
+## valkey_3c  01:03:17  temp=60.4'C  : /home/deadname/kvpi/src/valkey-9.2.1/src/valkey-server --port 7777 --save '' --appendonly no --protected-mode no --io-threads 3
+p4_valkey_3c     SET c= 1 P= 1       45436 rps  p50 0.023  p99 0.023 ms  srvCPU 161%  35.52 cpu-us/req
+p4_valkey_3c     GET c= 1 P= 1       47256 rps  p50 0.023  p99 0.023 ms  srvCPU 160%  33.76 cpu-us/req
+p4_valkey_3c     SET c=50 P= 1      108185 rps  p50 0.239  p99 0.279 ms  srvCPU 210%  19.43 cpu-us/req
+p4_valkey_3c     GET c=50 P= 1      106022 rps  p50 0.247  p99 0.279 ms  srvCPU 199%  18.83 cpu-us/req
+p4_valkey_3c     SET c= 1 P=16      389666 rps  p50 0.039  p99 0.039 ms  srvCPU 174%  4.48 cpu-us/req
+p4_valkey_3c     GET c= 1 P=16      447453 rps  p50 0.031  p99 0.039 ms  srvCPU 170%  3.80 cpu-us/req
+p4_valkey_3c     SET c=50 P=16     1153911 rps  p50 0.647  p99 0.791 ms  srvCPU 290%  2.52 cpu-us/req
+p4_valkey_3c     GET c=50 P=16     1310827 rps  p50 0.351  p99 0.463 ms  srvCPU 237%  1.84 cpu-us/req
+## dragonfly_1c  01:04:58  temp=63.7'C  : /home/deadname/kvpi/src/df/dragonfly-aarch64 --port 7777 --proactor_threads=1 --dbfilename= --logtostderr
+p4_dragonfly_1c  SET c= 1 P= 1       26240 rps  p50 0.039  p99 0.039 ms  srvCPU  74%  27.52 cpu-us/req
+p4_dragonfly_1c  GET c= 1 P= 1       29321 rps  p50 0.031  p99 0.039 ms  srvCPU  73%  25.20 cpu-us/req
+p4_dragonfly_1c  SET c=50 P= 1      110977 rps  p50 0.407  p99 0.815 ms  srvCPU  99%  8.92 cpu-us/req
+p4_dragonfly_1c  GET c=50 P= 1      117496 rps  p50 0.343  p99 0.735 ms  srvCPU  98%  8.31 cpu-us/req
+p4_dragonfly_1c  SET c= 1 P=16      199042 rps  p50 0.071  p99 0.079 ms  srvCPU  76%  3.82 cpu-us/req
+p4_dragonfly_1c  GET c= 1 P=16      221052 rps  p50 0.063  p99 0.071 ms  srvCPU  73%  3.30 cpu-us/req
+p4_dragonfly_1c  SET c=50 P=16      380013 rps  p50 2.007  p99 3.271 ms  srvCPU  99%  2.60 cpu-us/req
+p4_dragonfly_1c  GET c=50 P=16      443443 rps  p50 1.647  p99 3.055 ms  srvCPU  98%  2.22 cpu-us/req
+## dragonfly_2c  01:07:34  temp=58.2'C  : /home/deadname/kvpi/src/df/dragonfly-aarch64 --port 7777 --proactor_threads=2 --dbfilename= --logtostderr
+p4_dragonfly_2c  SET c= 1 P= 1       24929 rps  p50 0.039  p99 0.047 ms  srvCPU 102%  40.80 cpu-us/req
+p4_dragonfly_2c  GET c= 1 P= 1       26238 rps  p50 0.039  p99 0.047 ms  srvCPU 104%  39.60 cpu-us/req
+p4_dragonfly_2c  SET c=50 P= 1      166402 rps  p50 0.263  p99 0.479 ms  srvCPU 196%  11.81 cpu-us/req
+p4_dragonfly_2c  GET c=50 P= 1      173615 rps  p50 0.247  p99 0.455 ms  srvCPU 195%  11.21 cpu-us/req
+p4_dragonfly_2c  SET c= 1 P=16      165977 rps  p50 0.087  p99 0.103 ms  srvCPU  89%  5.36 cpu-us/req
+p4_dragonfly_2c  GET c= 1 P=16      181024 rps  p50 0.079  p99 0.095 ms  srvCPU  90%  4.98 cpu-us/req
+p4_dragonfly_2c  SET c=50 P=16      638709 rps  p50 1.183  p99 1.847 ms  srvCPU 193%  3.02 cpu-us/req
+p4_dragonfly_2c  GET c=50 P=16      725743 rps  p50 1.007  p99 1.695 ms  srvCPU 192%  2.64 cpu-us/req
+## dragonfly_3c  01:09:34  temp=58.7'C  : /home/deadname/kvpi/src/df/dragonfly-aarch64 --port 7777 --proactor_threads=3 --dbfilename= --logtostderr
+p4_dragonfly_3c  SET c= 1 P= 1       25757 rps  p50 0.039  p99 0.047 ms  srvCPU 114%  44.40 cpu-us/req
+p4_dragonfly_3c  GET c= 1 P= 1       25954 rps  p50 0.039  p99 0.047 ms  srvCPU 114%  44.08 cpu-us/req
+p4_dragonfly_3c  SET c=50 P= 1      104299 rps  p50 0.263  p99 0.319 ms  srvCPU 246%  23.55 cpu-us/req
+p4_dragonfly_3c  GET c=50 P= 1      102854 rps  p50 0.263  p99 0.319 ms  srvCPU 242%  23.53 cpu-us/req
+p4_dragonfly_3c  SET c= 1 P=16      183053 rps  p50 0.079  p99 0.095 ms  srvCPU 120%  6.54 cpu-us/req
+p4_dragonfly_3c  GET c= 1 P=16      208897 rps  p50 0.071  p99 0.087 ms  srvCPU 128%  6.14 cpu-us/req
+p4_dragonfly_3c  SET c=50 P=16      872011 rps  p50 0.831  p99 1.231 ms  srvCPU 299%  3.43 cpu-us/req
+p4_dragonfly_3c  GET c=50 P=16      984613 rps  p50 0.711  p99 1.055 ms  srvCPU 298%  3.03 cpu-us/req
+## keydb_1c  01:11:46  temp=62.6'C  : /home/deadname/kvpi/src/keydb/src/keydb-server --port 7777 --save '' --appendonly no --protected-mode no --server-threads 1
+./baseline.sh: line 25: kill: (36045) - No such process
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+  File "<stdin>", line 8, in <lambda>
+  File "/usr/lib/python3.13/statistics.py", line 634, in median
+    data = sorted(data)
+  File "<stdin>", line 8, in <genexpr>
+ValueError: could not convert string to float: ''
+## keydb_2c  01:11:48  temp=59.3'C  : /home/deadname/kvpi/src/keydb/src/keydb-server --port 7777 --save '' --appendonly no --protected-mode no --server-threads 2
+./baseline.sh: line 25: kill: (36301) - No such process
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+  File "<stdin>", line 8, in <lambda>
+  File "/usr/lib/python3.13/statistics.py", line 634, in median
+    data = sorted(data)
+  File "<stdin>", line 8, in <genexpr>
+ValueError: could not convert string to float: ''
+## keydb_3c  01:11:50  temp=56.5'C  : /home/deadname/kvpi/src/keydb/src/keydb-server --port 7777 --save '' --appendonly no --protected-mode no --server-threads 3
+./baseline.sh: line 25: kill: (36557) - No such process
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+  File "<stdin>", line 8, in <lambda>
+  File "/usr/lib/python3.13/statistics.py", line 634, in median
+    data = sorted(data)
+  File "<stdin>", line 8, in <genexpr>
+ValueError: could not convert string to float: ''
+## garnet_1c  01:11:53  temp=55.4'C  : env DOTNET_ROOT=/home/deadname/.dotnet /home/deadname/kvpi/src/garnet/net10.0/GarnetServer --port 7777 --bind 127.0.0.1
+p4_garnet_1c     SET c= 1 P= 1       27685 rps  p50 0.031  p99 0.039 ms  srvCPU  95%  34.48 cpu-us/req
+p4_garnet_1c     GET c= 1 P= 1       29295 rps  p50 0.031  p99 0.039 ms  srvCPU  99%  33.68 cpu-us/req
+p4_garnet_1c     SET c=50 P= 1       40726 rps  p50 0.071  p99 20.255 ms  srvCPU  99%  24.39 cpu-us/req
+p4_garnet_1c     GET c=50 P= 1       40337 rps  p50 0.071  p99 1.519 ms  srvCPU 100%  24.70 cpu-us/req
+p4_garnet_1c     SET c= 1 P=16      330979 rps  p50 0.047  p99 0.047 ms  srvCPU  93%  2.98 cpu-us/req
+p4_garnet_1c     GET c= 1 P=16      330914 rps  p50 0.047  p99 0.047 ms  srvCPU  99%  3.00 cpu-us/req
+p4_garnet_1c     SET c=50 P=16      484183 rps  p50 0.127  p99 5.287 ms  srvCPU  98%  2.03 cpu-us/req
+p4_garnet_1c     GET c=50 P=16      484158 rps  p50 0.127  p99 5.447 ms  srvCPU  99%  2.06 cpu-us/req
+## garnet_2c  01:15:51  temp=56.5'C  : env DOTNET_ROOT=/home/deadname/.dotnet /home/deadname/kvpi/src/garnet/net10.0/GarnetServer --port 7777 --bind 127.0.0.1
+p4_garnet_2c     SET c= 1 P= 1       35577 rps  p50 0.023  p99 0.031 ms  srvCPU 192%  54.08 cpu-us/req
+p4_garnet_2c     GET c= 1 P= 1       35577 rps  p50 0.023  p99 0.039 ms  srvCPU 192%  53.92 cpu-us/req
+p4_garnet_2c     SET c=50 P= 1       81541 rps  p50 0.607  p99 0.943 ms  srvCPU 198%  24.34 cpu-us/req
+p4_garnet_2c     GET c=50 P= 1       83234 rps  p50 0.591  p99 0.823 ms  srvCPU 198%  23.94 cpu-us/req
+p4_garnet_2c     SET c= 1 P=16      396604 rps  p50 0.031  p99 0.047 ms  srvCPU 188%  4.74 cpu-us/req
+p4_garnet_2c     GET c= 1 P=16      396542 rps  p50 0.031  p99 0.047 ms  srvCPU 185%  4.66 cpu-us/req
+p4_garnet_2c     SET c=50 P=16      839723 rps  p50 0.919  p99 1.319 ms  srvCPU 195%  2.33 cpu-us/req
+p4_garnet_2c     GET c=50 P=16      839747 rps  p50 0.911  p99 1.303 ms  srvCPU 194%  2.31 cpu-us/req
+## garnet_3c  01:18:05  temp=61.5'C  : env DOTNET_ROOT=/home/deadname/.dotnet /home/deadname/kvpi/src/garnet/net10.0/GarnetServer --port 7777 --bind 127.0.0.1
+p4_garnet_3c     SET c= 1 P= 1       33453 rps  p50 0.031  p99 0.039 ms  srvCPU 206%  61.36 cpu-us/req
+p4_garnet_3c     GET c= 1 P= 1       33774 rps  p50 0.031  p99 0.039 ms  srvCPU 206%  61.20 cpu-us/req
+p4_garnet_3c     SET c=50 P= 1       78146 rps  p50 0.335  p99 0.631 ms  srvCPU 293%  37.45 cpu-us/req
+p4_garnet_3c     GET c=50 P= 1       76543 rps  p50 0.343  p99 0.487 ms  srvCPU 295%  38.60 cpu-us/req
+p4_garnet_3c     SET c= 1 P=16      374218 rps  p50 0.039  p99 0.055 ms  srvCPU 201%  5.38 cpu-us/req
+p4_garnet_3c     GET c= 1 P=16      385982 rps  p50 0.039  p99 0.055 ms  srvCPU 201%  5.22 cpu-us/req
+p4_garnet_3c     SET c=50 P=16      914309 rps  p50 0.455  p99 1.215 ms  srvCPU 291%  3.12 cpu-us/req
+p4_garnet_3c     GET c=50 P=16      926163 rps  p50 0.447  p99 1.087 ms  srvCPU 293%  3.14 cpu-us/req
+## done 01:20:22 temp=65.3'C throttled=0x0

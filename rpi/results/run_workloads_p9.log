@@ -1,0 +1,171 @@
+## os: notrack=2 skb_defer_max=0 nofile=65536
+## kvpi5 mix90_P1  03:39:23 temp=49.9'C  load 100000 keys in 1 s, rss 29648 KiB
+   kvpi5      mix90_P1         412829 ops/s  p50   100.2 p99    206.6 us  srv 200%  4.83 us/req  cli 200%  err 0
+## kvpi5 mix90_P16  03:39:41 temp=53.8'C  load 100000 keys in 1 s, rss 29648 KiB
+   kvpi5      mix90_P16       3495275 ops/s  p50   220.4 p99    293.5 us  srv 200%  0.57 us/req  cli 152%  err 0
+## kvpi5 mix50_P1  03:39:58 temp=56.0'C  load 100000 keys in 1 s, rss 33776 KiB
+   kvpi5      mix50_P1         405282 ops/s  p50   101.4 p99    209.9 us  srv 197%  4.91 us/req  cli 200%  err 0
+## kvpi5 mix50_P16  03:40:16 temp=57.6'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi5      mix50_P16       3421253 ops/s  p50   229.7 p99    368.9 us  srv 200%  0.58 us/req  cli 166%  err 0
+## kvpi5 zipf90_P1  03:40:34 temp=57.1'C  load 100000 keys in 1 s, rss 33776 KiB
+   kvpi5      zipf90_P1        408014 ops/s  p50   106.2 p99    217.8 us  srv 199%  4.87 us/req  cli 200%  err 0
+## kvpi5 zipf90_P16  03:40:51 temp=57.1'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi5      zipf90_P16      3962794 ops/s  p50   196.3 p99    327.2 us  srv 200%  0.50 us/req  cli 184%  err 0
+## kvpi5 zipf50_P1  03:41:09 temp=58.2'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi5      zipf50_P1        403895 ops/s  p50   107.7 p99    221.4 us  srv 199%  4.92 us/req  cli 200%  err 0
+## kvpi5 zipf50_P16  03:41:27 temp=59.8'C  load 100000 keys in 1 s, rss 29632 KiB
+   kvpi5      zipf50_P16      3837851 ops/s  p50   199.1 p99    315.3 us  srv 200%  0.52 us/req  cli 188%  err 0
+## kvpi5 val1k_P1  03:41:45 temp=60.4'C  load 100000 keys in 2 s, rss 132528 KiB
+   kvpi5      val1k_P1         359668 ops/s  p50   137.6 p99    190.1 us  srv 200%  5.55 us/req  cli 199%  err 0
+## kvpi5 val16k_P1  03:42:03 temp=60.4'C  load 20000 keys in 2 s, rss 450256 KiB
+   kvpi5      val16k_P1         55218 ops/s  p50   900.0 p99   1281.7 us  srv 200% 36.16 us/req  cli 141%  err 0
+## kvpi5 ttl50_P1  03:42:20 temp=59.3'C  load 100000 keys in 1 s, rss 33776 KiB
+   kvpi5      ttl50_P1         396571 ops/s  p50   108.2 p99    222.9 us  srv 199%  5.03 us/req  cli 200%  err 0
+## kvpi5 conn1000_P1  03:42:38 temp=58.7'C  load 100000 keys in 1 s, rss 29648 KiB
+   kvpi5      conn1000_P1      232891 ops/s  p50  4291.3 p99   4432.4 us  srv 175%  7.51 us/req  cli 200%  err 0
+## kvpi5 keys10M_P1  03:43:05 temp=57.1'C  load 10000000 keys in 10 s, rss 808240 KiB
+   kvpi5      keys10M_P1       412181 ops/s  p50    91.8 p99    191.4 us  srv 199%  4.84 us/req  cli 200%  err 0
+## kvpi5 keys10M_P16  03:43:32 temp=58.2'C  load 10000000 keys in 10 s, rss 804160 KiB
+   kvpi5      keys10M_P16     3071764 ops/s  p50   244.0 p99    351.5 us  srv 200%  0.65 us/req  cli 129%  err 0
+## redis mix90_P1  03:43:50 temp=57.1'C  load 100000 keys in 1 s, rss 20272 KiB
+   redis      mix90_P1         175900 ops/s  p50   288.1 p99    428.7 us  srv 120%  6.81 us/req  cli 118%  err 0
+## redis mix90_P16  03:44:08 temp=57.1'C  load 100000 keys in 1 s, rss 20240 KiB
+   redis      mix90_P16       1413087 ops/s  p50   555.3 p99    748.2 us  srv 191%  1.36 us/req  cli  78%  err 0
+## redis mix50_P1  03:44:26 temp=57.1'C  load 100000 keys in 2 s, rss 20256 KiB
+   redis      mix50_P1         170409 ops/s  p50   292.8 p99    432.7 us  srv 122%  7.10 us/req  cli 116%  err 0
+## redis mix50_P16  03:44:43 temp=57.6'C  load 100000 keys in 1 s, rss 20240 KiB
+   redis      mix50_P16       1211136 ops/s  p50   648.3 p99    869.4 us  srv 193%  1.60 us/req  cli  72%  err 0
+## redis zipf90_P1  03:45:01 temp=57.1'C  load 100000 keys in 1 s, rss 20272 KiB
+   redis      zipf90_P1        175812 ops/s  p50   290.1 p99    428.7 us  srv 118%  6.74 us/req  cli 118%  err 0
+## redis zipf90_P16  03:45:19 temp=58.2'C  load 100000 keys in 1 s, rss 20256 KiB
+   redis      zipf90_P16      1430773 ops/s  p50   548.9 p99    741.3 us  srv 182%  1.27 us/req  cli  83%  err 0
+## redis zipf50_P1  03:45:37 temp=57.6'C  load 100000 keys in 1 s, rss 20240 KiB
+   redis      zipf50_P1        171991 ops/s  p50   293.5 p99    433.7 us  srv 120%  7.00 us/req  cli 117%  err 0
+## redis zipf50_P16  03:45:55 temp=57.1'C  load 100000 keys in 1 s, rss 20256 KiB
+   redis      zipf50_P16      1234582 ops/s  p50   636.4 p99    853.5 us  srv 186%  1.51 us/req  cli  76%  err 0
+## redis val1k_P1  03:46:13 temp=56.5'C  load 100000 keys in 2 s, rss 141936 KiB
+   redis      val1k_P1         164754 ops/s  p50   300.4 p99    415.1 us  srv 123%  7.47 us/req  cli 117%  err 0
+## redis val16k_P1  03:46:31 temp=57.1'C  load 20000 keys in 2 s, rss 414960 KiB
+   redis      val16k_P1         50336 ops/s  p50   987.2 p99   1402.6 us  srv 143% 28.39 us/req  cli  88%  err 0
+## redis ttl50_P1  03:46:48 temp=56.0'C  load 100000 keys in 1 s, rss 20272 KiB
+   redis      ttl50_P1         166660 ops/s  p50   296.2 p99    415.1 us  srv 126%  7.56 us/req  cli 116%  err 0
+## redis conn1000_P1  03:47:06 temp=57.1'C  load 100000 keys in 1 s, rss 20288 KiB
+   redis      conn1000_P1       96856 ops/s  p50 10089.2 p99  20178.4 us  srv 111% 11.52 us/req  cli  90%  err 0
+## redis keys10M_P1  03:47:44 temp=56.5'C  load 10000000 keys in 21 s, rss 1045888 KiB
+   redis      keys10M_P1       172940 ops/s  p50   282.8 p99    393.6 us  srv 128%  7.41 us/req  cli 117%  err 0
+## redis keys10M_P16  03:48:22 temp=56.5'C  load 10000000 keys in 21 s, rss 1045840 KiB
+   redis      keys10M_P16     1557108 ops/s  p50   502.8 p99    677.4 us  srv 197%  1.26 us/req  cli  81%  err 0
+## valkey mix90_P1  03:48:40 temp=60.9'C  load 100000 keys in 1 s, rss 17184 KiB
+   valkey     mix90_P1         179580 ops/s  p50   277.0 p99    297.6 us  srv 200% 11.13 us/req  cli 117%  err 0
+## valkey mix90_P16  03:48:58 temp=60.4'C  load 100000 keys in 1 s, rss 17200 KiB
+   valkey     mix90_P16       1426751 ops/s  p50   557.9 p99    597.9 us  srv 200%  1.40 us/req  cli  68%  err 0
+## valkey mix50_P1  03:49:16 temp=60.9'C  load 100000 keys in 2 s, rss 17216 KiB
+   valkey     mix50_P1         177817 ops/s  p50   279.6 p99    300.4 us  srv 200% 11.26 us/req  cli 116%  err 0
+## valkey mix50_P16  03:49:33 temp=59.3'C  load 100000 keys in 1 s, rss 17200 KiB
+   valkey     mix50_P16       1250192 ops/s  p50   636.4 p99    677.4 us  srv 200%  1.60 us/req  cli  66%  err 0
+## valkey zipf90_P1  03:49:51 temp=60.9'C  load 100000 keys in 1 s, rss 17200 KiB
+   valkey     zipf90_P1        180082 ops/s  p50   276.4 p99    295.5 us  srv 200% 11.11 us/req  cli 117%  err 0
+## valkey zipf90_P16  03:50:09 temp=58.2'C  load 100000 keys in 1 s, rss 17152 KiB
+   valkey     zipf90_P16      1460175 ops/s  p50   543.9 p99    587.0 us  srv 200%  1.37 us/req  cli  73%  err 0
+## valkey zipf50_P1  03:50:27 temp=60.9'C  load 100000 keys in 2 s, rss 17184 KiB
+   valkey     zipf50_P1        178329 ops/s  p50   278.9 p99    297.6 us  srv 200% 11.20 us/req  cli 118%  err 0
+## valkey zipf50_P16  03:50:44 temp=58.7'C  load 100000 keys in 1 s, rss 17200 KiB
+   valkey     zipf50_P16      1287585 ops/s  p50   617.6 p99    655.8 us  srv 200%  1.55 us/req  cli  70%  err 0
+## valkey val1k_P1  03:51:02 temp=59.8'C  load 100000 keys in 1 s, rss 140512 KiB
+   valkey     val1k_P1         166121 ops/s  p50   299.0 p99    330.2 us  srv 200% 12.04 us/req  cli 114%  err 0
+## valkey val16k_P1  03:51:20 temp=59.8'C  load 20000 keys in 1 s, rss 412912 KiB
+   valkey     val16k_P1         56322 ops/s  p50   883.6 p99    978.1 us  srv 200% 35.48 us/req  cli  82%  err 0
+## valkey ttl50_P1  03:51:38 temp=60.4'C  load 100000 keys in 1 s, rss 17200 KiB
+   valkey     ttl50_P1         175507 ops/s  p50   283.5 p99    304.5 us  srv 200% 11.39 us/req  cli 118%  err 0
+## valkey conn1000_P1  03:51:56 temp=59.3'C  load 100000 keys in 1 s, rss 17200 KiB
+   valkey     conn1000_P1      102361 ops/s  p50  9745.5 p99   9950.3 us  srv 198% 19.39 us/req  cli  89%  err 0
+## valkey keys10M_P1  03:52:29 temp=60.9'C  load 10000000 keys in 17 s, rss 795648 KiB
+   valkey     keys10M_P1       180429 ops/s  p50   275.7 p99    295.5 us  srv 200% 11.07 us/req  cli 117%  err 0
+## valkey keys10M_P16  03:53:03 temp=59.8'C  load 10000000 keys in 17 s, rss 795648 KiB
+   valkey     keys10M_P16     1419854 ops/s  p50   560.5 p99    600.7 us  srv 200%  1.41 us/req  cli  65%  err 0
+## dragonfly mix90_P1  03:53:20 temp=57.1'C  load 100000 keys in 1 s, rss 26240 KiB
+   dragonfly  mix90_P1         208200 ops/s  p50   240.0 p99    428.7 us  srv 200%  9.60 us/req  cli 125%  err 0
+## dragonfly mix90_P16  03:53:38 temp=57.1'C  load 100000 keys in 1 s, rss 26336 KiB
+   dragonfly  mix90_P16        776824 ops/s  p50   996.4 p99   1872.2 us  srv 200%  2.57 us/req  cli  42%  err 0
+## dragonfly mix50_P1  03:53:56 temp=57.6'C  load 100000 keys in 1 s, rss 26192 KiB
+   dragonfly  mix50_P1         212381 ops/s  p50   237.8 p99    424.8 us  srv 200%  9.40 us/req  cli 126%  err 0
+## dragonfly mix50_P16  03:54:14 temp=57.6'C  load 100000 keys in 1 s, rss 26208 KiB
+   dragonfly  mix50_P16        711013 ops/s  p50  1085.3 p99   1988.1 us  srv 200%  2.81 us/req  cli  39%  err 0
+## dragonfly zipf90_P1  03:54:32 temp=57.1'C  load 100000 keys in 1 s, rss 26368 KiB
+   dragonfly  zipf90_P1        209292 ops/s  p50   237.3 p99    428.7 us  srv 200%  9.54 us/req  cli 127%  err 0
+## dragonfly zipf90_P16  03:54:50 temp=58.2'C  load 100000 keys in 1 s, rss 26336 KiB
+   dragonfly  zipf90_P16       815680 ops/s  p50   929.6 p99   1714.8 us  srv 200%  2.45 us/req  cli  44%  err 0
+## dragonfly zipf50_P1  03:55:08 temp=57.6'C  load 100000 keys in 1 s, rss 26272 KiB
+   dragonfly  zipf50_P1        204247 ops/s  p50   241.7 p99    439.7 us  srv 200%  9.78 us/req  cli 126%  err 0
+## dragonfly zipf50_P16  03:55:26 temp=58.2'C  load 100000 keys in 2 s, rss 26320 KiB
+   dragonfly  zipf50_P16       747709 ops/s  p50   998.7 p99   1876.5 us  srv 200%  2.67 us/req  cli  43%  err 0
+## dragonfly val1k_P1  03:55:44 temp=57.6'C  load 100000 keys in 2 s, rss 111904 KiB
+   dragonfly  val1k_P1         172226 ops/s  p50   282.2 p99    522.9 us  srv 200% 11.61 us/req  cli 113%  err 0
+## dragonfly val16k_P1  03:56:02 temp=58.7'C  load 20000 keys in 2 s, rss 308736 KiB
+   dragonfly  val16k_P1         42618 ops/s  p50  1152.5 p99   1754.9 us  srv 200% 46.85 us/req  cli  78%  err 0
+## dragonfly ttl50_P1  03:56:20 temp=57.1'C  load 100000 keys in 1 s, rss 26336 KiB
+   dragonfly  ttl50_P1         193903 ops/s  p50   253.2 p99    486.8 us  srv 200% 10.32 us/req  cli 121%  err 0
+## dragonfly conn1000_P1  03:56:38 temp=58.2'C  load 100000 keys in 2 s, rss 26336 KiB
+   dragonfly  conn1000_P1       94549 ops/s  p50  5741.4 p99  31155.3 us  srv 179% 18.95 us/req  cli  80%  err 0
+## dragonfly keys10M_P1  03:57:27 temp=56.0'C  load 10000000 keys in 33 s, rss 858352 KiB
+   dragonfly  keys10M_P1       218461 ops/s  p50   225.0 p99    415.1 us  srv 200%  9.14 us/req  cli 131%  err 0
+## dragonfly keys10M_P16  03:58:16 temp=56.0'C  load 10000000 keys in 33 s, rss 858352 KiB
+   dragonfly  keys10M_P16      759433 ops/s  p50   987.2 p99   1951.7 us  srv 200%  2.63 us/req  cli  35%  err 0
+## garnet mix90_P1  03:58:35 temp=57.1'C  load 100000 keys in 2 s, rss 235184 KiB
+   garnet     mix90_P1          84834 ops/s  p50   721.0 p99   1080.3 us  srv 200% 23.55 us/req  cli  76%  err 0
+## garnet mix90_P16  03:58:54 temp=60.4'C  load 100000 keys in 2 s, rss 235312 KiB
+   garnet     mix90_P16        871575 ops/s  p50   944.8 p99   1825.2 us  srv 200%  2.30 us/req  cli  59%  err 0
+## garnet mix50_P1  03:59:13 temp=57.1'C  load 100000 keys in 2 s, rss 234864 KiB
+   garnet     mix50_P1          86234 ops/s  p50   688.4 p99   1163.2 us  srv 200% 23.17 us/req  cli  77%  err 0
+## garnet mix50_P16  03:59:32 temp=58.7'C  load 100000 keys in 2 s, rss 235328 KiB
+   garnet     mix50_P16        941793 ops/s  p50   843.7 p99   1641.2 us  srv 200%  2.12 us/req  cli  67%  err 0
+## garnet zipf90_P1  03:59:51 temp=56.5'C  load 100000 keys in 2 s, rss 235184 KiB
+   garnet     zipf90_P1         94926 ops/s  p50   614.8 p99   1123.6 us  srv 200% 21.02 us/req  cli  83%  err 0
+## garnet zipf90_P16  04:00:10 temp=57.6'C  load 100000 keys in 2 s, rss 235312 KiB
+   garnet     zipf90_P16       938934 ops/s  p50   867.4 p99   1787.7 us  srv 200%  2.13 us/req  cli  67%  err 0
+## garnet zipf50_P1  04:00:29 temp=57.1'C  load 100000 keys in 2 s, rss 234992 KiB
+   garnet     zipf50_P1         97901 ops/s  p50   603.5 p99   1121.0 us  srv 200% 20.39 us/req  cli  86%  err 0
+## garnet zipf50_P16  04:00:48 temp=58.7'C  load 100000 keys in 2 s, rss 234560 KiB
+   garnet     zipf50_P16       853247 ops/s  p50   991.8 p99   2011.2 us  srv 200%  2.34 us/req  cli  64%  err 0
+## garnet val1k_P1  04:01:07 temp=58.7'C  load 100000 keys in 2 s, rss 326768 KiB
+   garnet     val1k_P1          91340 ops/s  p50   651.3 p99   1067.9 us  srv 200% 21.85 us/req  cli  82%  err 0
+## garnet val16k_P1  04:01:26 temp=58.7'C  load 20000 keys in 2 s, rss 537056 KiB
+   garnet     val16k_P1         38168 ops/s  p50  1380.1 p99   1992.7 us  srv 199% 52.33 us/req  cli  63%  err 0
+## garnet ttl50_P1  04:01:45 temp=57.1'C  load 100000 keys in 1 s, rss 234608 KiB
+   garnet     ttl50_P1          86696 ops/s  p50   666.5 p99   1229.5 us  srv 200% 23.06 us/req  cli  79%  err 0
+## garnet conn1000_P1  04:02:04 temp=57.1'C  load 100000 keys in 1 s, rss 234352 KiB
+   garnet     conn1000_P1       64066 ops/s  p50 20225.1 p99  23072.0 us  srv 165% 26.71 us/req  cli  67%  err 0
+## garnet keys10M_P1  04:02:36 temp=57.6'C  load 10000000 keys in 14 s, rss 869696 KiB
+   garnet     keys10M_P1        83627 ops/s  p50   765.6 p99   1072.8 us  srv 200% 23.94 us/req  cli  74%  err 0
+## garnet keys10M_P16  04:03:06 temp=59.3'C  load 10000000 keys in 13 s, rss 869424 KiB
+   garnet     keys10M_P16      960840 ops/s  p50   839.8 p99   1527.7 us  srv 199%  2.08 us/req  cli  62%  err 0
+## keydb mix90_P1  04:03:24 temp=57.1'C  load 100000 keys in 1 s, rss 28960 KiB
+   keydb      mix90_P1         151604 ops/s  p50   167.4 p99   8026.3 us  srv 185% 12.21 us/req  cli  87%  err 0
+## keydb mix90_P16  04:03:42 temp=56.0'C  load 100000 keys in 1 s, rss 29184 KiB
+   keydb      mix90_P16        636427 ops/s  p50   998.7 p99  10065.9 us  srv 194%  3.05 us/req  cli  31%  err 0
+## keydb mix50_P1  04:04:00 temp=56.0'C  load 100000 keys in 1 s, rss 29200 KiB
+   keydb      mix50_P1         147347 ops/s  p50   172.9 p99   7770.8 us  srv 185% 12.45 us/req  cli  85%  err 0
+## keydb mix50_P16  04:04:18 temp=55.4'C  load 100000 keys in 1 s, rss 29136 KiB
+   keydb      mix50_P16        609443 ops/s  p50  1029.1 p99  10420.9 us  srv 194%  3.19 us/req  cli  32%  err 0
+## keydb zipf90_P1  04:04:36 temp=56.0'C  load 100000 keys in 1 s, rss 29040 KiB
+   keydb      zipf90_P1        171297 ops/s  p50   162.8 p99   5558.7 us  srv 186% 10.90 us/req  cli  99%  err 0
+## keydb zipf90_P16  04:04:54 temp=55.4'C  load 100000 keys in 1 s, rss 29216 KiB
+   keydb      zipf90_P16       763249 ops/s  p50   814.9 p99   9813.3 us  srv 194%  2.53 us/req  cli  39%  err 0
+## keydb zipf50_P1  04:05:12 temp=56.5'C  load 100000 keys in 1 s, rss 29024 KiB
+   keydb      zipf50_P1        170869 ops/s  p50   163.6 p99   5381.7 us  srv 187% 10.91 us/req  cli  99%  err 0
+## keydb zipf50_P16  04:05:30 temp=57.1'C  load 100000 keys in 1 s, rss 28976 KiB
+   keydb      zipf50_P16       707482 ops/s  p50   828.2 p99  10566.4 us  srv 192%  2.71 us/req  cli  37%  err 0
+## keydb val1k_P1  04:05:48 temp=56.0'C  load 100000 keys in 1 s, rss 151264 KiB
+   keydb      val1k_P1         147050 ops/s  p50   189.6 p99   7646.2 us  srv 185% 12.62 us/req  cli  89%  err 0
+## keydb val16k_P1  04:06:07 temp=56.0'C  load 20000 keys in 2 s, rss 420560 KiB
+   keydb      val16k_P1         41881 ops/s  p50   843.7 p99  10738.6 us  srv 191% 45.72 us/req  cli  71%  err 0
+## keydb ttl50_P1  04:06:25 temp=55.4'C  load 100000 keys in 1 s, rss 29008 KiB
+   keydb      ttl50_P1         159917 ops/s  p50   185.7 p99   5431.7 us  srv 188% 11.74 us/req  cli  96%  err 0
+## keydb conn1000_P1  04:06:43 temp=57.1'C  load 100000 keys in 1 s, rss 29216 KiB
+   keydb      conn1000_P1      140742 ops/s  p50  6534.5 p99  15292.4 us  srv 195% 13.87 us/req  cli 116%  err 0
+## keydb keys10M_P1  04:07:22 temp=55.4'C  load 10000000 keys in 22 s, rss 1319376 KiB
+   keydb      keys10M_P1       147234 ops/s  p50   172.9 p99   8044.9 us  srv 185% 12.58 us/req  cli  85%  err 0
+## keydb keys10M_P16  04:08:00 temp=55.4'C  load 10000000 keys in 21 s, rss 1172880 KiB
+   keydb      keys10M_P16      530865 ops/s  p50  1305.6 p99   9813.3 us  srv 196%  3.70 us/req  cli  25%  err 0
+## restored: notrack=0 skb_defer_max=64
+## done 04:08:16 temp=54.3'C throttled=0x0

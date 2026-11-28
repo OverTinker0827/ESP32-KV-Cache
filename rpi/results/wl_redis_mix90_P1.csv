@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+redis,mix90_P1,1,176004,289.5,428.7,460.5,118,0,120,6.79,20272
+redis,mix90_P1,2,175900,287.5,427.7,456.3,118,0,120,6.81,20272
+redis,mix90_P1,3,175147,288.1,428.7,455.3,117,0,120,6.84,20272

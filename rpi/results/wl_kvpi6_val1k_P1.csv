@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+kvpi6,val1k_P1,1,361828,136.9,186.2,234.0,200,0,200,5.52,144880
+kvpi6,val1k_P1,2,362520,136.6,184.9,222.4,200,0,200,5.51,144880
+kvpi6,val1k_P1,3,360050,137.6,186.6,224.5,200,0,200,5.55,144880

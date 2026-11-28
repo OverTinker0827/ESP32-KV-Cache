@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+keydb,zipf50_P16,1,720444,828.2,9927.3,14202.5,39,0,193,2.67,28976
+keydb,zipf50_P16,2,707482,731.1,10566.4,17852.7,36,0,192,2.71,28976
+keydb,zipf50_P16,3,686962,830.1,10713.9,18958.0,37,0,192,2.79,28976

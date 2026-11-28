@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+redis,zipf90_P1,1,175812,290.8,428.7,453.2,118,0,118,6.70,20272
+redis,zipf90_P1,2,176039,290.1,428.7,455.3,118,0,119,6.74,20272
+redis,zipf90_P1,3,174511,290.1,431.7,857.4,117,0,118,6.79,20272

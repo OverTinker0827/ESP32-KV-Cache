@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+dragonfly,zipf50_P1,1,203257,241.7,439.7,500.5,126,0,200,9.83,26272
+dragonfly,zipf50_P1,2,204247,240.6,436.7,499.3,127,0,200,9.78,26272
+dragonfly,zipf50_P1,3,204338,248.5,483.4,1160.5,115,0,198,9.70,26272

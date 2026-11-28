@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+valkey,val1k_P1,1,166367,298.3,330.2,379.3,114,0,200,12.01,140512
+valkey,val1k_P1,2,165514,300.4,331.0,400.0,115,0,200,12.08,140512
+valkey,val1k_P1,3,166121,299.0,328.7,397.2,114,0,200,12.04,140512

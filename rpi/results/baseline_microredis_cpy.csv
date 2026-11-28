@@ -1,0 +1,9 @@
+tag,test,clients,pipeline,rep,n,rps,p50_ms,p99_ms,server_cpu_pct
+microredis_cpy,SET,1,1,1,2500,9960.16,0.055,0.063,66
+microredis_cpy,GET,1,1,1,2500,9920.63,0.047,0.063,54
+microredis_cpy,SET,50,1,1,10000,19960.08,2.215,2.735,92
+microredis_cpy,GET,50,1,1,10000,19960.08,2.047,2.231,94
+microredis_cpy,test,1,16,1,80000,rps,p50_latency_ms,p99_latency_ms,2
+microredis_cpy,test,1,16,1,80000,rps,p50_latency_ms,p99_latency_ms,0
+microredis_cpy,test,50,16,1,80000,rps,p50_latency_ms,p99_latency_ms,0
+microredis_cpy,test,50,16,1,80000,rps,p50_latency_ms,p99_latency_ms,2

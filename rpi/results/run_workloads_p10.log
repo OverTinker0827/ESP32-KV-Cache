@@ -1,0 +1,35 @@
+## os: notrack=2 skb_defer_max=0 nofile=65536
+## kvpi6 mix90_P1  04:18:05 temp=50.5'C  load 100000 keys in 2 s, rss 33728 KiB
+   kvpi6      mix90_P1         412136 ops/s  p50    96.7 p99    202.8 us  srv 199%  4.82 us/req  cli 200%  err 0
+## kvpi6 mix90_P16  04:18:22 temp=54.9'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi6      mix90_P16       3545079 ops/s  p50   213.9 p99    381.9 us  srv 200%  0.56 us/req  cli 155%  err 0
+## kvpi6 zipf50_P16  04:18:40 temp=53.8'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi6      zipf50_P16      3797418 ops/s  p50   205.1 p99    332.5 us  srv 200%  0.53 us/req  cli 186%  err 0
+## kvpi6 val1k_P1  04:18:58 temp=57.1'C  load 100000 keys in 2 s, rss 144880 KiB
+   kvpi6      val1k_P1         361828 ops/s  p50   136.9 p99    186.2 us  srv 200%  5.52 us/req  cli 200%  err 0
+## kvpi6 val16k_P1  04:19:16 temp=56.5'C  load 20000 keys in 2 s, rss 348720 KiB
+   kvpi6      val16k_P1         74600 ops/s  p50   668.1 p99    865.4 us  srv 200% 26.79 us/req  cli 165%  err 0
+## kvpi6 conn1000_P1  04:19:33 temp=56.0'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi6      conn1000_P1      234556 ops/s  p50  4261.6 p99   4381.4 us  srv 173%  7.36 us/req  cli 200%  err 0
+## kvpi6 keys10M_P1  04:19:59 temp=56.5'C  load 10000000 keys in 9 s, rss 698688 KiB
+   kvpi6      keys10M_P1       414337 ops/s  p50    91.4 p99    188.3 us  srv 200%  4.82 us/req  cli 200%  err 0
+## kvpi6 keys10M_P16  04:20:25 temp=56.0'C  load 10000000 keys in 9 s, rss 690512 KiB
+   kvpi6      keys10M_P16     3050997 ops/s  p50   245.1 p99    409.3 us  srv 200%  0.66 us/req  cli 132%  err 0
+## kvpi5 mix90_P1  04:20:43 temp=56.0'C  load 100000 keys in 2 s, rss 29616 KiB
+   kvpi5      mix90_P1         413000 ops/s  p50    96.9 p99    202.8 us  srv 199%  4.82 us/req  cli 200%  err 0
+## kvpi5 mix90_P16  04:21:00 temp=58.2'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi5      mix90_P16       3537679 ops/s  p50   218.9 p99    292.1 us  srv 200%  0.56 us/req  cli 153%  err 0
+## kvpi5 zipf50_P16  04:21:18 temp=58.7'C  load 100000 keys in 1 s, rss 29632 KiB
+   kvpi5      zipf50_P16      3820957 ops/s  p50   209.9 p99    322.7 us  srv 199%  0.52 us/req  cli 187%  err 0
+## kvpi5 val1k_P1  04:21:36 temp=59.8'C  load 100000 keys in 2 s, rss 136672 KiB
+   kvpi5      val1k_P1         360298 ops/s  p50   137.2 p99    189.2 us  srv 200%  5.54 us/req  cli 199%  err 0
+## kvpi5 val16k_P1  04:21:54 temp=59.8'C  load 20000 keys in 2 s, rss 454352 KiB
+   kvpi5      val16k_P1         55194 ops/s  p50   891.8 p99   1311.7 us  srv 199% 36.10 us/req  cli 140%  err 0
+## kvpi5 conn1000_P1  04:22:11 temp=57.6'C  load 100000 keys in 1 s, rss 33760 KiB
+   kvpi5      conn1000_P1      234108 ops/s  p50  4271.5 p99   4381.4 us  srv 173%  7.46 us/req  cli 200%  err 0
+## kvpi5 keys10M_P1  04:22:38 temp=58.2'C  load 10000000 keys in 11 s, rss 804176 KiB
+   kvpi5      keys10M_P1       412960 ops/s  p50    91.8 p99    190.5 us  srv 200%  4.84 us/req  cli 200%  err 0
+## kvpi5 keys10M_P16  04:23:06 temp=57.1'C  load 10000000 keys in 11 s, rss 808272 KiB
+   kvpi5      keys10M_P16     3053378 ops/s  p50   245.1 p99    352.3 us  srv 200%  0.65 us/req  cli 127%  err 0
+## restored: notrack=0 skb_defer_max=64
+## done 04:23:21 temp=58.2'C throttled=0x0

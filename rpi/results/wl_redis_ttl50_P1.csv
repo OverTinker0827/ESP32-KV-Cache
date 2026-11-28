@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+redis,ttl50_P1,1,166698,296.2,415.1,445.9,116,0,126,7.55,20272
+redis,ttl50_P1,2,166660,296.2,414.1,439.7,116,0,126,7.56,20272
+redis,ttl50_P1,3,166102,297.6,417.0,444.9,116,0,126,7.58,20272

@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+keydb,mix50_P16,1,610695,1029.1,10348.9,15831.6,32,0,194,3.18,29136
+keydb,mix50_P16,2,594095,1029.1,10689.1,14007.0,31,0,193,3.25,29136
+keydb,mix50_P16,3,609443,1026.7,10420.9,13405.4,32,0,194,3.19,29136

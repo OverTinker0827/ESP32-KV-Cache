@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+keydb,val1k_P1,1,147452,188.3,8063.5,10888.5,89,0,184,12.50,151264
+keydb,val1k_P1,2,142636,190.5,7488.8,10913.7,87,0,185,13.00,151264
+keydb,val1k_P1,3,147050,189.6,7646.2,10913.7,89,0,186,12.62,151264

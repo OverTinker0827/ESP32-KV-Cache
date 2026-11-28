@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+garnet,zipf90_P16,1,938934,847.6,1825.2,7183.8,67,0,199,2.12,235312
+garnet,zipf90_P16,2,934610,869.4,1787.7,6096.9,66,0,200,2.13,235312
+garnet,zipf90_P16,3,940113,867.4,1714.8,4097.5,67,0,200,2.13,235312

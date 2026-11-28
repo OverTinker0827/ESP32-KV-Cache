@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+kvpi5,zipf90_P16,1,3965609,196.3,327.2,361.3,184,0,200,0.50,33760
+kvpi5,zipf90_P16,2,3958003,198.2,273.8,310.2,186,0,200,0.50,33760
+kvpi5,zipf90_P16,3,3962794,190.5,360.5,387.3,183,0,200,0.50,33760

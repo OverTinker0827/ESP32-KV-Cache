@@ -1,0 +1,4 @@
+server,workload,rep,ops,p50_us,p99_us,p999_us,client_cpu_pct,errors,server_cpu_pct,server_us_per_req,rss_kb
+redis,keys10M_P16,1,1101960,785.3,1163.2,2160.6,58,0,169,1.53,1045840
+redis,keys10M_P16,2,1557108,502.8,677.4,746.4,82,0,197,1.26,1045840
+redis,keys10M_P16,3,1560185,501.6,675.8,756.8,81,0,197,1.26,1045840
